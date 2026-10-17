@@ -44,3 +44,6 @@ example
 
 .idea
 .claude
+
+public/content/story.json
+public/content/manifest.json
