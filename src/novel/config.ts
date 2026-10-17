@@ -1,0 +1,1 @@
+export const CONTENT_URL = process.env.EXPO_PUBLIC_CONTENT_URL ?? 'https://complewin.github.io/windturbine/content'

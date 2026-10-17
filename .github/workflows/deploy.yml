@@ -29,7 +29,13 @@ jobs:
 
       - run: npm run story
 
+      - id: pages
+        uses: actions/configure-pages@v6
+
       - run: npx expo export -p web
+        env:
+          EXPO_PUBLIC_CONTENT_URL: ${{ steps.pages.outputs.base_url }}/content
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
 
       - uses: actions/upload-pages-artifact@v5
         with:
