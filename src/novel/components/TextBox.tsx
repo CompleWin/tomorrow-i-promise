@@ -1,4 +1,7 @@
 import { StyleSheet, View, Text } from 'react-native'
+import { Image } from 'expo-image'
+import { useStageSize } from '@/novel/components/Stage'
+import { CONTENT_URL } from '@/novel/config'
 
 type Props = {
   speaker: string | null
@@ -6,35 +9,61 @@ type Props = {
 }
 
 export function TextBox ({ speaker, text }: Props) {
+  const { w } = useStageSize()
+
+  const speakerFontSize = w * 0.02
+  const textFontSize = w * 0.018
+
   return (
-    <View style={styles.box}>
-      {speaker && <Text style={styles.speaker}>{speaker}</Text>}
-      <Text style={styles.text}>{text}</Text>
+    <View style={StyleSheet.absoluteFill}>
+      <Image
+        source={`${CONTENT_URL}/assets/text_box.png`}
+        style={StyleSheet.absoluteFill}
+      />
+      <View style={styles.plate}>
+        {speaker ?
+          <Text style={[styles.speaker, { fontSize: speakerFontSize }]}>
+            {speaker}
+          </Text>
+          : 
+          null}
+      </View>
+      <View style={styles.window}>
+        <Text style={[
+          styles.text,
+          {
+            fontSize: textFontSize,
+            lineHeight: textFontSize * 1.4,
+          }]}>{text}</Text>
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  box: {
+  plate: {
     position: 'absolute',
-    bottom: 16,
-    left: 16,
-    right: 16,
-    maxWidth: 900,
-    alignSelf: 'center',
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
+    left: '73.6%',
+    right: '5.9%',
+    top: '72.1%',
+    height: '6.2%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  window: {
+    position: 'absolute',
+    left: '2.9%',
+    right: '2.9%',
+    top: '76.3%',
+    bottom: '2%',
+    padding: '1.5%',
   },
   speaker: {
-    color: '#ffd27f',
+    color: '#fff',
     fontWeight: 'bold',
-    fontSize: 18,
-    marginBottom: 6,
   },
   text: {
     color: '#fff',
-    fontSize: 18,
-    lineHeight: 26,
-  }
+  },
+
 })

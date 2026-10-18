@@ -4,6 +4,7 @@ import { Background } from '@/novel/components/Background'
 import { ChoiceList } from '@/novel/components/ChoiceList'
 import { TextBox } from '@/novel/components/TextBox'
 import End from '@/novel/components/End'
+import { Stage } from '@/novel/components/Stage'
 
 export default function Play () {
   const novel = useNovel()
@@ -16,10 +17,12 @@ export default function Play () {
   }
   return (
     <Pressable onPress={novel.next} style={styles.screen}>
-      <Background name={novel.bg} />
-      {novel.choices.length > 0 && <ChoiceList choices={novel.choices} onChoose={novel.choose}/>}
-      {novel.text !== '' && <TextBox speaker={novel.speaker} text={novel.text}/>}
-      {novel.ended && <End/>}
+      <Stage>
+        <Background name={novel.bg} />
+        {novel.choices.length > 0 && <ChoiceList choices={novel.choices} onChoose={novel.choose}/>}
+        {novel.text !== '' && <TextBox speaker={novel.speaker} text={novel.text}/>}
+        {novel.ended && <End/>}
+      </Stage>
     </Pressable>
   )
 }
