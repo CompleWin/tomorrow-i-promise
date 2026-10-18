@@ -8,7 +8,7 @@ type Props = {
   onChoose: (index: number) => void
 }
 
-export function ChoiceList ({ choices, onChoose }: Props) {
+export default function ChoiceList ({ choices, onChoose }: Props) {
   return (
     <View style={styles.list}>
       {choices.map((choice) => (

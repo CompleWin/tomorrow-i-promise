@@ -3,7 +3,8 @@ import fs from 'node:fs'
 import crypto from 'node:crypto'
 
 const BOM = /^\uFEFF/
-const BG_DIR = 'public/content/assets/bg'
+const ASSETS_DIR = 'public/content/assets'
+const BG_DIR = `${ASSETS_DIR}/bg`
 
 const textFile = fs.readFileSync('story/main.ink', 'utf8')
 const text = textFile.replace(BOM, '')
@@ -27,6 +28,14 @@ const backgrounds = [...text.matchAll(/#\s*bg:\s*(\S+)/g)].map(bg => bg[1])
 for (const bg of backgrounds) {
   if (!fs.existsSync(`${BG_DIR}/${bg}`)) {
     console.error(`bg does not exist: ${bg}`)
+    process.exit(1)
+  }
+}
+
+const sprites = [...text.matchAll(/#\s*sprite:\s*(\S+)/g)].map(spr => spr[1])
+for (const sprite of sprites) {
+  if (!fs.existsSync(`${ASSETS_DIR}/${sprite}`)) {
+    console.error(`asset does not exist: ${sprite}`)
     process.exit(1)
   }
 }

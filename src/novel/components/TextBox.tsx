@@ -1,31 +1,25 @@
 import { StyleSheet, View, Text } from 'react-native'
-import { Image } from 'expo-image'
 import { useStageSize } from '@/novel/components/Stage'
-import { CONTENT_URL } from '@/novel/config'
 
 type Props = {
   speaker: string | null
   text: string
 }
 
-export function TextBox ({ speaker, text }: Props) {
+export default function TextBox ({ speaker, text }: Props) {
   const { w } = useStageSize()
 
-  const speakerFontSize = w * 0.02
-  const textFontSize = w * 0.018
+  const speakerFontSize = w * 0.018
+  const textFontSize = w * 0.026
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      <Image
-        source={`${CONTENT_URL}/assets/text_box.png`}
-        style={StyleSheet.absoluteFill}
-      />
       <View style={styles.plate}>
         {speaker ?
           <Text style={[styles.speaker, { fontSize: speakerFontSize }]}>
             {speaker}
           </Text>
-          : 
+          :
           null}
       </View>
       <View style={styles.window}>
@@ -52,7 +46,8 @@ const styles = StyleSheet.create({
   },
   window: {
     position: 'absolute',
-    left: '2.9%',
+    justifyContent: 'center',
+    left: '10%',
     right: '2.9%',
     top: '76.3%',
     bottom: '2%',
@@ -64,6 +59,7 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#fff',
+    textAlign: 'center',
   },
 
 })

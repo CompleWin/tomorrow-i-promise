@@ -6,6 +6,7 @@ type Line = {
   text: string
   speaker: string | null
   bg: string | null
+  sprite: string | null
   choices: { index: number; text: string }[]
   ended: boolean
 }
@@ -14,6 +15,7 @@ const EMPTY: Line = {
   text: '',
   speaker: null,
   bg: null,
+  sprite: null,
   choices: [],
   ended: false,
 }
@@ -32,7 +34,7 @@ function parseTags (tags: string[] | null): Record<string, string> {
   return result
 }
 
-export function useNovel () {
+export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
@@ -58,6 +60,7 @@ export function useNovel () {
       text,
       speaker: tags.speaker ?? null,
       bg: tags.bg ?? prev.bg,
+      sprite: tags.sprite ?? null,
       choices,
       ended: !story.canContinue && choices.length === 0,
     }))
