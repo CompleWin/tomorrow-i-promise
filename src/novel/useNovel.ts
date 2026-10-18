@@ -18,7 +18,7 @@ const EMPTY: Line = {
   ended: false,
 }
 
-function parseTags(tags: string[] | null): Record<string, string> {
+function parseTags (tags: string[] | null): Record<string, string> {
   const result: Record<string, string> = {}
   for (const tag of tags ?? []) {
     const colon = tag.indexOf(':')
@@ -32,7 +32,7 @@ function parseTags(tags: string[] | null): Record<string, string> {
   return result
 }
 
-export function useNovel() {
+export function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
@@ -51,21 +51,22 @@ export function useNovel() {
       tags = parseTags(story.currentTags)
     }
 
-    const choices = story.currentChoices.map(c => ({ index: c.index, text: c.text}))
+    const choices = story.currentChoices.map(
+      c => ({ index: c.index, text: c.text }))
 
     setLine(prev => ({
       text,
       speaker: tags.speaker ?? null,
       bg: tags.bg ?? prev.bg,
       choices,
-      ended: !story.canContinue && choices.length === 0
+      ended: !story.canContinue && choices.length === 0,
     }))
   }, [])
 
   useEffect(() => {
     let cancelled = false
 
-    async function load() {
+    async function load () {
       try {
         const result = await fetch(`${CONTENT_URL}/story.json`)
         if (!result.ok) {
