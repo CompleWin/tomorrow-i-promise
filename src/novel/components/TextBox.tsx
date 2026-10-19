@@ -4,9 +4,10 @@ import { useStageSize } from '@/novel/components/Stage'
 type Props = {
   speaker: string | null
   text: string
+  isSprite: boolean
 }
 
-export default function TextBox ({ speaker, text }: Props) {
+export default function TextBox ({ speaker, text, isSprite }: Props) {
   const { w } = useStageSize()
 
   const speakerFontSize = w * 0.018
@@ -22,7 +23,7 @@ export default function TextBox ({ speaker, text }: Props) {
           :
           null}
       </View>
-      <View style={styles.window}>
+      <View style={[styles.window, isSprite ? { left: '30%' } : { left: '2.9%' }]}>
         <Text style={[
           styles.text,
           {
@@ -47,7 +48,7 @@ const styles = StyleSheet.create({
   window: {
     position: 'absolute',
     justifyContent: 'center',
-    left: '10%',
+    // left: '10%',
     right: '2.9%',
     top: '76.3%',
     bottom: '2%',

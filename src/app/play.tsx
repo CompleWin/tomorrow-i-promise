@@ -17,13 +17,15 @@ export default function Play () {
   if (novel.error) {
     return <Text>Ошибка: {novel.error}</Text>
   }
+
+  const isSprite = novel.sprite !== null
   return (
     <Pressable onPress={novel.next} style={styles.screen}>
       <Stage>
         <Background name={novel.bg} />
         <TextBoxFrame/>
         <Sprite name={novel.sprite}/>
-        {novel.text !== '' && <TextBox speaker={novel.speaker} text={novel.text}/>}
+        {novel.text !== '' && <TextBox speaker={novel.speaker} text={novel.text} isSprite={isSprite}/>}
         {novel.choices.length > 0 && <ChoiceList choices={novel.choices} onChoose={novel.choose}/>}
         {novel.ended && <End/>}
       </Stage>
