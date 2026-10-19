@@ -1,6 +1,7 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { CONTENT_URL } from '@/novel/config'
+import { clearSave, loadSave, writeSave } from '@/novel/storage'
 
 type Line = {
   text: string
@@ -36,9 +37,42 @@ function parseTags (tags: string[] | null): Record<string, string> {
 
 export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
+  const bgRef = useRef<string | null>(null)
+
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const show = useCallback((story: Story) => {
+    const text = (story.currentText ?? '').trim()
+    const tags = parseTags(story.currentTags)
+    const choices = story.currentChoices.map(
+      c => ({ index: c.index, text: c.text }))
+
+    bgRef.current = tags.bg ?? bgRef.current
+
+    setLine({
+      text: text,
+      speaker: tags.speaker ?? null,
+      bg: bgRef.current,
+      sprite: tags.sprite ?? null,
+      choices: choices,
+      ended: !story.canContinue && choices.length === 0
+    })
+
+    const fc = story.variablesState['final_choice']
+    const finalChoice = fc === 'A' || fc === 'B' ? fc : null
+    const voteStatus = finalChoice !== null ? 'pending' : 'none'
+
+    writeSave({
+      schema: 1,
+      inkState: story.state.ToJson(),
+      contentVersion: null,
+      currentBg: bgRef.current,
+      finalChoice: finalChoice,
+      voteStatus: voteStatus
+    })
+  }, [])
 
   const step = useCallback(() => {
     const story = storyRef.current
@@ -46,25 +80,12 @@ export default function useNovel () {
       return
     }
 
-    let text = ''
-    let tags: Record<string, string> = {}
     if (story.canContinue) {
-      text = (story.Continue() ?? '').trim()
-      tags = parseTags(story.currentTags)
+      story.Continue()
     }
 
-    const choices = story.currentChoices.map(
-      c => ({ index: c.index, text: c.text }))
-
-    setLine(prev => ({
-      text,
-      speaker: tags.speaker ?? null,
-      bg: tags.bg ?? prev.bg,
-      sprite: tags.sprite ?? null,
-      choices,
-      ended: !story.canContinue && choices.length === 0,
-    }))
-  }, [])
+    show(story)
+  }, [show])
 
   useEffect(() => {
     let cancelled = false
@@ -80,8 +101,28 @@ export default function useNovel () {
         if (cancelled) {
           return
         }
+
         storyRef.current = new Story(json)
+        const save = await loadSave()
+        if (cancelled) {
+          return
+        }
+
+        if (save) {
+          try {
+            storyRef.current.state.LoadJson(save.inkState)
+            bgRef.current = save.currentBg
+            show(storyRef.current)
+            return
+          } catch (error) {
+            console.warn('save is broken', error)
+            await clearSave()
+            storyRef.current = new Story(json)
+          }
+        }
+
         step()
+
       } catch (error) {
         if (!cancelled) {
           setError(String(error))
@@ -95,7 +136,7 @@ export default function useNovel () {
 
     load()
     return () => { cancelled = true }
-  }, [step])
+  }, [step, show])
 
   const next = useCallback(() => {
     if (line.choices.length > 0) {
