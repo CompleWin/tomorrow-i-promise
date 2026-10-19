@@ -1,15 +1,20 @@
 import { Image } from 'expo-image'
-import { CONTENT_URL } from '@/novel/config'
+import { assetUrl } from '@/novel/config'
 import { StyleSheet } from 'react-native'
 
-export default function Sprite({ name }: { name: string | null }) {
+type Props = {
+  name: string | null
+  version: string | null
+}
+
+export default function Sprite({ name, version }: Props) {
   if (!name) {
     return null
   }
 
   return (
     <Image
-      source={`${CONTENT_URL}/assets/${name}`}
+      source={assetUrl(name, version)}
       style={styles.sprite}
       contentFit={'contain'}
     />

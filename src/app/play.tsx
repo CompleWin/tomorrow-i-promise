@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, Text } from 'react-native'
 import useNovel from '@/novel/useNovel'
-import Background  from '@/novel/components/Background'
+import Background from '@/novel/components/Background'
 import ChoiceList from '@/novel/components/ChoiceList'
 import TextBox from '@/novel/components/TextBox'
 import End from '@/novel/components/End'
@@ -22,12 +22,35 @@ export default function Play () {
   return (
     <Pressable onPress={novel.next} style={styles.screen}>
       <Stage>
-        <Background name={novel.bg} />
-        <TextBoxFrame/>
-        <Sprite name={novel.sprite}/>
-        {novel.text !== '' && <TextBox speaker={novel.speaker} text={novel.text} isSprite={isSprite}/>}
-        {novel.choices.length > 0 && <ChoiceList choices={novel.choices} onChoose={novel.choose}/>}
-        {novel.ended && <End/>}
+        <Background name={novel.bg}
+                    version={novel.version}
+        />
+
+        <TextBoxFrame version={novel.version} />
+
+        <Sprite name={novel.sprite}
+                version={novel.version}
+        />
+
+        {novel.text !== '' && (
+          <TextBox speaker={novel.speaker}
+                   text={novel.text}
+                   isSprite={isSprite}
+          />
+        )}
+
+        {novel.choices.length > 0 && (
+          <ChoiceList choices={novel.choices} onChoose={novel.choose} />
+        )}
+
+        {novel.ended && <End />}
+
+        {novel.notice !== null && (
+          <Text style={styles.notice}>
+            {novel.notice}
+          </Text>
+        )}
+
       </Stage>
     </Pressable>
   )
@@ -36,6 +59,14 @@ export default function Play () {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#000'
+    backgroundColor: '#000',
+  },
+  notice: {
+    position: 'absolute',
+    top: '4%',
+    alignSelf: 'center',
+    color: '#fff',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 8
   }
 })

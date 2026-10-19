@@ -1,11 +1,18 @@
 import { Image } from 'expo-image'
-import { CONTENT_URL } from '@/novel/config'
+import { assetUrl } from '@/novel/config'
 import { StyleSheet } from 'react-native'
 
-export default function TextBoxFrame () {
+type Props = {
+  version: string | null
+}
+
+export default function TextBoxFrame ({ version }: Props) {
+
+  const textBoxFramePath = 'text_box.png'
+
   return (
     <Image
-      source={`${CONTENT_URL}/assets/text_box.png`}
+      source={assetUrl(textBoxFramePath, version)}
       style={StyleSheet.absoluteFill}
     />
   )

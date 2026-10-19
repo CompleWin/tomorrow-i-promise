@@ -1,7 +1,7 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { CONTENT_URL } from '@/novel/config'
 import { clearSave, loadSave, writeSave } from '@/novel/storage'
+import { getStory } from '@/novel/content'
 
 type Line = {
   text: string
@@ -38,10 +38,13 @@ function parseTags (tags: string[] | null): Record<string, string> {
 export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const bgRef = useRef<string | null>(null)
+  const versionRef = useRef<string | null>(null)
 
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
+  const [version, setVersion] = useState<string | null>(null)
 
   const show = useCallback((story: Story) => {
     const text = (story.currentText ?? '').trim()
@@ -57,7 +60,7 @@ export default function useNovel () {
       bg: bgRef.current,
       sprite: tags.sprite ?? null,
       choices: choices,
-      ended: !story.canContinue && choices.length === 0
+      ended: !story.canContinue && choices.length === 0,
     })
 
     const fc = story.variablesState['final_choice']
@@ -67,10 +70,10 @@ export default function useNovel () {
     writeSave({
       schema: 1,
       inkState: story.state.ToJson(),
-      contentVersion: null,
+      contentVersion: versionRef.current,
       currentBg: bgRef.current,
       finalChoice: finalChoice,
-      voteStatus: voteStatus
+      voteStatus: voteStatus,
     })
   }, [])
 
@@ -92,17 +95,15 @@ export default function useNovel () {
 
     async function load () {
       try {
-        const result = await fetch(`${CONTENT_URL}/story.json`)
-        if (!result.ok) {
-          throw new Error(`HTTP ${result.status}`)
-        }
-        const json = await result.text()
-
+        const loaded = await getStory()
         if (cancelled) {
           return
         }
 
-        storyRef.current = new Story(json)
+        versionRef.current = loaded.version
+        setVersion(loaded.version)
+        storyRef.current = new Story(loaded.json)
+
         const save = await loadSave()
         if (cancelled) {
           return
@@ -115,14 +116,19 @@ export default function useNovel () {
             show(storyRef.current)
             return
           } catch (error) {
-            console.warn('save is broken', error)
+            console.warn('save does not fit the story', error)
             await clearSave()
-            storyRef.current = new Story(json)
+            storyRef.current = new Story(loaded.json)
+
+            if (save.contentVersion !== loaded.version) {
+              setNotice('История обновилась, начинаем сначала')
+            } else {
+              setNotice('Сохранение повреждено, начинаем сначала')
+            }
           }
         }
 
         step()
-
       } catch (error) {
         if (!cancelled) {
           setError(String(error))
@@ -139,6 +145,8 @@ export default function useNovel () {
   }, [step, show])
 
   const next = useCallback(() => {
+    setNotice(null)
+
     if (line.choices.length > 0) {
       return
     }
@@ -150,7 +158,7 @@ export default function useNovel () {
     step()
   }, [step])
 
-  return { ...line, loading, error, next, choose }
+  return { ...line, loading, error, notice, version, next, choose }
 
 }
 

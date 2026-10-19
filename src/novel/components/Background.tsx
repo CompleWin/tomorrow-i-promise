@@ -1,15 +1,20 @@
 import { Image } from 'expo-image'
 import { StyleSheet } from 'react-native'
-import { CONTENT_URL } from '@/novel/config'
+import { assetUrl } from '@/novel/config'
 
-export default function Background ({ name }: { name: string | null }) {
+type Props = {
+  name: string | null
+  version: string | null
+}
+
+export default function Background ({ name, version }: Props) {
   if (!name) {
     return null
   }
 
   return (
     <Image
-      source={`${CONTENT_URL}/assets/bg/${name}`}
+      source={assetUrl(`bg/${name}`, version)}
       style={StyleSheet.absoluteFill}
       contentFit={'cover'}
       transition={300}

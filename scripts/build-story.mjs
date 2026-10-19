@@ -11,7 +11,7 @@ const text = textFile.replace(BOM, '')
 
 const compiler = new Compiler(text)
 
-let story;
+let story
 try {
   story = compiler.Compile()
 } catch (error) {
@@ -46,19 +46,25 @@ fs.writeFileSync('public/content/story.json', json)
 const hash = crypto.createHash('sha256')
 hash.update(json)
 
-for (const name of fs.readdirSync(BG_DIR).sort()) {
+const assetFiles = fs.readdirSync(ASSETS_DIR, { recursive: true })
+  .map(name => name.replaceAll('\\', '/'))
+  .filter(name => fs.statSync(`${ASSETS_DIR}/${name}`).isFile())
+  .sort()
+
+for (const name of assetFiles) {
   hash.update(name)
-  hash.update(fs.readFileSync(`${BG_DIR}/${name}`))
+  hash.update(fs.readFileSync(`${ASSETS_DIR}/${name}`))
 }
 
 const version = hash.digest('hex').slice(0, 8)
 
 const manifestJson = {
-  "version": version,
-  "story": "story.json",
+  'version': version,
+  'story': 'story.json',
 }
 
-fs.writeFileSync('public/content/manifest.json', JSON.stringify(manifestJson, null, 2), 'utf8')
+fs.writeFileSync('public/content/manifest.json',
+  JSON.stringify(manifestJson, null, 2), 'utf8')
 
 console.log(`story built, version: ${version}`)
 
