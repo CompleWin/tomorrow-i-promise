@@ -51,6 +51,13 @@ export default function Play () {
           </Text>
         )}
 
+        {novel.updateAvailable && (
+          <Pressable style={styles.banner} onPress={novel.update}>
+            <Text style={styles.bannerText}>Доступна новая версия истории.
+              Обновить</Text>
+          </Pressable>
+        )}
+
       </Stage>
     </Pressable>
   )
@@ -67,6 +74,16 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     color: '#fff',
     backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 8
-  }
+    padding: 8,
+  },
+  banner: {
+    position: 'absolute',
+    top: '4%',
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 8,
+  },
+  bannerText: {
+    color: '#fff',
+  },
 })

@@ -1,7 +1,8 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { clearSave, loadSave, writeSave } from '@/novel/storage'
-import { getStory } from '@/novel/content'
+import { fetchManifest, getStory } from '@/novel/content'
+import { AppState } from 'react-native'
 
 type Line = {
   text: string
@@ -45,6 +46,27 @@ export default function useNovel () {
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [version, setVersion] = useState<string | null>(null)
+
+  const [updateAvailable, setUpdateAvailable] = useState(false)
+  const [reloadKey, setReloadKey] = useState(0)
+
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', async state => {
+      if (state !== 'active') {
+        return
+      }
+      try {
+        const manifest = await fetchManifest()
+        if (versionRef.current !== null && versionRef.current !== manifest.version) {
+          setUpdateAvailable(true)
+        }
+      } catch (error) {
+        console.warn('update check failed', error)
+      }
+    })
+
+    return () => subscription.remove()
+  }, [])
 
   const show = useCallback((story: Story) => {
     const text = (story.currentText ?? '').trim()
@@ -142,7 +164,7 @@ export default function useNovel () {
 
     load()
     return () => { cancelled = true }
-  }, [step, show])
+  }, [step, show, reloadKey])
 
   const next = useCallback(() => {
     setNotice(null)
@@ -158,7 +180,14 @@ export default function useNovel () {
     step()
   }, [step])
 
-  return { ...line, loading, error, notice, version, next, choose }
+  const update = useCallback(() => {
+    setUpdateAvailable(false)
+    setError(null)
+    setLoading(true)
+    setReloadKey(k => k + 1)
+  }, [])
+
+  return { ...line, loading, error, notice, version, updateAvailable, next, choose, update }
 
 }
 
