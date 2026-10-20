@@ -1,8 +1,9 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { clearSave, loadSave, writeSave } from '@/novel/storage'
+import { clearSave, loadSave, VoteStatus, writeSave } from '@/novel/storage'
 import { fetchManifest, getStory } from '@/novel/content'
 import { AppState } from 'react-native'
+import { Choice, submitVote } from '@/novel/vote'
 
 type Line = {
   text: string
@@ -20,6 +21,16 @@ const EMPTY: Line = {
   sprite: null,
   choices: [],
   ended: false,
+}
+
+type Vote = {
+  finalChoice: Choice | null
+  voteStatus: VoteStatus
+}
+
+const NO_VOTE: Vote = {
+  finalChoice: null,
+  voteStatus: 'none',
 }
 
 function parseTags (tags: string[] | null): Record<string, string> {
@@ -50,6 +61,9 @@ export default function useNovel () {
   const [updateAvailable, setUpdateAvailable] = useState(false)
   const [reloadKey, setReloadKey] = useState(0)
 
+  const voteRef = useRef<Vote>(NO_VOTE)
+  const [vote, setVote] = useState<Vote>(NO_VOTE)
+
   useEffect(() => {
     const subscription = AppState.addEventListener('change', async state => {
       if (state !== 'active') {
@@ -57,7 +71,8 @@ export default function useNovel () {
       }
       try {
         const manifest = await fetchManifest()
-        if (versionRef.current !== null && versionRef.current !== manifest.version) {
+        if (versionRef.current !== null && versionRef.current !==
+          manifest.version) {
           setUpdateAvailable(true)
         }
       } catch (error) {
@@ -66,6 +81,17 @@ export default function useNovel () {
     })
 
     return () => subscription.remove()
+  }, [])
+
+  const persist = useCallback((story: Story) => {
+    writeSave({
+      schema: 1,
+      inkState: story.state.ToJson(),
+      contentVersion: versionRef.current,
+      currentBg: bgRef.current,
+      finalChoice: voteRef.current.finalChoice,
+      voteStatus: voteRef.current.voteStatus,
+    })
   }, [])
 
   const show = useCallback((story: Story) => {
@@ -86,18 +112,12 @@ export default function useNovel () {
     })
 
     const fc = story.variablesState['final_choice']
-    const finalChoice = fc === 'A' || fc === 'B' ? fc : null
-    const voteStatus = finalChoice !== null ? 'pending' : 'none'
-
-    writeSave({
-      schema: 1,
-      inkState: story.state.ToJson(),
-      contentVersion: versionRef.current,
-      currentBg: bgRef.current,
-      finalChoice: finalChoice,
-      voteStatus: voteStatus,
-    })
-  }, [])
+    if ((fc === 'A' || fc === 'B') && voteRef.current.voteStatus === 'none') {
+      voteRef.current = { finalChoice: fc, voteStatus: 'pending' }
+    }
+    setVote(voteRef.current)
+    persist(story)
+  }, [persist])
 
   const step = useCallback(() => {
     const story = storyRef.current
@@ -126,6 +146,8 @@ export default function useNovel () {
         setVersion(loaded.version)
         storyRef.current = new Story(loaded.json)
 
+        voteRef.current = NO_VOTE
+
         const save = await loadSave()
         if (cancelled) {
           return
@@ -135,6 +157,10 @@ export default function useNovel () {
           try {
             storyRef.current.state.LoadJson(save.inkState)
             bgRef.current = save.currentBg
+            voteRef.current = {
+              finalChoice: save.finalChoice,
+              voteStatus: save.voteStatus,
+            }
             show(storyRef.current)
             return
           } catch (error) {
@@ -166,6 +192,28 @@ export default function useNovel () {
     return () => { cancelled = true }
   }, [step, show, reloadKey])
 
+  useEffect(() => {
+    const { finalChoice, voteStatus } = vote
+    const version = versionRef.current
+    if (voteStatus !== 'pending' || finalChoice === null || version === null) {
+      return
+    }
+
+    let cancelled = false
+    submitVote(finalChoice, version).then(() => {
+      if (cancelled) {
+        return
+      }
+      voteRef.current = { finalChoice: finalChoice, voteStatus: 'sent' }
+      setVote(voteRef.current)
+      if (storyRef.current !== null) {
+        persist(storyRef.current)
+      }
+    }).catch(error => console.warn('vote failed', error))
+
+    return () => {cancelled = true}
+  }, [vote, persist])
+
   const next = useCallback(() => {
     setNotice(null)
 
@@ -187,7 +235,19 @@ export default function useNovel () {
     setReloadKey(k => k + 1)
   }, [])
 
-  return { ...line, loading, error, notice, version, updateAvailable, next, choose, update }
+  return {
+    ...line,
+    loading,
+    error,
+    notice,
+    version,
+    updateAvailable,
+    finalChoice: vote.finalChoice,
+    voteStatus: vote.voteStatus,
+    next,
+    choose,
+    update,
+  }
 
 }
 

@@ -36,6 +36,11 @@ jobs:
         env:
           EXPO_PUBLIC_CONTENT_URL: ${{ steps.pages.outputs.base_url }}/content
           BASE_PATH: ${{ steps.pages.outputs.base_path }}
+          EXPO_PUBLIC_FIREBASE_API_KEY: ${{ vars.EXPO_PUBLIC_FIREBASE_API_KEY }}
+          EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ vars.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+          EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
+          EXPO_PUBLIC_FIREBASE_APP_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_APP_ID }}
+
 
       - uses: actions/upload-pages-artifact@v5
         with:

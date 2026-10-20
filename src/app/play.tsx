@@ -43,7 +43,8 @@ export default function Play () {
           <ChoiceList choices={novel.choices} onChoose={novel.choose} />
         )}
 
-        {novel.ended && <End />}
+        {novel.ended && <End finalChoice={novel.finalChoice}
+                             voteStatus={novel.voteStatus} />}
 
         {novel.notice !== null && (
           <Text style={styles.notice}>
