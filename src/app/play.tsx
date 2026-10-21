@@ -2,12 +2,15 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { router } from 'expo-router'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { LinearGradient } from 'expo-linear-gradient'
 import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
+import sleep from '@/novel/sleep'
+import { clearSave } from '@/novel/storage'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
-import ChoiceList from '@/novel/components/ChoiceList'
+import BottomGradient from '@/novel/components/BottomGradient'
+import ChoicePlates from '@/novel/components/ChoicePlates'
+import Credits from '@/novel/components/Credits'
 import End from '@/novel/components/End'
 import { useFade } from '@/novel/components/Fade'
 import MenuItem from '@/novel/components/MenuItem'
@@ -19,11 +22,9 @@ import Subtitles from '@/novel/components/Subtitles'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
 
-const GRADIENT_H = 470
-const GRADIENT_OVERSCAN = 40
-const GRADIENT_K = GRADIENT_H / (GRADIENT_H + GRADIENT_OVERSCAN)
-const GRADIENT_COLORS = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)', 'rgba(4,3,2,.94)'] as const
-const GRADIENT_LOCATIONS = [0, 0.52 * GRADIENT_K, GRADIENT_K, 1] as const
+const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
+
+type Phase = 'play' | 'choice' | 'credits' | 'result'
 
 const SHAKE = {
   offsets: [0, 0.1, 0.22, 0.36, 0.52, 0.7, 1],
@@ -41,8 +42,12 @@ export default function Play () {
   const [leaving, setLeaving] = useState(false)
   const [updating, setUpdating] = useState(false)
   const [slowLoad, setSlowLoad] = useState(false)
+  const [stagePhase, setStagePhase] = useState<Phase>('play')
+  const phase: Phase = novel.ended && stagePhase !== 'credits' ? 'result' : stagePhase
   const ready = readyLine === novel.lineId
   const busy = leaving || updating
+  const hasChoices = novel.choices.length > 0
+  const alive = useRef(true)
   const typing = useTypewriter(novel.text, { key: novel.lineId, paused: !ready || paused || busy })
   const veiling = novel.fx === 'toBlack' && !ready
 
@@ -109,18 +114,31 @@ export default function Play () {
 
   useEffect(() => {
     const lineId = novel.lineId
-    if (lineId === 0) {
+    if (lineId === 0 || novel.ended) {
       return
     }
     const timer = setTimeout(() => finishLine(lineId), startLine())
     return () => clearTimeout(timer)
-  }, [novel.lineId])
+  }, [novel.lineId, novel.ended])
 
   useEffect(() => {
     if (!fade.isBlack()) {
       fade.set(1)
     }
   }, [fade])
+
+  useEffect(() => {
+    alive.current = true
+    return () => { alive.current = false }
+  }, [])
+
+  useEffect(() => {
+    if (!ready || !typing.done || !hasChoices) {
+      return
+    }
+    const timer = setTimeout(() => setStagePhase('choice'), 500)
+    return () => clearTimeout(timer)
+  }, [ready, typing.done, hasChoices])
 
   useEffect(() => {
     if (!novel.loading) {
@@ -172,6 +190,7 @@ export default function Play () {
         return
       }
       reveal.current = true
+      setStagePhase('play')
       setUpdating(false)
       reload()
     })
@@ -182,7 +201,7 @@ export default function Play () {
     if (novel.loading || novel.error !== null) {
       return false
     }
-    if (!busy) {
+    if (!busy && phase !== 'credits') {
       setPaused(p => !p)
     }
     return true
@@ -197,6 +216,9 @@ export default function Play () {
     setPaused(false)
     setLeaving(true)
     await fade.to(1, 600)
+    if (phase === 'result' && novel.voteStatus !== 'pending') {
+      await clearSave()
+    }
     if (router.canGoBack()) {
       router.back()
     } else {
@@ -205,17 +227,30 @@ export default function Play () {
   }
 
   const tap = () => {
-    if (!ready || novel.ended || paused || busy) {
+    if (phase !== 'play' || !ready || paused || busy) {
       return
     }
     if (!typing.done) {
       typing.finish()
       return
     }
-    if (novel.choices.length > 0) {
+    if (hasChoices) {
       return
     }
     novel.next()
+  }
+
+  async function pick (index: number) {
+    await sleep(1100)
+    if (!alive.current) {
+      return
+    }
+    await fade.to(1, 1500)
+    if (!alive.current) {
+      return
+    }
+    novel.choose(index)
+    setStagePhase('credits')
   }
 
   if (novel.loading) {
@@ -241,43 +276,49 @@ export default function Play () {
   return (
     <Pressable onPress={tap} style={styles.screen}>
       <Stage>
-        <Animated.View style={[StyleSheet.absoluteFill, cameraStyle]}>
-          <Background name={novel.bg}
-                      fx={novel.fx}
-                      instant={novel.resumed}
-                      version={novel.version}
+        {(phase === 'play' || phase === 'choice') && (
+          <Animated.View style={[StyleSheet.absoluteFill, cameraStyle]}>
+            <Background name={novel.bg}
+                        fx={novel.fx}
+                        instant={novel.resumed}
+                        version={novel.version}
+            />
+
+            <Sprite name={novel.sprite}
+                    version={novel.version}
+                    hidden={novel.dark || veiling}
+                    instant={novel.resumed}
+            />
+
+            <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
+
+            <BottomGradient height={470} colors={GRADIENT} middle={0.52} />
+
+            <Subtitles speaker={veiling ? null : novel.speaker}
+                       text={veiling ? '' : novel.text}
+                       shown={typing.shown}
+                       instant={novel.resumed}
+                       intro
+            />
+
+            {phase === 'choice' && hasChoices && (
+              <ChoicePlates choices={novel.choices} onPick={pick} />
+            )}
+          </Animated.View>
+        )}
+
+        {phase === 'credits' && (
+          <Credits version={novel.version} onDone={() => setStagePhase('result')} />
+        )}
+
+        {phase === 'result' && (
+          <End finalChoice={novel.finalChoice}
+               voteStatus={novel.voteStatus}
+               version={novel.version}
           />
+        )}
 
-          <Sprite name={novel.sprite}
-                  version={novel.version}
-                  hidden={novel.dark || veiling}
-                  instant={novel.resumed}
-          />
-
-          <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
-
-          <LinearGradient colors={GRADIENT_COLORS}
-                          locations={GRADIENT_LOCATIONS}
-                          pointerEvents={'none'}
-                          style={styles.gradient}
-          />
-
-          <Subtitles speaker={veiling ? null : novel.speaker}
-                     text={veiling ? '' : novel.text}
-                     shown={typing.shown}
-                     instant={novel.resumed}
-                     intro
-          />
-
-          {typing.done && novel.choices.length > 0 && (
-            <ChoiceList choices={novel.choices} onChoose={novel.choose} />
-          )}
-
-          {novel.ended && <End finalChoice={novel.finalChoice}
-                               voteStatus={novel.voteStatus} />}
-        </Animated.View>
-
-        <PauseButton onPress={() => setPaused(true)} />
+        {phase !== 'credits' && <PauseButton onPress={() => setPaused(true)} />}
 
         {paused && <PauseOverlay onResume={() => setPaused(false)} onMenu={toMenu} />}
       </Stage>
@@ -303,12 +344,5 @@ const styles = StyleSheet.create({
   veil: {
     ...StyleSheet.absoluteFill,
     backgroundColor: '#000',
-  },
-  gradient: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: -GRADIENT_OVERSCAN,
-    height: GRADIENT_H + GRADIENT_OVERSCAN,
   },
 })

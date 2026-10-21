@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withDelay, withTiming } from 'react-native-reanimated'
+import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE } from '@/novel/theme'
 
@@ -81,8 +82,7 @@ export default function Subtitles ({ speaker, text, shown, instant = false, intr
               shadow
               color={speaker === null ? COLORS.narration : COLORS.cream}
       >
-        {text.slice(0, shown)}
-        <Text style={styles.rest}>{text.slice(shown)}</Text>
+        <TypedText text={text} shown={shown} />
       </UIText>
     </Animated.View>
   )
@@ -106,11 +106,5 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     overflow: 'hidden',
-  },
-  rest: {
-    color: 'transparent',
-    textShadowColor: 'transparent',
-    textShadowOffset: { width: 0, height: 2 },
-    textShadowRadius: 0.01,
   },
 })
