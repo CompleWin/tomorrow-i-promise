@@ -3,6 +3,11 @@ import { ScrollViewStyleReset, useServerDocumentContext } from 'expo-router/html
 
 const BASE = __DEV__ ? '' : process.env.EXPO_BASE_URL ?? ''
 const TITLE = 'Завтра точно'
+const CSS = [
+  'body{background-color:#000}',
+  '*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}',
+  'img{-webkit-user-drag:none}',
+].join('')
 
 export default function Root ({ children }: { children: ReactNode }) {
   const { bodyAttributes, bodyNodes, htmlAttributes, headNodes } = useServerDocumentContext()
@@ -21,7 +26,7 @@ export default function Root ({ children }: { children: ReactNode }) {
         <link rel="manifest" href={`${BASE}/manifest.json`} />
         <link rel="apple-touch-icon" href={`${BASE}/icon.png`} />
         <ScrollViewStyleReset />
-        <style dangerouslySetInnerHTML={{ __html: 'body{background-color:#000}' }} />
+        <style dangerouslySetInnerHTML={{ __html: CSS }} />
         {headNodes}
       </head>
       <body {...bodyAttributes}>
