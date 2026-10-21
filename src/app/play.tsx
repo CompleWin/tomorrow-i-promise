@@ -72,12 +72,12 @@ export default function Play () {
   }))
 
   function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music'>) {
-    playMusic(line.music === null ? null : assetUrl(`music/${line.music}`, novel.version))
+    playMusic(line.music === null ? null : assetUrl(line.music, novel.version))
     if (line.sfx === null || soundLine.current === line.lineId) {
       return
     }
     soundLine.current = line.lineId
-    playSfx(assetUrl(`sfx/${line.sfx}`, novel.version))
+    playSfx(assetUrl(line.sfx, novel.version))
   }
 
   const startLine = useEffectEvent(() => {

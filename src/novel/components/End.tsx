@@ -92,7 +92,7 @@ export default function End ({ finalChoice, voteStatus, version, onExit }: Props
 
   return (
     <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>
-      <Background name={lit ? 'bg3.png' : null} fx={'lightsOn'} version={version} />
+      <Background name={lit ? 'act1/bg/bg3.png' : null} fx={'lightsOn'} version={version} />
       <View style={styles.dim} />
       <BottomGradient height={720} colors={GRADIENT} middle={0.42} />
 

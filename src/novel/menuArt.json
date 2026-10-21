@@ -1,6 +1,6 @@
 {
   "acts": {
-    "1": { "base": "bg/bg2.png", "flicker": "bg/bg3.png" }
+    "1": { "base": "act1/bg/bg2.png", "flicker": "act1/bg/bg3.png" }
   },
-  "completed": { "base": "bg/bg6.png" }
+  "completed": { "base": "act1/bg/bg6.png" }
 }

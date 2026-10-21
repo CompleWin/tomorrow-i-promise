@@ -114,7 +114,7 @@ function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: La
   return (
     <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
       <Image
-        source={assetSource(`bg/${name}`, version)}
+        source={assetSource(name, version)}
         style={[StyleSheet.absoluteFill, !loaded && styles.hidden]}
         contentFit={'cover'}
         onLoad={() => setLoaded(true)}

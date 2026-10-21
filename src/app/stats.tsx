@@ -102,7 +102,7 @@ export default function Stats () {
   return (
     <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>
       <Stage>
-        {info !== null && <Background name={'bg3.png'} fx={null} instant version={info.version} />}
+        {info !== null && <Background name={'act1/bg/bg3.png'} fx={null} instant version={info.version} />}
         <View style={styles.dim} />
         <BottomGradient height={720} colors={GRADIENT} middle={0.42} />
 
