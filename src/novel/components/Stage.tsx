@@ -1,17 +1,27 @@
 import { StyleSheet, useWindowDimensions, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 
 export const STAGE_W = 1920
 export const STAGE_H = 1080
 
-export function useStageScale () {
-  const { width, height } = useWindowDimensions()
-  const insets = useSafeAreaInsets()
+const noop = () => () => {}
 
+function useHydrated () {
+  return useSyncExternalStore(noop, () => true, () => false)
+}
+
+export function useStageScale () {
+  const screen = useWindowDimensions()
+  const insets = useSafeAreaInsets()
+  const hydrated = useHydrated()
+
+  const width = hydrated ? screen.width : 0
+  const height = hydrated ? screen.height : 0
   const availW = width - insets.left - insets.right
   const availH = height - insets.top - insets.bottom
-  const k = Math.min(availW / STAGE_W, availH / STAGE_H)
+  const k = Math.max(0, Math.min(availW / STAGE_W, availH / STAGE_H))
 
   return {
     k,
