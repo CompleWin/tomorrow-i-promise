@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
+import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
@@ -220,7 +221,7 @@ export default function Play () {
     }
   }, [phase, novel.finalChoice])
 
-  const onBack = useEffectEvent(() => {
+  function togglePause () {
     if (novel.loading || novel.error !== null) {
       return false
     }
@@ -228,7 +229,9 @@ export default function Play () {
       setPaused(p => !p)
     }
     return true
-  })
+  }
+
+  const onBack = useEffectEvent(togglePause)
 
   useEffect(() => {
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
@@ -266,6 +269,8 @@ export default function Play () {
       playLineSound(shown.lineId, shown.sfx)
     }
   }
+
+  useKeys({ onNext: tap, onPause: togglePause })
 
   async function pick (index: number) {
     await sleep(1100)
