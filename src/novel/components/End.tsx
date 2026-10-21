@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { useEffect, useRef, useState } from 'react'
+import { Pressable, StyleSheet, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { Choice, getResults, Results } from '@/novel/vote'
 import { VoteStatus } from '@/novel/storage'
@@ -17,6 +17,7 @@ const LABELS: Record<Choice, string> = {
   B: 'Не оставляем',
 }
 
+const COUNTING = 'Считаем голоса...'
 const CELLS = 50
 const COUNT_MS = 1400
 const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.84)', 'rgba(4,3,2,.95)'] as const
@@ -25,6 +26,7 @@ type Props = {
   finalChoice: Choice | null
   voteStatus: VoteStatus
   version: string | null
+  onExit: () => void
 }
 
 type Fetched = {
@@ -32,7 +34,7 @@ type Fetched = {
   results: Results | null
 }
 
-export default function End ({ finalChoice, voteStatus, version }: Props) {
+export default function End ({ finalChoice, voteStatus, version, onExit }: Props) {
   const fade = useFade()
   const [lit, setLit] = useState(false)
   const [typingOn, setTypingOn] = useState(false)
@@ -41,6 +43,7 @@ export default function End ({ finalChoice, voteStatus, version }: Props) {
   const [fetched, setFetched] = useState<Fetched | null>(null)
   const [progress, setProgress] = useState(0)
   const statsIn = useSharedValue(0)
+  const exiting = useRef(false)
 
   const answer = finalChoice === null ? '' : LABELS[finalChoice]
   const typing = useTypewriter(answer, { key: 1, paused: !typingOn })
@@ -104,7 +107,7 @@ export default function End ({ finalChoice, voteStatus, version }: Props) {
   if (voteStatus === 'pending') {
     message = 'Голос будет учтён, когда появится связь'
   } else if (!held || current === null) {
-    message = 'Считаем голоса...'
+    message = COUNTING
   } else if (current.results === null) {
     message = 'Статистика сейчас недоступна'
   } else {
@@ -116,6 +119,7 @@ export default function End ({ finalChoice, voteStatus, version }: Props) {
     }
   }
   const showStats = statusOn && message === null
+  const settled = showStats ? progress >= 1 : statusOn && message !== COUNTING
 
   useEffect(() => {
     if (!showStats) {
@@ -147,8 +151,16 @@ export default function End ({ finalChoice, voteStatus, version }: Props) {
   const litA = Math.round(groupA * progress)
   const litB = Math.round(groupB * progress)
 
+  const tap = () => {
+    if (!settled || exiting.current) {
+      return
+    }
+    exiting.current = true
+    onExit()
+  }
+
   return (
-    <View style={styles.screen}>
+    <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>
       <Background name={lit ? 'bg3.png' : null} fx={'lightsOn'} version={version} />
       <View style={styles.dim} />
       <BottomGradient height={720} colors={GRADIENT} middle={0.42} />
@@ -202,7 +214,7 @@ export default function End ({ finalChoice, voteStatus, version }: Props) {
           </UIText>
         </View>
       </View>
-    </View>
+    </Pressable>
   )
 }
 
@@ -210,6 +222,9 @@ const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFill,
     backgroundColor: '#000',
+  },
+  waiting: {
+    cursor: 'auto',
   },
   dim: {
     ...StyleSheet.absoluteFill,

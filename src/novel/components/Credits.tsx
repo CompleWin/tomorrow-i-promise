@@ -4,21 +4,18 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } f
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
 import { AUTHORS } from '@/novel/credits'
-import Background from '@/novel/components/Background'
-import BottomGradient from '@/novel/components/BottomGradient'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE } from '@/novel/theme'
 
 type Props = {
-  version: string | null
   onDone: () => void
 }
 
 const HOLD = 4000
 
-export default function Credits ({ version, onDone }: Props) {
+export default function Credits ({ onDone }: Props) {
   const fade = useFade()
   const left = useTypewriter(AUTHORS[0].name, { key: 1 })
   const right = useTypewriter(AUTHORS[1].name, { key: 1 })
@@ -78,10 +75,6 @@ export default function Credits ({ version, onDone }: Props) {
 
   return (
     <Pressable onPress={tap} style={styles.screen}>
-      <Background name={'bg2.png'} fx={null} instant version={version} />
-      <View style={styles.dim} />
-      <BottomGradient height={520} colors={GRADIENT} middle={0.52} />
-
       <Animated.View pointerEvents={'none'} style={[styles.row, columnStyle]}>
         {AUTHORS.map((author, i) => (
           <View key={author.handle} style={styles.column}>
@@ -96,22 +89,13 @@ export default function Credits ({ version, onDone }: Props) {
   )
 }
 
-const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.82)', 'rgba(4,3,2,.95)'] as const
-
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#000',
-  },
-  dim: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: COLORS.creditsDim,
+    backgroundColor: COLORS.inkBlack,
+    justifyContent: 'center',
   },
   row: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 76,
     flexDirection: 'row',
   },
   column: {

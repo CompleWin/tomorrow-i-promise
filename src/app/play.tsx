@@ -308,13 +308,14 @@ export default function Play () {
         )}
 
         {phase === 'credits' && (
-          <Credits version={novel.version} onDone={() => setStagePhase('result')} />
+          <Credits onDone={() => setStagePhase('result')} />
         )}
 
         {phase === 'result' && (
           <End finalChoice={novel.finalChoice}
                voteStatus={novel.voteStatus}
                version={novel.version}
+               onExit={toMenu}
           />
         )}
 
