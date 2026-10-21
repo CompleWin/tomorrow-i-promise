@@ -11,6 +11,7 @@ export type SaveData = {
   voteStatus: VoteStatus
   dark: boolean
   act: number | null
+  music: string | null
 }
 
 export type Completed = {
@@ -19,9 +20,18 @@ export type Completed = {
 
 export type Settings = {
   volume: number
+  music: number
+  sfx: number
 }
 
-export const DEFAULT_SETTINGS: Settings = { volume: 50 }
+export const DEFAULT_SETTINGS: Settings = { volume: 50, music: 50, sfx: 50 }
+
+function percent (value: unknown, fallback: number): number {
+  if (typeof value !== 'number' || !Number.isFinite(value)) {
+    return fallback
+  }
+  return Math.min(100, Math.max(0, Math.round(value)))
+}
 
 const SAVE_KEY = 'tomorrow-i-promise.save'
 const COMPLETED_KEY = 'tomorrow-i-promise.completed'
@@ -44,6 +54,7 @@ export async function loadSave() : Promise<SaveData | null> {
       schema: 2,
       dark: saveData.dark === true,
       act: typeof saveData.act === 'number' ? saveData.act : null,
+      music: typeof saveData.music === 'string' ? saveData.music : null,
     } as SaveData
   } catch (error) {
     console.warn('loadSave failed', error)
@@ -101,11 +112,12 @@ export async function loadSettings() : Promise<Settings> {
     if (settings === null) {
       return DEFAULT_SETTINGS
     }
-    const data = JSON.parse(settings)
-    if (typeof data.volume !== 'number' || !Number.isFinite(data.volume)) {
-      return DEFAULT_SETTINGS
+    const data = JSON.parse(settings) ?? {}
+    return {
+      volume: percent(data.volume, DEFAULT_SETTINGS.volume),
+      music: percent(data.music, DEFAULT_SETTINGS.music),
+      sfx: percent(data.sfx, DEFAULT_SETTINGS.sfx),
     }
-    return { volume: Math.min(100, Math.max(0, Math.round(data.volume))) }
   } catch (error) {
     console.warn('loadSettings failed', error)
     return DEFAULT_SETTINGS

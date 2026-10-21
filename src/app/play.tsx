@@ -2,13 +2,13 @@ import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { router } from 'expo-router'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import useNovel from '@/novel/useNovel'
+import useNovel, { Line } from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
 import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
-import { playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
+import { playMusic, playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -71,17 +71,18 @@ export default function Play () {
     ],
   }))
 
-  function playLineSound (lineId: number, sfx: string | null) {
-    if (sfx === null || soundLine.current === lineId) {
+  function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music'>) {
+    playMusic(line.music === null ? null : assetUrl(`music/${line.music}`, novel.version))
+    if (line.sfx === null || soundLine.current === line.lineId) {
       return
     }
-    soundLine.current = lineId
-    playSfx(assetUrl(`sfx/${sfx}`, novel.version))
+    soundLine.current = line.lineId
+    playSfx(assetUrl(`sfx/${line.sfx}`, novel.version))
   }
 
   const startLine = useEffectEvent(() => {
     let wait = 0
-    playLineSound(novel.lineId, novel.sfx)
+    playLineSound(novel)
 
     if (reveal.current) {
       reveal.current = false
@@ -257,6 +258,7 @@ export default function Play () {
     if (phase !== 'play' || !ready || paused || busy) {
       return
     }
+    playLineSound(novel)
     if (!typing.done) {
       typing.finish()
       return
@@ -266,7 +268,7 @@ export default function Play () {
     }
     const shown = novel.next()
     if (shown !== null) {
-      playLineSound(shown.lineId, shown.sfx)
+      playLineSound(shown)
     }
   }
 

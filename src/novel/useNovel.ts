@@ -13,6 +13,7 @@ export type Line = {
   sprite: string | null
   fx: string | null
   sfx: string | null
+  music: string | null
   dark: boolean
   resumed: boolean
   choices: { index: number; text: string }[]
@@ -27,6 +28,7 @@ const EMPTY: Line = {
   sprite: null,
   fx: null,
   sfx: null,
+  music: null,
   dark: false,
   resumed: false,
   choices: [],
@@ -64,6 +66,7 @@ export default function useNovel () {
   const bgRef = useRef<string | null>(null)
   const darkRef = useRef(false)
   const actRef = useRef<number | null>(null)
+  const musicRef = useRef<string | null>(null)
   const versionRef = useRef<string | null>(null)
   const lineIdRef = useRef(0)
 
@@ -108,6 +111,7 @@ export default function useNovel () {
       voteStatus: voteRef.current.voteStatus,
       dark: darkRef.current,
       act: actRef.current,
+      music: musicRef.current,
     })
   }, [])
 
@@ -124,6 +128,9 @@ export default function useNovel () {
     if (tags.fx === 'toBlack') {
       darkRef.current = true
     }
+    if (tags.music !== undefined) {
+      musicRef.current = tags.music === 'stop' ? null : tags.music
+    }
     const act = ACT.exec(story.state.currentPathString ?? '')
     if (act !== null) {
       actRef.current = Number(act[1])
@@ -138,6 +145,7 @@ export default function useNovel () {
       sprite: tags.sprite ?? null,
       fx: tags.fx ?? null,
       sfx: tags.sfx ?? null,
+      music: musicRef.current,
       dark: darkRef.current,
       resumed: resumed,
       choices: choices,
@@ -189,6 +197,7 @@ export default function useNovel () {
         bgRef.current = null
         darkRef.current = false
         actRef.current = null
+        musicRef.current = null
 
         const save = await loadSave()
         if (cancelled) {
@@ -201,6 +210,7 @@ export default function useNovel () {
             bgRef.current = save.currentBg
             darkRef.current = save.dark
             actRef.current = save.act
+            musicRef.current = save.music
             voteRef.current = {
               finalChoice: save.finalChoice,
               voteStatus: save.voteStatus,
@@ -214,6 +224,7 @@ export default function useNovel () {
             bgRef.current = null
             darkRef.current = false
             actRef.current = null
+            musicRef.current = null
 
             if (save.contentVersion !== loaded.version) {
               setNotice('История обновилась, начинаем сначала')

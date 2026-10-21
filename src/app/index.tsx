@@ -8,7 +8,7 @@ import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuItem from '@/novel/components/MenuItem'
-import VolumeControl from '@/novel/components/VolumeControl'
+import VolumeSettings from '@/novel/components/VolumeSettings'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
@@ -115,7 +115,7 @@ export default function Index () {
 
         {menu !== null && view === 'settings' && (
           <Animated.View style={itemsStyle}>
-            <VolumeControl label={'Громкость'} />
+            <VolumeSettings />
             <MenuItem label={'Назад'} onPress={() => switchView('main')} />
           </Animated.View>
         )}

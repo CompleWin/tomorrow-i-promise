@@ -2,7 +2,7 @@ import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import MenuItem from '@/novel/components/MenuItem'
 import UIText from '@/novel/components/UIText'
-import VolumeControl from '@/novel/components/VolumeControl'
+import VolumeSettings from '@/novel/components/VolumeSettings'
 import { COLORS } from '@/novel/theme'
 
 type Props = {
@@ -30,7 +30,7 @@ export default function PauseOverlay ({ onResume, onMenu }: Props) {
         <View style={styles.column}>
           <UIText size={30} color={COLORS.muted} spacing={0.3} upper style={styles.title}>Настройки</UIText>
           <View style={styles.list}>
-            <VolumeControl label={'Громкость'} />
+            <VolumeSettings />
             <MenuItem label={'Назад'} onPress={() => setSettings(false)} style={styles.item} />
           </View>
         </View>

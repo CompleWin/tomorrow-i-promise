@@ -6,6 +6,7 @@ const BOM = /^\uFEFF/
 const ASSETS_DIR = 'public/content/assets'
 const BG_DIR = `${ASSETS_DIR}/bg`
 const SFX_DIR = `${ASSETS_DIR}/sfx`
+const MUSIC_DIR = `${ASSETS_DIR}/music`
 
 const textFile = fs.readFileSync('story/main.ink', 'utf8')
 const text = textFile.replace(BOM, '')
@@ -45,6 +46,14 @@ const sounds = [...text.matchAll(/#\s*sfx:\s*(\S+)/g)].map(sfx => sfx[1])
 for (const sfx of sounds) {
   if (!fs.existsSync(`${SFX_DIR}/${sfx}`)) {
     console.error(`sfx does not exist: ${sfx} (expected in ${SFX_DIR})`)
+    process.exit(1)
+  }
+}
+
+const tracks = [...text.matchAll(/#\s*music:\s*(\S+)/g)].map(music => music[1])
+for (const music of tracks) {
+  if (music !== 'stop' && !fs.existsSync(`${MUSIC_DIR}/${music}`)) {
+    console.error(`music does not exist: ${music} (expected in ${MUSIC_DIR}, or use "music: stop")`)
     process.exit(1)
   }
 }

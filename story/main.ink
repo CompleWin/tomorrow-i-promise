@@ -2,7 +2,7 @@ VAR final_choice = ""
 -> act_1
 === act_1 ===
 
-# bg: bg1.png # fx: fadeIn
+# bg: bg1.png # fx: fadeIn # music: theme.mp3
 Опять без соли? # speaker: Гай # sprite: act1/guy_normal.png
 А ты её купил? # speaker: Марта # sprite: act1/martha_normal.png
 Я думал, у нас ещё оставалась. # speaker: Гай # sprite: act1/guy_normal.png
@@ -14,7 +14,7 @@ VAR final_choice = ""
 Они продолжают ужинать.
 Внезапно лампа над столом гаснет.
 
-# bg: bg2.png # fx: blackout
+# bg: bg2.png # fx: blackout # music: night.mp3
 Комната погружается в темноту. Слышен только шум улицы.
 Да чтоб тебя... # speaker: Гай # sprite: act1/guy_normal.png
 Может, уже достанем свечи? # speaker: Марта # sprite: act1/martha_smile.png
@@ -46,7 +46,7 @@ VAR final_choice = ""
 Надо будет сходить в больницу. Убедиться, что всё нормально. # speaker: Марта # sprite: act1/martha_smile.png
 Да, конечно. Завтра сходим. # speaker: Гай # sprite: act1/guy_smile.png
 
-# fx: toBlack
+# fx: toBlack # music: stop
 Ты рад? # speaker: Марта
 Конечно, рад. # speaker: Гай
 Звук отдалённого баха. # fx: shake # sfx: bang.mp3

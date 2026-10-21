@@ -1,7 +1,5 @@
 import { Pressable, StyleSheet, View } from 'react-native'
-import { useEffect, useState } from 'react'
-import { setVolume } from '@/novel/sound'
-import { loadSettings, writeSettings } from '@/novel/storage'
+import { useState } from 'react'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
 
@@ -10,6 +8,8 @@ const CELLS = 100 / STEP
 
 type Props = {
   label: string
+  value: number
+  onChange: (value: number) => void
 }
 
 function StepButton ({ sign, onPress }: { sign: string, onPress: () => void }) {
@@ -28,34 +28,13 @@ function StepButton ({ sign, onPress }: { sign: string, onPress: () => void }) {
   )
 }
 
-export default function VolumeControl ({ label }: Props) {
-  const [value, setValue] = useState<number | null>(null)
-
-  useEffect(() => {
-    let cancelled = false
-    loadSettings().then(settings => {
-      if (!cancelled) {
-        setValue(settings.volume)
-      }
-    })
-    return () => { cancelled = true }
-  }, [])
-
-  if (value === null) {
-    return <View style={styles.placeholder} />
-  }
-
+export default function VolumeControl ({ label, value, onChange }: Props) {
   const lit = Math.round(value / STEP)
-  const set = (next: number) => {
-    const volume = Math.min(100, Math.max(0, next))
-    setValue(volume)
-    setVolume(volume)
-    writeSettings({ volume })
-  }
+  const set = (next: number) => onChange(Math.min(100, Math.max(0, next)))
 
   return (
     <View style={styles.control}>
-      <UIText size={52} color={COLORS.cream2}>{label}</UIText>
+      <UIText size={52} color={COLORS.cream2} style={styles.label}>{label}</UIText>
       <View style={styles.row}>
         <StepButton sign={'−'} onPress={() => set(value - STEP)} />
         {Array.from({ length: CELLS }, (_, i) => (
@@ -71,12 +50,13 @@ export default function VolumeControl ({ label }: Props) {
 }
 
 const styles = StyleSheet.create({
-  placeholder: {
-    height: 178,
-  },
   control: {
     paddingLeft: 36,
-    gap: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  label: {
+    width: 580,
   },
   row: {
     flexDirection: 'row',
