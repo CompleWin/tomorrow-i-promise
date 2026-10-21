@@ -118,11 +118,14 @@ export async function getStory (): Promise<LoadedStory> {
 
 const PRELOAD_TIMEOUT_MS = 15 * 1000
 const ASSET_TAG = /"\^(?:bg|sprite):\s*([^"]+?)\s*"/g
-const SFX_TAG = /"\^sfx:\s*([^"]+?)\s*"/g
+const SFX_TAG = /"\^sfx:\s*([^"\s]+)[^"]*"/g
 
 export async function preloadStory (json: string, version: string): Promise<void> {
   const sounds = new Set<string>()
   for (const [, name] of json.matchAll(SFX_TAG)) {
+    if (name === 'stop') {
+      continue
+    }
     sounds.add(assetUrl(name, version))
   }
   preloadSounds([...sounds])

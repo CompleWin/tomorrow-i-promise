@@ -32,6 +32,7 @@ export const EASE = {
   inOut: Easing.bezier(0.42, 0, 0.58, 1),
   easeOut: Easing.bezier(0, 0, 0.58, 1),
   easeIn: Easing.bezier(0.42, 0, 1, 1),
+  move: Easing.bezier(0.65, 0, 0.35, 1),
 }
 
 export const TEXT_SPEED = 1
@@ -49,4 +50,14 @@ export const TEXT_DELAY: Record<string, number> = {
   close: 700,
   blackout: 1100,
   lightsOn: 700,
+  move: 900,
+}
+
+export const BG_DURATION: Record<string, number> = {
+  default: 700,
+  fadeIn: 1400,
+  close: 1600,
+  blackout: 1500,
+  lightsOn: 1000,
+  move: 1200,
 }

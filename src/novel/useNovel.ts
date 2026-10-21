@@ -14,6 +14,7 @@ export type Line = {
   fx: string | null
   sfx: string | null
   music: string | null
+  loops: string[]
   dark: boolean
   resumed: boolean
   choices: { index: number; text: string }[]
@@ -29,6 +30,7 @@ const EMPTY: Line = {
   fx: null,
   sfx: null,
   music: null,
+  loops: [],
   dark: false,
   resumed: false,
   choices: [],
@@ -61,12 +63,23 @@ function parseTags (tags: string[] | null): Record<string, string> {
   return result
 }
 
-export default function useNovel () {
+function tagValues (tags: string[] | null, key: string): string[] {
+  return (tags ?? []).flatMap(tag => {
+    const colon = tag.indexOf(':')
+    if (colon === -1 || tag.slice(0, colon).trim() !== key) {
+      return []
+    }
+    return [tag.slice(colon + 1).trim()]
+  })
+}
+
+export default function useNovel (startAct?: string) {
   const storyRef = useRef<Story | null>(null)
   const bgRef = useRef<string | null>(null)
   const darkRef = useRef(false)
   const actRef = useRef<number | null>(null)
   const musicRef = useRef<string | null>(null)
+  const loopsRef = useRef<string[]>([])
   const versionRef = useRef<string | null>(null)
   const lineIdRef = useRef(0)
 
@@ -112,6 +125,7 @@ export default function useNovel () {
       dark: darkRef.current,
       act: actRef.current,
       music: musicRef.current,
+      loops: loopsRef.current,
     })
   }, [])
 
@@ -131,6 +145,19 @@ export default function useNovel () {
     if (tags.music !== undefined) {
       musicRef.current = tags.music === 'stop' ? null : tags.music
     }
+    let sfx: string | null = null
+    for (const value of tagValues(story.currentTags, 'sfx')) {
+      const [path, mode] = value.split(/\s+/)
+      if (path === 'stop') {
+        loopsRef.current = []
+      } else if (mode === 'loop') {
+        if (!loopsRef.current.includes(path)) {
+          loopsRef.current = [...loopsRef.current, path]
+        }
+      } else {
+        sfx = path
+      }
+    }
     const act = ACT.exec(story.state.currentPathString ?? '')
     if (act !== null) {
       actRef.current = Number(act[1])
@@ -144,8 +171,9 @@ export default function useNovel () {
       bg: bgRef.current,
       sprite: tags.sprite ?? null,
       fx: tags.fx ?? null,
-      sfx: tags.sfx ?? null,
+      sfx: sfx,
       music: musicRef.current,
+      loops: loopsRef.current,
       dark: darkRef.current,
       resumed: resumed,
       choices: choices,
@@ -198,8 +226,9 @@ export default function useNovel () {
         darkRef.current = false
         actRef.current = null
         musicRef.current = null
+        loopsRef.current = []
 
-        const save = await loadSave()
+        const save = startAct ? null : await loadSave()
         if (cancelled) {
           return
         }
@@ -211,6 +240,7 @@ export default function useNovel () {
             darkRef.current = save.dark
             actRef.current = save.act
             musicRef.current = save.music
+            loopsRef.current = save.loops
             voteRef.current = {
               finalChoice: save.finalChoice,
               voteStatus: save.voteStatus,
@@ -225,6 +255,7 @@ export default function useNovel () {
             darkRef.current = false
             actRef.current = null
             musicRef.current = null
+            loopsRef.current = []
 
             if (save.contentVersion !== loaded.version) {
               setNotice('История обновилась, начинаем сначала')
@@ -234,6 +265,9 @@ export default function useNovel () {
           }
         }
 
+        if (startAct) {
+          storyRef.current.ChoosePathString(`act_${startAct}`)
+        }
         step()
       } catch (error) {
         console.warn('story load failed', error)
@@ -249,7 +283,7 @@ export default function useNovel () {
 
     load()
     return () => { cancelled = true }
-  }, [step, show, reloadKey])
+  }, [step, show, reloadKey, startAct])
 
   useEffect(() => {
     const { finalChoice, voteStatus } = vote

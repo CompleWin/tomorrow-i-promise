@@ -39,10 +39,14 @@ for (const sprite of sprites) {
   }
 }
 
-const sounds = [...text.matchAll(/#\s*sfx:\s*(\S+)/g)].map(sfx => sfx[1])
-for (const sfx of sounds) {
-  if (!fs.existsSync(`${ASSETS_DIR}/${sfx}`)) {
-    console.error(`sfx does not exist: ${sfx} (expected in ${ASSETS_DIR})`)
+const sounds = [...text.matchAll(/#\s*sfx:\s*([^\s#]+)[ \t]*([^\s#]*)/g)]
+for (const [, sfx, mode] of sounds) {
+  if (sfx !== 'stop' && !fs.existsSync(`${ASSETS_DIR}/${sfx}`)) {
+    console.error(`sfx does not exist: ${sfx} (expected in ${ASSETS_DIR}, or use "sfx: stop")`)
+    process.exit(1)
+  }
+  if (mode !== '' && mode !== 'loop') {
+    console.error(`unknown sfx mode: ${mode}, expected "loop" or nothing`)
     process.exit(1)
   }
 }
@@ -55,7 +59,7 @@ for (const music of tracks) {
   }
 }
 
-const FX = ['fadeIn', 'close', 'blackout', 'lightsOn', 'toBlack', 'shake']
+const FX = ['fadeIn', 'close', 'blackout', 'lightsOn', 'move', 'toBlack', 'shake']
 const effects = [...text.matchAll(/#\s*fx:\s*(\S*)/g)].map(fx => fx[1])
 for (const fx of effects) {
   if (!FX.includes(fx)) {

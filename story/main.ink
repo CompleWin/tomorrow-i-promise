@@ -54,7 +54,57 @@ VAR final_choice = ""
 -> act_2
 === act_2 ===
 
-PLACEHOLDER
+# bg: act2/bg/bg1.png # fx: fadeIn # music: act2/music/hospital.mp3 # sfx: act2/sfx/ultrasound.mp3 loop
+
+Так... Ну что ж, поздравляю. Беременность подтверждается. Пока всё выглядит нормально. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+Правда? # speaker: Марта # sprite: act2/sprites/martha_normal.png
+Да. Срок еще небольшой. # speaker: Врач # sprite: act2/sprites/doctor_smile.png
+
+# bg: act2/bg/bg2.png
+
+Марта улыбается и поворачивается к Гаю. Тот с облегчением выдыхает и улыбается ей в ответ.
+Скажите, вы планируете сохранять беременность? # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+
+# bg: act2/bg/bg3.png
+
+Гай и Марта удивленно переглядываются.
+
+# bg: act2/bg/bg4.png # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
+Простите, что? # speaker: Марта # sprite: act2/sprites/martha_worried.png
+Вы уже приняли решение насчет ребенка? # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+Мы... как-то еще не думали об этом. # speaker: Гай # sprite: act2/sprites/guy_normal.png
+
+# bg: act2/bg/bg5.png
+
+Мы только недавно узнали. # speaker: Марта # sprite: act2/sprites/martha_worried.png
+Понимаю. Но советую не затягивать с решением. Чем больше срок, тем меньше у вас будет вариантов. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+
+# bg: act2/bg/bg4.png # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
+А с ребенком точно всё в порядке? # speaker: Гай # sprite: act2/sprites/guy_sad.png
+
+На данный момент я не вижу никаких отклонений. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+Но вы должны понимать, что у нас нет оборудования для генетического скрининга. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+Поэтому исключить возможные нарушения развития мы не можем. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+
+То есть мы никак не узнаем заранее? # speaker: Марта # sprite: act2/sprites/martha_sad.png
+К сожалению, здесь такой возможности нет. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+
+Можно нам немного времени подумать? # speaker: Гай # sprite: act2/sprites/guy_sad.png
+
+# bg: act2/bg/bg7.png 
+
+Конечно. Обсудите всё дома. Когда будете готовы, приходите. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+Только, пожалуйста, не откладывайте надолго, иначе может стать поздно. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
+
+{""} # bg: act2/bg/bg8.png # sfx: act2/sfx/martha-wipes-belly.mp3
+
+# bg: act2/bg/bg9.png
+
+На сегодня всё. Можете одеваться. # speaker: Врач # sprite: act2/sprites/doctor_normal.png # sfx: act2/sfx/doctor-throws-napkin.mp3
+
+# fx: toBlack # music: stop # sfx: act2/sfx/martha-gets-off-couch.mp3
+
+...
 
 -> act_3
 === act_3 ===

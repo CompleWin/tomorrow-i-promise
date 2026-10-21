@@ -4,9 +4,15 @@ import { DEFAULT_SETTINGS, loadSettings, Settings } from '@/novel/storage'
 const FADE_MS = 500
 const FADE_STEPS = 10
 
+type Loop = {
+  url: string
+  player: AudioPlayer
+}
+
 let player: AudioPlayer | null = null
 let music: AudioPlayer | null = null
 let track: string | null = null
+let loops: Loop[] = []
 let modeSet = false
 let levels: Settings = DEFAULT_SETTINGS
 
@@ -56,11 +62,30 @@ function resumeMusic () {
   }
 }
 
+function resumeLoops () {
+  if (sfxLevel() === 0) {
+    return
+  }
+  for (const loop of loops) {
+    try {
+      loop.player.volume = sfxLevel()
+      if (!loop.player.currentStatus.playing) {
+        loop.player.play()
+      }
+    } catch (error) {
+      console.warn('sfx failed', loop.url, error)
+    }
+  }
+}
+
 export function setLevels (next: Settings) {
   levels = next
   try {
     if (sfxLevel() === 0) {
       player?.pause()
+      for (const loop of loops) {
+        loop.player.pause()
+      }
     } else if (player !== null) {
       player.volume = sfxLevel()
     }
@@ -71,6 +96,7 @@ export function setLevels (next: Settings) {
     console.warn('volume failed', error)
   }
   resumeMusic()
+  resumeLoops()
 }
 
 export function startSound () {
@@ -106,6 +132,31 @@ export function playSfx (url: string) {
   }
 }
 
+export function playLoops (urls: string[]) {
+  const next: Loop[] = []
+  for (const url of urls) {
+    const kept = loops.find(loop => loop.url === url)
+    if (kept !== undefined) {
+      next.push(kept)
+      continue
+    }
+    try {
+      const created = createAudioPlayer(url)
+      created.loop = true
+      next.push({ url, player: created })
+    } catch (error) {
+      console.warn('sfx failed', url, error)
+    }
+  }
+  for (const loop of loops) {
+    if (!next.includes(loop)) {
+      fadeOut(loop.player)
+    }
+  }
+  loops = next
+  resumeLoops()
+}
+
 export function playMusic (url: string | null) {
   if (url === track) {
     resumeMusic()
@@ -135,11 +186,12 @@ export function stopAll () {
   } catch (error) {
     console.warn('sfx stop failed', error)
   }
+  playLoops([])
   playMusic(null)
 }
 
 export function releaseSound () {
-  for (const released of [player, music]) {
+  for (const released of [player, music, ...loops.map(loop => loop.player)]) {
     try {
       released?.remove()
     } catch (error) {
@@ -149,4 +201,5 @@ export function releaseSound () {
   player = null
   music = null
   track = null
+  loops = []
 }

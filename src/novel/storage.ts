@@ -12,6 +12,7 @@ export type SaveData = {
   dark: boolean
   act: number | null
   music: string | null
+  loops: string[]
 }
 
 export type Completed = {
@@ -56,6 +57,7 @@ export async function loadSave() : Promise<SaveData | null> {
       dark: saveData.dark === true,
       act: typeof saveData.act === 'number' ? saveData.act : null,
       music: typeof saveData.music === 'string' ? saveData.music : null,
+      loops: Array.isArray(saveData.loops) ? saveData.loops.filter((loop: unknown) => typeof loop === 'string') : [],
     } as SaveData
   } catch (error) {
     console.warn('loadSave failed', error)

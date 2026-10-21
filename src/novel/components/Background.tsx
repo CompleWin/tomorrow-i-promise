@@ -11,9 +11,9 @@ import Animated, {
 } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { assetSource } from '@/novel/preload'
-import { EASE } from '@/novel/theme'
+import { BG_DURATION, EASE } from '@/novel/theme'
 
-type Mode = 'default' | 'fadeIn' | 'close' | 'blackout' | 'lightsOn' | 'instant'
+type Mode = 'default' | 'fadeIn' | 'close' | 'blackout' | 'lightsOn' | 'move' | 'instant'
 
 type Layer = {
   key: number
@@ -28,16 +28,19 @@ type Props = {
   version: string | null
 }
 
-const MODES: Mode[] = ['fadeIn', 'close', 'blackout', 'lightsOn']
+const MODES: Mode[] = ['fadeIn', 'close', 'blackout', 'lightsOn', 'move']
 
 const ENTER = {
-  default: { duration: 700, easing: EASE.inOut },
-  fadeIn: { duration: 1400, easing: EASE.easeOut },
-  close: { duration: 1600, easing: EASE.close },
-  blackout: { duration: 1500, easing: Easing.linear },
-  lightsOn: { duration: 1000, easing: Easing.linear },
+  default: { duration: BG_DURATION.default, easing: EASE.inOut },
+  fadeIn: { duration: BG_DURATION.fadeIn, easing: EASE.easeOut },
+  close: { duration: BG_DURATION.close, easing: EASE.close },
+  blackout: { duration: BG_DURATION.blackout, easing: Easing.linear },
+  lightsOn: { duration: BG_DURATION.lightsOn, easing: Easing.linear },
+  move: { duration: BG_DURATION.move, easing: EASE.move },
   instant: { duration: 0, easing: Easing.linear },
 }
+
+const NUDGE = 1.015
 
 const BLACKOUT_OUT = {
   offsets: [0, 0.12, 0.2, 0.32, 0.4, 0.55, 0.62, 0.7, 1],
@@ -66,9 +69,10 @@ type LayerProps = {
   leaving: boolean
   version: string | null
   onDone: (key: number) => void
+  onMove: () => void
 }
 
-function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: LayerProps) {
+function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone, onMove }: LayerProps) {
   const enter = useSharedValue(mode === 'instant' ? 1 : 0)
   const out = useSharedValue(0)
   const [loaded, setLoaded] = useState(false)
@@ -81,12 +85,15 @@ function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: La
       onDone(layerKey)
       return
     }
+    if (mode === 'move') {
+      onMove()
+    }
     enter.set(withTiming(1, ENTER[mode], finished => {
       if (finished) {
         scheduleOnRN(onDone, layerKey)
       }
     }))
-  }, [loaded, mode, enter, onDone, layerKey])
+  }, [loaded, mode, enter, onDone, onMove, layerKey])
 
   useEffect(() => {
     if (leaving) {
@@ -127,6 +134,7 @@ export default function Background ({ name, fx, instant = false, version }: Prop
   const [stack, setStack] = useState<{ name: string | null, serial: number, layers: Layer[] }>(
     { name: null, serial: 0, layers: [] })
   const zoom = useSharedValue(1)
+  const nudge = useSharedValue(0)
 
   if (name !== stack.name) {
     const mode = toMode(fx, instant)
@@ -144,12 +152,17 @@ export default function Background ({ name, fx, instant = false, version }: Prop
   }, [zoom])
 
   const zoomStyle = useAnimatedStyle(() => ({
-    transform: [{ scale: zoom.get() }],
+    transform: [{ scale: zoom.get() * interpolate(nudge.get(), [0, 0.5, 1], [1, NUDGE, 1]) }],
   }))
 
   const settle = useCallback((key: number) => {
     setStack(s => ({ ...s, layers: s.layers.filter(l => l.key >= key) }))
   }, [])
+
+  const push = useCallback(() => {
+    nudge.set(0)
+    nudge.set(withTiming(1, ENTER.move))
+  }, [nudge])
 
   return (
     <Animated.View style={[StyleSheet.absoluteFill, zoomStyle]} pointerEvents={'none'}>
@@ -162,6 +175,7 @@ export default function Background ({ name, fx, instant = false, version }: Prop
           leaving={stack.layers[i + 1]?.mode === 'blackout'}
           version={version}
           onDone={settle}
+          onMove={push}
         />
       ))}
     </Animated.View>

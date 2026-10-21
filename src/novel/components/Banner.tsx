@@ -41,10 +41,10 @@ export default function Banner ({ text, action, onPress, visible }: Props) {
                  contentFit={'fill'}
                  style={StyleSheet.absoluteFill}
           />
-          <UIText size={34} color={COLORS.cream} numberOfLines={1}>{text}</UIText>
+          <UIText size={34} lineHeight={1.4} color={COLORS.cream} numberOfLines={1} style={styles.line}>{text}</UIText>
           {action !== undefined && (
             <View style={styles.action}>
-              <UIText size={34} color={COLORS.lamp} numberOfLines={1}>{action}</UIText>
+              <UIText size={34} lineHeight={1.4} color={COLORS.lamp} numberOfLines={1} style={styles.line}>{action}</UIText>
             </View>
           )}
         </Pressable>
@@ -141,6 +141,9 @@ const styles = StyleSheet.create({
     paddingTop: 32,
     paddingHorizontal: 72,
     paddingBottom: 36,
+  },
+  line: {
+    marginVertical: -7,
   },
   action: {
     paddingBottom: 8,

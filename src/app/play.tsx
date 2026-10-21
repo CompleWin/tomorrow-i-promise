@@ -1,6 +1,6 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
-import { router } from 'expo-router'
+import { router, useLocalSearchParams } from 'expo-router'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import useNovel, { Line } from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
@@ -8,7 +8,7 @@ import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
-import { playMusic, playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
+import { playLoops, playMusic, playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -23,7 +23,7 @@ import { Stage } from '@/novel/components/Stage'
 import Sprite from '@/novel/components/Sprite'
 import Subtitles from '@/novel/components/Subtitles'
 import UIText from '@/novel/components/UIText'
-import { COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
+import { BG_DURATION, COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
 
 const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
 
@@ -36,7 +36,8 @@ const SHAKE = {
 }
 
 export default function Play () {
-  const novel = useNovel()
+  const { act } = useLocalSearchParams<{ act?: string }>()
+  const novel = useNovel(__DEV__ ? act : undefined)
   const reload = novel.reload
   const fade = useFade()
   const banner = useBanner()
@@ -71,8 +72,9 @@ export default function Play () {
     ],
   }))
 
-  function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music'>) {
+  function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music' | 'loops'>) {
     playMusic(line.music === null ? null : assetUrl(line.music, novel.version))
+    playLoops(line.loops.map(loop => assetUrl(loop, novel.version)))
     if (line.sfx === null || soundLine.current === line.lineId) {
       return
     }
@@ -102,7 +104,8 @@ export default function Play () {
       wait = 1100 + 500
     } else if (novel.bg !== null && novel.bg !== shownBg.current) {
       shownBg.current = novel.bg
-      wait = TEXT_DELAY[novel.fx ?? 'default'] ?? TEXT_DELAY.default
+      const delays = novel.text === '' ? BG_DURATION : TEXT_DELAY
+      wait = delays[novel.fx ?? 'default'] ?? delays.default
       if (veilOn.current) {
         veil.set(withTiming(0, { duration: 900, easing: EASE.inOut }))
         veilOn.current = false
@@ -119,7 +122,7 @@ export default function Play () {
   })
 
   const finishLine = useEffectEvent((lineId: number) => {
-    if (novel.fx === 'toBlack' && novel.text === '') {
+    if (novel.text === '' && !hasChoices) {
       novel.next()
       return
     }

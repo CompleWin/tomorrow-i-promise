@@ -42,15 +42,15 @@ function SpeakerName ({ name, instant }: { name: string | null, instant: boolean
   return (
     <View style={name === null && styles.hidden}>
       <View style={styles.hidden}
-            onLayout={e => width.set(Math.ceil(e.nativeEvent.layout.width))}
+            onLayout={e => width.set(Math.ceil(e.nativeEvent.layout.width) + 1)}
       >
-        <UIText size={34} color={COLORS.lamp} spacing={0.06} numberOfLines={1}>
+        <UIText size={34} lineHeight={1.4} color={COLORS.lamp} spacing={0.06} numberOfLines={1} style={styles.name}>
           {name ?? ' '}
         </UIText>
       </View>
       <Animated.View style={[styles.clip, clipStyle]}>
         <Animated.View style={textStyle}>
-          <UIText size={34} color={COLORS.lamp} spacing={0.06} numberOfLines={1}>
+          <UIText size={34} lineHeight={1.4} color={COLORS.lamp} spacing={0.06} numberOfLines={1} style={styles.name}>
             {name ?? ' '}
           </UIText>
         </Animated.View>
@@ -100,11 +100,15 @@ const styles = StyleSheet.create({
   hidden: {
     opacity: 0,
   },
+  name: {
+    marginVertical: -7,
+  },
   clip: {
     position: 'absolute',
     left: 0,
-    top: 0,
-    bottom: 0,
+    top: -16,
+    bottom: -16,
+    paddingTop: 16,
     overflow: 'hidden',
   },
 })
