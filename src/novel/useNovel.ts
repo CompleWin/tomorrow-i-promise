@@ -11,6 +11,9 @@ type Line = {
   speaker: string | null
   bg: string | null
   sprite: string | null
+  fx: string | null
+  dark: boolean
+  resumed: boolean
   choices: { index: number; text: string }[]
   ended: boolean
 }
@@ -21,6 +24,9 @@ const EMPTY: Line = {
   speaker: null,
   bg: null,
   sprite: null,
+  fx: null,
+  dark: false,
+  resumed: false,
   choices: [],
   ended: false,
 }
@@ -52,6 +58,7 @@ function parseTags (tags: string[] | null): Record<string, string> {
 export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const bgRef = useRef<string | null>(null)
+  const darkRef = useRef(false)
   const versionRef = useRef<string | null>(null)
   const lineIdRef = useRef(0)
 
@@ -88,22 +95,29 @@ export default function useNovel () {
 
   const persist = useCallback((story: Story) => {
     writeSave({
-      schema: 1,
+      schema: 2,
       inkState: story.state.ToJson(),
       contentVersion: versionRef.current,
       currentBg: bgRef.current,
       finalChoice: voteRef.current.finalChoice,
       voteStatus: voteRef.current.voteStatus,
+      dark: darkRef.current,
     })
   }, [])
 
-  const show = useCallback((story: Story) => {
+  const show = useCallback((story: Story, resumed = false) => {
     const text = (story.currentText ?? '').trim()
     const tags = parseTags(story.currentTags)
     const choices = story.currentChoices.map(
       c => ({ index: c.index, text: c.text }))
 
     bgRef.current = tags.bg ?? bgRef.current
+    if (tags.bg !== undefined) {
+      darkRef.current = false
+    }
+    if (tags.fx === 'toBlack') {
+      darkRef.current = true
+    }
     lineIdRef.current += 1
 
     setLine({
@@ -112,6 +126,9 @@ export default function useNovel () {
       speaker: tags.speaker ?? null,
       bg: bgRef.current,
       sprite: tags.sprite ?? null,
+      fx: tags.fx ?? null,
+      dark: darkRef.current,
+      resumed: resumed,
       choices: choices,
       ended: !story.canContinue && choices.length === 0,
     })
@@ -152,6 +169,8 @@ export default function useNovel () {
         storyRef.current = new Story(loaded.json)
 
         voteRef.current = NO_VOTE
+        bgRef.current = null
+        darkRef.current = false
 
         const save = await loadSave()
         if (cancelled) {
@@ -162,16 +181,19 @@ export default function useNovel () {
           try {
             storyRef.current.state.LoadJson(save.inkState)
             bgRef.current = save.currentBg
+            darkRef.current = save.dark
             voteRef.current = {
               finalChoice: save.finalChoice,
               voteStatus: save.voteStatus,
             }
-            show(storyRef.current)
+            show(storyRef.current, true)
             return
           } catch (error) {
             console.warn('save does not fit the story', error)
             await clearSave()
             storyRef.current = new Story(loaded.json)
+            bgRef.current = null
+            darkRef.current = false
 
             if (save.contentVersion !== loaded.version) {
               setNotice('История обновилась, начинаем сначала')

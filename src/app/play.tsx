@@ -1,5 +1,6 @@
-import { useRef } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
+import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { LinearGradient } from 'expo-linear-gradient'
 import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
@@ -11,18 +12,87 @@ import { Stage } from '@/novel/components/Stage'
 import Sprite from '@/novel/components/Sprite'
 import Subtitles from '@/novel/components/Subtitles'
 import UIText from '@/novel/components/UIText'
-import { COLORS } from '@/novel/theme'
+import { COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
 
 const GRADIENT_COLORS = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
 const GRADIENT_LOCATIONS = [0, 0.52, 1] as const
 
+const SHAKE = {
+  offsets: [0, 0.1, 0.22, 0.36, 0.52, 0.7, 1],
+  x: [0, -9, 8, -6, 4, -2, 0],
+  y: [0, 4, -5, 3, -2, 1, 0],
+}
+
 export default function Play () {
   const novel = useNovel()
-  const typing = useTypewriter(novel.text, { key: novel.lineId })
-  const busy = useRef(false)
+  const [readyLine, setReadyLine] = useState(-1)
+  const ready = readyLine === novel.lineId
+  const typing = useTypewriter(novel.text, { key: novel.lineId, paused: !ready })
+  const veiling = novel.fx === 'toBlack' && !ready
+
+  const veil = useSharedValue(0)
+  const shake = useSharedValue(1)
+  const veilOn = useRef(false)
+  const shownBg = useRef<string | null>(null)
+
+  const veilStyle = useAnimatedStyle(() => ({
+    opacity: veil.get(),
+  }))
+  const cameraStyle = useAnimatedStyle(() => ({
+    transform: [
+      { translateX: interpolate(shake.get(), SHAKE.offsets, SHAKE.x) },
+      { translateY: interpolate(shake.get(), SHAKE.offsets, SHAKE.y) },
+    ],
+  }))
+
+  const startLine = useEffectEvent(() => {
+    let wait = 0
+
+    if (novel.resumed) {
+      veil.set(novel.dark ? 1 : 0)
+      veilOn.current = novel.dark
+      shownBg.current = novel.bg
+    } else if (novel.fx === 'toBlack') {
+      veil.set(withTiming(1, { duration: 1100, easing: EASE.inOut }))
+      veilOn.current = true
+      wait = 1100 + 500
+    } else if (novel.bg !== null && novel.bg !== shownBg.current) {
+      shownBg.current = novel.bg
+      wait = TEXT_DELAY[novel.fx ?? 'default'] ?? TEXT_DELAY.default
+      if (veilOn.current) {
+        veil.set(withTiming(0, { duration: 900, easing: EASE.inOut }))
+        veilOn.current = false
+        wait = Math.max(wait, 500)
+      }
+    }
+
+    if (novel.fx === 'shake') {
+      shake.set(0)
+      shake.set(withTiming(1, { duration: 620, easing: EASE.easeOut }))
+    }
+
+    return wait
+  })
+
+  const finishLine = useEffectEvent((lineId: number) => {
+    if (novel.fx === 'toBlack' && novel.text === '') {
+      novel.next()
+      return
+    }
+    setReadyLine(lineId)
+  })
+
+  useEffect(() => {
+    const lineId = novel.lineId
+    if (lineId === 0) {
+      return
+    }
+    const timer = setTimeout(() => finishLine(lineId), startLine())
+    return () => clearTimeout(timer)
+  }, [novel.lineId])
 
   const tap = () => {
-    if (busy.current || novel.ended) {
+    if (!ready || novel.ended) {
       return
     }
     if (!typing.done) {
@@ -58,14 +128,19 @@ export default function Play () {
   return (
     <Pressable onPress={tap} style={styles.screen}>
       <Stage>
-        <View style={StyleSheet.absoluteFill}>
+        <Animated.View style={[StyleSheet.absoluteFill, cameraStyle]}>
           <Background name={novel.bg}
+                      fx={novel.fx}
+                      instant={novel.resumed}
                       version={novel.version}
           />
 
           <Sprite name={novel.sprite}
                   version={novel.version}
+                  hidden={novel.dark || veiling}
           />
+
+          <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
 
           <LinearGradient colors={GRADIENT_COLORS}
                           locations={GRADIENT_LOCATIONS}
@@ -73,8 +148,8 @@ export default function Play () {
                           style={styles.gradient}
           />
 
-          <Subtitles speaker={novel.speaker}
-                     text={novel.text}
+          <Subtitles speaker={veiling ? null : novel.speaker}
+                     text={veiling ? '' : novel.text}
                      shown={typing.shown}
           />
 
@@ -84,7 +159,7 @@ export default function Play () {
 
           {novel.ended && <End finalChoice={novel.finalChoice}
                                voteStatus={novel.voteStatus} />}
-        </View>
+        </Animated.View>
 
         {novel.notice !== null && (
           <UIText size={34} color={COLORS.cream} style={styles.notice}>
@@ -118,6 +193,10 @@ const styles = StyleSheet.create({
   retry: {
     paddingLeft: 0,
     marginTop: 40,
+  },
+  veil: {
+    ...StyleSheet.absoluteFill,
+    backgroundColor: '#000',
   },
   gradient: {
     position: 'absolute',

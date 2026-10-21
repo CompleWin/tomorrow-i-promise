@@ -40,6 +40,15 @@ for (const sprite of sprites) {
   }
 }
 
+const FX = ['fadeIn', 'close', 'blackout', 'lightsOn', 'toBlack', 'shake']
+const effects = [...text.matchAll(/#\s*fx:\s*(\S*)/g)].map(fx => fx[1])
+for (const fx of effects) {
+  if (!FX.includes(fx)) {
+    console.error(`unknown fx: ${fx}, expected one of: ${FX.join(', ')}`)
+    process.exit(1)
+  }
+}
+
 const json = story.ToJson()
 fs.writeFileSync('public/content/story.json', json)
 

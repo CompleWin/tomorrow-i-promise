@@ -3,12 +3,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 export type VoteStatus = 'none' | 'pending' | 'sent'
 
 export type SaveData = {
-  schema: 1
+  schema: 2
   inkState: string
   contentVersion: string | null
   currentBg: string | null
   finalChoice: 'A' | 'B' | null
   voteStatus: VoteStatus
+  dark: boolean
 }
 
 const SAVE_KEY = 'tomorrow-i-promise.save'
@@ -22,10 +23,10 @@ export async function loadSave() : Promise<SaveData | null> {
     }
 
     const saveData = JSON.parse(save)
-    if (saveData.schema !== 1 || typeof saveData.inkState !== 'string') {
+    if ((saveData.schema !== 1 && saveData.schema !== 2) || typeof saveData.inkState !== 'string') {
       return null
     }
-    return saveData as SaveData
+    return { ...saveData, schema: 2, dark: saveData.dark === true } as SaveData
   } catch (error) {
     console.warn('loadSave failed', error)
     return null

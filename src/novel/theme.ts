@@ -40,3 +40,11 @@ export const TYPE_DELAY = {
   stop: 260,
   pause: 110,
 }
+
+export const TEXT_DELAY: Record<string, number> = {
+  default: 250,
+  fadeIn: 600,
+  close: 700,
+  blackout: 1100,
+  lightsOn: 700,
+}
