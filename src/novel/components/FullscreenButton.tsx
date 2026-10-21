@@ -17,7 +17,7 @@ type LockableOrientation = ScreenOrientation & {
   lock?: (orientation: string) => Promise<void>
 }
 
-const QUERIES = ['(pointer: coarse)', '(display-mode: standalone)', '(display-mode: fullscreen)']
+const QUERIES = ['(display-mode: standalone)', '(display-mode: fullscreen)']
 
 function subscribe (onChange: () => void) {
   if (Platform.OS !== 'web') {
@@ -43,7 +43,7 @@ function shouldOffer () {
     || window.matchMedia('(display-mode: fullscreen)').matches
     || (navigator as Navigator & { standalone?: boolean }).standalone === true
   const fullscreen = (doc.fullscreenElement ?? doc.webkitFullscreenElement ?? null) !== null
-  return window.matchMedia('(pointer: coarse)').matches && !standalone && !fullscreen
+  return !standalone && !fullscreen
 }
 
 function enterFullscreen (): boolean {
