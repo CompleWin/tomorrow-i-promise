@@ -30,10 +30,6 @@ export function useStageScale () {
   }
 }
 
-export function useStageSize () {
-  return { w: STAGE_W, h: STAGE_H }
-}
-
 export function Stage ({ children }: { children: ReactNode }) {
   const { k, left, top } = useStageScale()
   return (

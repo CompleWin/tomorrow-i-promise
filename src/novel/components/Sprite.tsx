@@ -5,18 +5,27 @@ import { StyleSheet } from 'react-native'
 type Props = {
   name: string | null
   version: string | null
+  hidden?: boolean
 }
 
-export default function Sprite({ name, version }: Props) {
-  if (!name) {
-    return null
-  }
+function isRight (name: string | null) {
+  const base = name?.split('/').pop() ?? ''
+  return base.startsWith('guy_')
+}
+
+export default function Sprite ({ name, version, hidden = false }: Props) {
+  const visible = name !== null && !hidden
 
   return (
     <Image
-      source={assetUrl(name, version)}
-      style={styles.sprite}
+      source={name === null ? null : assetUrl(name, version)}
+      style={[
+        styles.sprite,
+        isRight(name) ? styles.right : styles.left,
+        !visible && styles.hidden,
+      ]}
       contentFit={'contain'}
+      pointerEvents={'none'}
     />
   )
 }
@@ -24,9 +33,17 @@ export default function Sprite({ name, version }: Props) {
 const styles = StyleSheet.create({
   sprite: {
     position: 'absolute',
-    left: '4%',
-    bottom: '2.4%',
-    height: '64%',
-    aspectRatio: 1086 / 1448,
-  }
+    bottom: 0,
+    width: 583.5,
+    height: 778,
+  },
+  left: {
+    left: 96,
+  },
+  right: {
+    right: 96,
+  },
+  hidden: {
+    opacity: 0,
+  },
 })

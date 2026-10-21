@@ -33,3 +33,10 @@ export const EASE = {
 }
 
 export const TEXT_SPEED = 1
+
+export const TYPE_DELAY = {
+  start: 160,
+  char: 28,
+  stop: 260,
+  pause: 110,
+}

@@ -6,6 +6,7 @@ import { AppState } from 'react-native'
 import { Choice, submitVote } from '@/novel/vote'
 
 type Line = {
+  lineId: number
   text: string
   speaker: string | null
   bg: string | null
@@ -15,6 +16,7 @@ type Line = {
 }
 
 const EMPTY: Line = {
+  lineId: 0,
   text: '',
   speaker: null,
   bg: null,
@@ -51,6 +53,7 @@ export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const bgRef = useRef<string | null>(null)
   const versionRef = useRef<string | null>(null)
+  const lineIdRef = useRef(0)
 
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
@@ -101,8 +104,10 @@ export default function useNovel () {
       c => ({ index: c.index, text: c.text }))
 
     bgRef.current = tags.bg ?? bgRef.current
+    lineIdRef.current += 1
 
     setLine({
+      lineId: lineIdRef.current,
       text: text,
       speaker: tags.speaker ?? null,
       bg: bgRef.current,
@@ -178,6 +183,7 @@ export default function useNovel () {
 
         step()
       } catch (error) {
+        console.warn('story load failed', error)
         if (!cancelled) {
           setError(String(error))
         }
@@ -228,7 +234,7 @@ export default function useNovel () {
     step()
   }, [step])
 
-  const update = useCallback(() => {
+  const reload = useCallback(() => {
     setUpdateAvailable(false)
     setError(null)
     setLoading(true)
@@ -246,7 +252,7 @@ export default function useNovel () {
     voteStatus: vote.voteStatus,
     next,
     choose,
-    update,
+    reload,
   }
 
 }
