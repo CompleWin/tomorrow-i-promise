@@ -106,7 +106,6 @@ export default function Index () {
 
       <Animated.View style={[styles.column, columnStyle]}>
         <View style={styles.title}>
-          <UIText size={30} spacing={0.06} color={COLORS.kicker}>визуальная новелла</UIText>
           <View>
             <UIText size={132} color={COLORS.cream}>Завтра</UIText>
             <UIText size={132} color={COLORS.cream}>точно</UIText>
