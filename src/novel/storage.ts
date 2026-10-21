@@ -17,8 +17,15 @@ export type Completed = {
   choice: 'A' | 'B'
 }
 
+export type Settings = {
+  volume: number
+}
+
+export const DEFAULT_SETTINGS: Settings = { volume: 50 }
+
 const SAVE_KEY = 'tomorrow-i-promise.save'
 const COMPLETED_KEY = 'tomorrow-i-promise.completed'
+const SETTINGS_KEY = 'tomorrow-i-promise.settings'
 
 export async function loadSave() : Promise<SaveData | null> {
   try {
@@ -85,5 +92,30 @@ export async function markCompleted(choice: 'A' | 'B') : Promise<void> {
     await AsyncStorage.setItem(COMPLETED_KEY, JSON.stringify({ choice }))
   } catch (error) {
     console.warn('markCompleted failed', error)
+  }
+}
+
+export async function loadSettings() : Promise<Settings> {
+  try {
+    const settings = await AsyncStorage.getItem(SETTINGS_KEY)
+    if (settings === null) {
+      return DEFAULT_SETTINGS
+    }
+    const data = JSON.parse(settings)
+    if (typeof data.volume !== 'number' || !Number.isFinite(data.volume)) {
+      return DEFAULT_SETTINGS
+    }
+    return { volume: Math.min(100, Math.max(0, Math.round(data.volume))) }
+  } catch (error) {
+    console.warn('loadSettings failed', error)
+    return DEFAULT_SETTINGS
+  }
+}
+
+export async function writeSettings(settings: Settings) : Promise<void> {
+  try {
+    await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
+  } catch (error) {
+    console.warn('writeSettings failed', error)
   }
 }

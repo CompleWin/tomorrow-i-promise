@@ -1,14 +1,15 @@
-import { StyleSheet, View } from 'react-native'
+import { BackHandler, StyleSheet, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { cachedVersion } from '@/novel/content'
 import { menuArtFor, MENU_ART_COMPLETED } from '@/novel/menuArt'
-import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
-import { useBanner } from '@/novel/components/Banner'
+import { setVolume } from '@/novel/sound'
+import { clearSave, loadCompleted, loadSave, loadSettings, writeSettings } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuItem from '@/novel/components/MenuItem'
+import VolumeControl from '@/novel/components/VolumeControl'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
@@ -18,24 +19,29 @@ type Menu = {
   act: number | null
   completed: boolean
   version: string | null
+  volume: number
 }
 
+type MenuView = 'main' | 'settings'
+
 async function loadMenu (): Promise<Menu> {
-  const [save, completed] = await Promise.all([loadSave(), loadCompleted()])
+  const [save, completed, settings] = await Promise.all([loadSave(), loadCompleted(), loadSettings()])
   return {
     hasSave: save !== null,
     act: save?.act ?? null,
     completed: completed !== null,
     version: save?.contentVersion ?? await cachedVersion(),
+    volume: settings.volume,
   }
 }
 
 export default function Index () {
 
   const [menu, setMenu] = useState<Menu | null>(null)
+  const [view, setView] = useState<MenuView>('main')
   const fade = useFade()
-  const banner = useBanner()
   const shown = useSharedValue(0)
+  const items = useSharedValue(1)
   const loaded = menu !== null
 
   useEffect(() => {
@@ -46,6 +52,9 @@ export default function Index () {
 
   const columnStyle = useAnimatedStyle(() => ({
     opacity: shown.get(),
+  }))
+  const itemsStyle = useAnimatedStyle(() => ({
+    opacity: items.get(),
   }))
 
   useFocusEffect(
@@ -73,9 +82,33 @@ export default function Index () {
     await open('/play')
   }
 
-  function settings () {
-    banner.show('Настройки появятся в следующей версии', { duration: 3200 })
+  function switchView (next: MenuView) {
+    items.set(0)
+    items.set(withTiming(1, { duration: 300 }))
+    setView(next)
   }
+
+  function changeVolume (volume: number) {
+    if (menu === null) {
+      return
+    }
+    setMenu({ ...menu, volume })
+    setVolume(volume)
+    writeSettings({ volume })
+  }
+
+  const onBack = useEffectEvent(() => {
+    if (view !== 'settings') {
+      return false
+    }
+    switchView('main')
+    return true
+  })
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
+    return () => subscription.remove()
+  }, [])
 
   const art = menu?.completed ? MENU_ART_COMPLETED : menuArtFor(menu?.act ?? null)
 
@@ -92,8 +125,15 @@ export default function Index () {
           </View>
         </View>
 
-        {menu !== null && (
-          <View>
+        {menu !== null && view === 'settings' && (
+          <Animated.View style={itemsStyle}>
+            <VolumeControl label={'Громкость'} value={menu.volume} onChange={changeVolume} />
+            <MenuItem label={'Назад'} onPress={() => switchView('main')} />
+          </Animated.View>
+        )}
+
+        {menu !== null && view === 'main' && (
+          <Animated.View style={itemsStyle}>
             {menu.hasSave ? (
               <>
                 <MenuItem label={'Продолжить'} active onPress={() => open('/play')} />
@@ -105,9 +145,9 @@ export default function Index () {
             {menu.completed && (
               <MenuItem label={'Статистика'} onPress={() => open('/stats')} />
             )}
-            <MenuItem label={'Настройки'} onPress={settings} />
+            <MenuItem label={'Настройки'} onPress={() => switchView('settings')} />
             <MenuItem label={'Авторы'} onPress={() => open('/credits')} />
-          </View>
+          </Animated.View>
         )}
       </Animated.View>
     </Stage>
