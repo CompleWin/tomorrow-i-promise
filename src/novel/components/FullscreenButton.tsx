@@ -1,7 +1,7 @@
 import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import { useState, useSyncExternalStore } from 'react'
 import { useBanner } from '@/novel/components/Banner'
-import { COLORS } from '@/novel/theme'
+import { COLORS, IDLE_OPACITY } from '@/novel/theme'
 
 const HINT = 'Чтобы играть на весь экран: «Поделиться» → «На экран «Домой»»'
 
@@ -107,9 +107,11 @@ const styles = StyleSheet.create({
     width: 72,
     height: 72,
     backgroundColor: COLORS.pauseBtn,
+    opacity: IDLE_OPACITY,
   },
   squarePressed: {
     backgroundColor: COLORS.pauseBtnPressed,
+    opacity: 1,
   },
   corner: {
     position: 'absolute',

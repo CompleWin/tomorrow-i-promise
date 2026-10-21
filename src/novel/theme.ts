@@ -23,6 +23,8 @@ export const COLORS = {
 
 export const FONT = 'Galmuri11'
 
+export const IDLE_OPACITY = 0.45
+
 export const EASE = {
   out: Easing.bezier(0.2, 0.8, 0.2, 1),
   wipe: Easing.bezier(0.3, 0.7, 0.2, 1),

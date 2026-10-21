@@ -1,6 +1,6 @@
 import { Pressable, StyleSheet, View } from 'react-native'
 import { useState } from 'react'
-import { COLORS } from '@/novel/theme'
+import { COLORS, IDLE_OPACITY } from '@/novel/theme'
 
 export default function PauseButton ({ onPress }: { onPress: () => void }) {
   const [hovered, setHovered] = useState(false)
@@ -37,9 +37,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
     backgroundColor: COLORS.pauseBtn,
+    opacity: IDLE_OPACITY,
   },
   squarePressed: {
     backgroundColor: COLORS.pauseBtnPressed,
+    opacity: 1,
   },
   bar: {
     width: 12,
