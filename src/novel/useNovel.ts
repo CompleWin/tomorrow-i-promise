@@ -1,7 +1,7 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { clearSave, loadSave, VoteStatus, writeSave } from '@/novel/storage'
-import { fetchManifest, getStory } from '@/novel/content'
+import { fetchManifest, getStory, preloadStory } from '@/novel/content'
 import { AppState } from 'react-native'
 import { Choice, submitVote } from '@/novel/vote'
 
@@ -167,6 +167,10 @@ export default function useNovel () {
         versionRef.current = loaded.version
         setVersion(loaded.version)
         storyRef.current = new Story(loaded.json)
+        await preloadStory(loaded.json, loaded.version)
+        if (cancelled) {
+          return
+        }
 
         voteRef.current = NO_VOTE
         bgRef.current = null

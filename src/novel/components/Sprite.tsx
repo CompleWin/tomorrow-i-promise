@@ -1,6 +1,7 @@
+import { useState } from 'react'
 import { Image } from 'expo-image'
-import { assetUrl } from '@/novel/config'
-import { StyleSheet } from 'react-native'
+import { assetSource } from '@/novel/preload'
+import { StyleSheet, View } from 'react-native'
 
 type Props = {
   name: string | null
@@ -13,20 +14,33 @@ function isRight (name: string | null) {
   return base.startsWith('guy_')
 }
 
+function SpriteImage ({ name, version }: { name: string, version: string | null }) {
+  const [loaded, setLoaded] = useState(false)
+
+  return (
+    <Image
+      source={assetSource(name, version)}
+      style={[StyleSheet.absoluteFill, !loaded && styles.hidden]}
+      contentFit={'contain'}
+      onLoad={() => setLoaded(true)}
+    />
+  )
+}
+
 export default function Sprite ({ name, version, hidden = false }: Props) {
   const visible = name !== null && !hidden
 
   return (
-    <Image
-      source={name === null ? null : assetUrl(name, version)}
+    <View
+      pointerEvents={'none'}
       style={[
         styles.sprite,
         isRight(name) ? styles.right : styles.left,
         !visible && styles.hidden,
       ]}
-      contentFit={'contain'}
-      pointerEvents={'none'}
-    />
+    >
+      {name !== null && <SpriteImage key={name} name={name} version={version} />}
+    </View>
   )
 }
 

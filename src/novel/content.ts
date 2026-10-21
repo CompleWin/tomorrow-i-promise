@@ -1,6 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Story } from 'inkjs'
 import { CONTENT_URL } from '@/novel/config'
+import { preloadAssets } from '@/novel/preload'
 
 export type Manifest = {
   version: string
@@ -107,4 +108,23 @@ export async function getStory (): Promise<LoadedStory> {
     throw error
   }
 
+}
+
+const PRELOAD_TIMEOUT_MS = 15 * 1000
+const ASSET_TAG = /"\^(bg|sprite):\s*([^"]+?)\s*"/g
+
+export async function preloadStory (json: string, version: string): Promise<void> {
+  const paths = new Set<string>()
+  for (const [, tag, value] of json.matchAll(ASSET_TAG)) {
+    paths.add(tag === 'bg' ? `bg/${value}` : value)
+  }
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<void>(resolve => { timer = setTimeout(resolve, PRELOAD_TIMEOUT_MS) })
+  try {
+    await Promise.race([preloadAssets([...paths], version), timeout])
+  } catch (error) {
+    console.warn('preload failed', error)
+  } finally {
+    clearTimeout(timer)
+  }
 }

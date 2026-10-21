@@ -10,7 +10,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
-import { assetUrl } from '@/novel/config'
+import { assetSource } from '@/novel/preload'
 import { EASE } from '@/novel/theme'
 
 type Mode = 'default' | 'fadeIn' | 'close' | 'blackout' | 'lightsOn' | 'instant'
@@ -71,8 +71,12 @@ type LayerProps = {
 function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: LayerProps) {
   const enter = useSharedValue(mode === 'instant' ? 1 : 0)
   const out = useSharedValue(0)
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    if (!loaded) {
+      return
+    }
     if (mode === 'instant') {
       onDone(layerKey)
       return
@@ -82,7 +86,7 @@ function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: La
         scheduleOnRN(onDone, layerKey)
       }
     }))
-  }, [mode, enter, onDone, layerKey])
+  }, [loaded, mode, enter, onDone, layerKey])
 
   useEffect(() => {
     if (leaving) {
@@ -110,9 +114,10 @@ function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone }: La
   return (
     <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
       <Image
-        source={assetUrl(`bg/${name}`, version)}
-        style={StyleSheet.absoluteFill}
+        source={assetSource(`bg/${name}`, version)}
+        style={[StyleSheet.absoluteFill, !loaded && styles.hidden]}
         contentFit={'cover'}
+        onLoad={() => setLoaded(true)}
       />
     </Animated.View>
   )
@@ -162,3 +167,9 @@ export default function Background ({ name, fx, instant = false, version }: Prop
     </Animated.View>
   )
 }
+
+const styles = StyleSheet.create({
+  hidden: {
+    opacity: 0,
+  },
+})
