@@ -6,6 +6,9 @@
     },
     "2": {
       "base": "act2/bg/bg2.png"
+    },
+    "3": {
+      "base": "act3/bg/city1.webp"
     }
   },
   "completed": {

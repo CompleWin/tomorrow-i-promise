@@ -45,7 +45,11 @@ for (const [, sfx, mode] of sounds) {
     console.error(`sfx does not exist: ${sfx} (expected in ${ASSETS_DIR}, or use "sfx: stop")`)
     process.exit(1)
   }
-  if (mode !== '' && mode !== 'loop') {
+  if (sfx === 'stop' && mode !== '' && mode !== 'all') {
+    console.error(`unknown sfx stop mode: ${mode}, expected "all" or nothing`)
+    process.exit(1)
+  }
+  if (sfx !== 'stop' && mode !== '' && mode !== 'loop') {
     console.error(`unknown sfx mode: ${mode}, expected "loop" or nothing`)
     process.exit(1)
   }
@@ -64,6 +68,14 @@ const effects = [...text.matchAll(/#\s*fx:\s*(\S*)/g)].map(fx => fx[1])
 for (const fx of effects) {
   if (!FX.includes(fx)) {
     console.error(`unknown fx: ${fx}, expected one of: ${FX.join(', ')}`)
+    process.exit(1)
+  }
+}
+
+const waits = [...text.matchAll(/#\s*wait:\s*(\S*)/g)].map(wait => wait[1])
+for (const wait of waits) {
+  if (!/^\d+$/.test(wait)) {
+    console.error(`wait must be milliseconds: ${wait}`)
     process.exit(1)
   }
 }

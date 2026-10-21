@@ -180,12 +180,16 @@ export function playMusic (url: string | null) {
   resumeMusic()
 }
 
-export function stopAll () {
+export function stopSfx () {
   try {
     player?.pause()
   } catch (error) {
     console.warn('sfx stop failed', error)
   }
+}
+
+export function stopAll () {
+  stopSfx()
   playLoops([])
   playMusic(null)
 }

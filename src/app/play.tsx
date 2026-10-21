@@ -8,7 +8,7 @@ import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
-import { playLoops, playMusic, playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
+import { playLoops, playMusic, playSfx, releaseSound, startSound, stopAll, stopSfx } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -72,14 +72,19 @@ export default function Play () {
     ],
   }))
 
-  function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music' | 'loops'>) {
+  function playLineSound (line: Pick<Line, 'lineId' | 'sfx' | 'music' | 'loops' | 'silence'>) {
     playMusic(line.music === null ? null : assetUrl(line.music, novel.version))
     playLoops(line.loops.map(loop => assetUrl(loop, novel.version)))
-    if (line.sfx === null || soundLine.current === line.lineId) {
+    if (soundLine.current === line.lineId) {
       return
     }
     soundLine.current = line.lineId
-    playSfx(assetUrl(line.sfx, novel.version))
+    if (line.silence) {
+      stopSfx()
+    }
+    if (line.sfx !== null) {
+      playSfx(assetUrl(line.sfx, novel.version))
+    }
   }
 
   const startLine = useEffectEvent(() => {
@@ -118,7 +123,7 @@ export default function Play () {
       shake.set(withTiming(1, { duration: 620, easing: EASE.easeOut }))
     }
 
-    return wait
+    return wait + novel.wait
   })
 
   const finishLine = useEffectEvent((lineId: number) => {
