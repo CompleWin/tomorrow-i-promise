@@ -110,5 +110,7 @@ const styles = StyleSheet.create({
   rest: {
     color: 'transparent',
     textShadowColor: 'transparent',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 0.01,
   },
 })

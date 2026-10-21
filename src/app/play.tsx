@@ -14,8 +14,11 @@ import Subtitles from '@/novel/components/Subtitles'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
 
-const GRADIENT_COLORS = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
-const GRADIENT_LOCATIONS = [0, 0.52, 1] as const
+const GRADIENT_H = 470
+const GRADIENT_OVERSCAN = 40
+const GRADIENT_K = GRADIENT_H / (GRADIENT_H + GRADIENT_OVERSCAN)
+const GRADIENT_COLORS = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)', 'rgba(4,3,2,.94)'] as const
+const GRADIENT_LOCATIONS = [0, 0.52 * GRADIENT_K, GRADIENT_K, 1] as const
 
 const SHAKE = {
   offsets: [0, 0.1, 0.22, 0.36, 0.52, 0.7, 1],
@@ -205,8 +208,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
-    height: 470,
+    bottom: -GRADIENT_OVERSCAN,
+    height: GRADIENT_H + GRADIENT_OVERSCAN,
   },
   notice: {
     position: 'absolute',
