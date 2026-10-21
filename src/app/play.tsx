@@ -6,6 +6,8 @@ import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
+import { assetUrl } from '@/novel/config'
+import { playSfx, releaseSound, startSound, stopAll } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -56,6 +58,7 @@ export default function Play () {
   const veilOn = useRef(false)
   const shownBg = useRef<string | null>(null)
   const reveal = useRef(true)
+  const soundLine = useRef(0)
 
   const veilStyle = useAnimatedStyle(() => ({
     opacity: veil.get(),
@@ -67,8 +70,17 @@ export default function Play () {
     ],
   }))
 
+  function playLineSound (lineId: number, sfx: string | null) {
+    if (sfx === null || soundLine.current === lineId) {
+      return
+    }
+    soundLine.current = lineId
+    playSfx(assetUrl(`sfx/${sfx}`, novel.version))
+  }
+
   const startLine = useEffectEvent(() => {
     let wait = 0
+    playLineSound(novel.lineId, novel.sfx)
 
     if (reveal.current) {
       reveal.current = false
@@ -130,6 +142,11 @@ export default function Play () {
   useEffect(() => {
     alive.current = true
     return () => { alive.current = false }
+  }, [])
+
+  useEffect(() => {
+    startSound()
+    return () => releaseSound()
   }, [])
 
   useEffect(() => {
@@ -221,6 +238,7 @@ export default function Play () {
   async function toMenu () {
     setPaused(false)
     setLeaving(true)
+    stopAll()
     await fade.to(1, 600)
     if (phase === 'result' && novel.voteStatus !== 'pending') {
       await clearSave()
@@ -243,7 +261,10 @@ export default function Play () {
     if (hasChoices) {
       return
     }
-    novel.next()
+    const shown = novel.next()
+    if (shown !== null) {
+      playLineSound(shown.lineId, shown.sfx)
+    }
   }
 
   async function pick (index: number) {

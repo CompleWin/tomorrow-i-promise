@@ -5,6 +5,7 @@ import crypto from 'node:crypto'
 const BOM = /^\uFEFF/
 const ASSETS_DIR = 'public/content/assets'
 const BG_DIR = `${ASSETS_DIR}/bg`
+const SFX_DIR = `${ASSETS_DIR}/sfx`
 
 const textFile = fs.readFileSync('story/main.ink', 'utf8')
 const text = textFile.replace(BOM, '')
@@ -36,6 +37,14 @@ const sprites = [...text.matchAll(/#\s*sprite:\s*(\S+)/g)].map(spr => spr[1])
 for (const sprite of sprites) {
   if (!fs.existsSync(`${ASSETS_DIR}/${sprite}`)) {
     console.error(`asset does not exist: ${sprite}`)
+    process.exit(1)
+  }
+}
+
+const sounds = [...text.matchAll(/#\s*sfx:\s*(\S+)/g)].map(sfx => sfx[1])
+for (const sfx of sounds) {
+  if (!fs.existsSync(`${SFX_DIR}/${sfx}`)) {
+    console.error(`sfx does not exist: ${sfx} (expected in ${SFX_DIR})`)
     process.exit(1)
   }
 }

@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Story } from 'inkjs'
-import { CONTENT_URL } from '@/novel/config'
+import { assetUrl, CONTENT_URL } from '@/novel/config'
 import { preloadAssets } from '@/novel/preload'
+import { preloadSounds } from '@/novel/sound'
 
 export type Manifest = {
   version: string
@@ -117,8 +118,15 @@ export async function getStory (): Promise<LoadedStory> {
 
 const PRELOAD_TIMEOUT_MS = 15 * 1000
 const ASSET_TAG = /"\^(bg|sprite):\s*([^"]+?)\s*"/g
+const SFX_TAG = /"\^sfx:\s*([^"]+?)\s*"/g
 
 export async function preloadStory (json: string, version: string): Promise<void> {
+  const sounds = new Set<string>()
+  for (const [, name] of json.matchAll(SFX_TAG)) {
+    sounds.add(assetUrl(`sfx/${name}`, version))
+  }
+  preloadSounds([...sounds])
+
   const paths = new Set<string>()
   for (const [, tag, value] of json.matchAll(ASSET_TAG)) {
     paths.add(tag === 'bg' ? `bg/${value}` : value)

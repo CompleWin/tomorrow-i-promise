@@ -7,7 +7,7 @@ VAR final_choice = ""
 А ты её купил? # speaker: Марта # sprite: act1/martha_normal.png
 Я думал, у нас ещё оставалась. # speaker: Гай # sprite: act1/guy_normal.png
 Ну вот и я думала. # speaker: Марта # sprite: act1/martha_normal.png
-Слышен стук ложек.
+Слышен стук ложек. # sfx: spoons.mp3
 Ладно, завтра куплю. # speaker: Гай # sprite: act1/guy_smile.png
 Ты вчера так же говорил. # speaker: Марта # sprite: act1/martha_smile.png
 Завтра точно. # speaker: Гай # sprite: act1/guy_smile.png
@@ -49,7 +49,7 @@ VAR final_choice = ""
 # fx: toBlack
 Ты рад? # speaker: Марта
 Конечно, рад. # speaker: Гай
-Звук отдалённого баха. # fx: shake
+Звук отдалённого баха. # fx: shake # sfx: bang.mp3
 
 -> act_2
 === act_2 ===

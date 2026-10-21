@@ -5,13 +5,14 @@ import { fetchManifest, getStory, preloadStory } from '@/novel/content'
 import { AppState } from 'react-native'
 import { Choice, submitVote } from '@/novel/vote'
 
-type Line = {
+export type Line = {
   lineId: number
   text: string
   speaker: string | null
   bg: string | null
   sprite: string | null
   fx: string | null
+  sfx: string | null
   dark: boolean
   resumed: boolean
   choices: { index: number; text: string }[]
@@ -25,6 +26,7 @@ const EMPTY: Line = {
   bg: null,
   sprite: null,
   fx: null,
+  sfx: null,
   dark: false,
   resumed: false,
   choices: [],
@@ -109,7 +111,7 @@ export default function useNovel () {
     })
   }, [])
 
-  const show = useCallback((story: Story, resumed = false) => {
+  const show = useCallback((story: Story, resumed = false): Line => {
     const text = (story.currentText ?? '').trim()
     const tags = parseTags(story.currentTags)
     const choices = story.currentChoices.map(
@@ -128,18 +130,20 @@ export default function useNovel () {
     }
     lineIdRef.current += 1
 
-    setLine({
+    const shown: Line = {
       lineId: lineIdRef.current,
       text: text,
       speaker: tags.speaker ?? null,
       bg: bgRef.current,
       sprite: tags.sprite ?? null,
       fx: tags.fx ?? null,
+      sfx: tags.sfx ?? null,
       dark: darkRef.current,
       resumed: resumed,
       choices: choices,
       ended: !story.canContinue && choices.length === 0,
-    })
+    }
+    setLine(shown)
 
     const fc = story.variablesState['final_choice']
     if ((fc === 'A' || fc === 'B') && voteRef.current.voteStatus === 'none') {
@@ -147,19 +151,20 @@ export default function useNovel () {
     }
     setVote(voteRef.current)
     persist(story)
+    return shown
   }, [persist])
 
-  const step = useCallback(() => {
+  const step = useCallback((): Line | null => {
     const story = storyRef.current
     if (!story) {
-      return
+      return null
     }
 
     if (story.canContinue) {
       story.Continue()
     }
 
-    show(story)
+    return show(story)
   }, [show])
 
   useEffect(() => {
@@ -257,13 +262,13 @@ export default function useNovel () {
     return () => {cancelled = true}
   }, [vote, persist])
 
-  const next = useCallback(() => {
+  const next = useCallback((): Line | null => {
     setNotice(null)
 
     if (line.choices.length > 0) {
-      return
+      return null
     }
-    step()
+    return step()
   }, [line.choices.length, step])
 
   const choose = useCallback((index: number) => {
