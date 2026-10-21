@@ -36,6 +36,7 @@ function percent (value: unknown, fallback: number): number {
 const SAVE_KEY = 'tomorrow-i-promise.save'
 const COMPLETED_KEY = 'tomorrow-i-promise.completed'
 const SETTINGS_KEY = 'tomorrow-i-promise.settings'
+const EMAIL_KEY = 'tomorrow-i-promise.email'
 
 export async function loadSave() : Promise<SaveData | null> {
   try {
@@ -129,5 +130,22 @@ export async function writeSettings(settings: Settings) : Promise<void> {
     await AsyncStorage.setItem(SETTINGS_KEY, JSON.stringify(settings))
   } catch (error) {
     console.warn('writeSettings failed', error)
+  }
+}
+
+export async function loadEmailSent() : Promise<boolean> {
+  try {
+    return await AsyncStorage.getItem(EMAIL_KEY) !== null
+  } catch (error) {
+    console.warn('loadEmailSent failed', error)
+    return false
+  }
+}
+
+export async function markEmailSent() : Promise<void> {
+  try {
+    await AsyncStorage.setItem(EMAIL_KEY, '1')
+  } catch (error) {
+    console.warn('markEmailSent failed', error)
   }
 }

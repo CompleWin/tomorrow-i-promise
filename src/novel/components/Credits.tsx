@@ -75,6 +75,9 @@ export default function Credits ({ onDone }: Props) {
 
   return (
     <Pressable onPress={tap} style={styles.screen}>
+      <Animated.View pointerEvents={'none'} style={[styles.title, columnStyle]}>
+        <UIText size={48} spacing={0.06} color={COLORS.kicker}>Авторы</UIText>
+      </Animated.View>
       <Animated.View pointerEvents={'none'} style={[styles.row, columnStyle]}>
         {AUTHORS.map((author, i) => (
           <View key={author.handle} style={styles.column}>
@@ -94,6 +97,13 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     backgroundColor: COLORS.inkBlack,
     justifyContent: 'center',
+  },
+  title: {
+    position: 'absolute',
+    top: 120,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
   },
   row: {
     flexDirection: 'row',

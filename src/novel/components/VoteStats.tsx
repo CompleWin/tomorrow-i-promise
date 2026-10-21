@@ -1,7 +1,8 @@
 import { useEffect, useEffectEvent, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { getResults, Results } from '@/novel/vote'
+import { getResults, MIN_VOTES, Results } from '@/novel/vote'
+import EmailForm from '@/novel/components/EmailForm'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
 
@@ -35,9 +36,6 @@ export function resultsMessage (results: Results | null): string | null {
   if (results === null) {
     return 'Статистика сейчас недоступна'
   }
-  if (results.a + results.b === 0) {
-    return 'Пока никто не голосовал'
-  }
   return null
 }
 
@@ -50,11 +48,19 @@ type Props = {
 export default function VoteStats ({ message, results, onCounted }: Props) {
   const [progress, setProgress] = useState(0)
   const statsIn = useSharedValue(0)
-  const showStats = message === null && results !== null
+  const total = results === null ? 0 : results.a + results.b
+  const showStats = message === null && results !== null && total >= MIN_VOTES
+  const showForm = message === null && results !== null && total < MIN_VOTES
 
   const counted = useEffectEvent(() => {
     onCounted?.()
   })
+
+  useEffect(() => {
+    if (showForm) {
+      counted()
+    }
+  }, [showForm])
 
   useEffect(() => {
     if (!showStats) {
@@ -82,7 +88,6 @@ export default function VoteStats ({ message, results, onCounted }: Props) {
     opacity: statsIn.get(),
   }))
 
-  const total = results === null ? 0 : results.a + results.b
   const percentA = results === null || total === 0 ? 0 : Math.round(results.a * 100 / total)
   const percentB = 100 - percentA
   const groupA = Math.round(percentA / 2)
@@ -97,6 +102,8 @@ export default function VoteStats ({ message, results, onCounted }: Props) {
           <UIText size={40} color={COLORS.cream2} align={'center'}>{message}</UIText>
         </View>
       )}
+
+      {showForm && <EmailForm />}
 
       {showStats && (
         <Animated.View style={[styles.stats, statsStyle]}>

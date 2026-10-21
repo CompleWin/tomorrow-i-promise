@@ -9,6 +9,7 @@ import BottomGradient from '@/novel/components/BottomGradient'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
+import GitHubStar from '@/novel/components/GitHubStar'
 import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
 
@@ -110,6 +111,8 @@ export default function End ({ finalChoice, voteStatus, version, onExit }: Props
             <TypedText text={answer} shown={typing.shown} />
           </UIText>
         </View>
+
+        <GitHubStar visible={settled} />
       </View>
     </Pressable>
   )
@@ -133,7 +136,7 @@ const styles = StyleSheet.create({
     right: 240,
     bottom: 76,
     alignItems: 'center',
-    gap: 72,
+    gap: 56,
   },
   answer: {
     alignItems: 'center',

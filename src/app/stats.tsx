@@ -10,6 +10,7 @@ import BottomGradient from '@/novel/components/BottomGradient'
 import { useFade } from '@/novel/components/Fade'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
+import GitHubStar from '@/novel/components/GitHubStar'
 import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
 
@@ -118,6 +119,8 @@ export default function Stats () {
               {choice === undefined ? ' ' : LABELS[choice]}
             </UIText>
           </View>
+
+          <GitHubStar visible={settled} />
         </View>
       </Stage>
     </Pressable>
@@ -142,7 +145,7 @@ const styles = StyleSheet.create({
     right: 240,
     bottom: 76,
     alignItems: 'center',
-    gap: 72,
+    gap: 56,
   },
   answer: {
     alignItems: 'center',

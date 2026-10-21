@@ -10,6 +10,9 @@ export default function useKeys ({ onNext, onPause }: Keys) {
     if (event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
       return
     }
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLTextAreaElement) {
+      return
+    }
     if (event.key === 'Escape') {
       event.preventDefault()
       onPause()

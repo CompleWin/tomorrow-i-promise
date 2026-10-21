@@ -21,6 +21,10 @@ export const LABELS: Record<Choice, string> = {
   B: 'Не оставляем',
 }
 
+export const MIN_VOTES = 12
+
+export const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
 const TIMEOUT_MS = 8 * 1000
 
 function withTimeout<T> (promise: Promise<T>): Promise<T> {
@@ -42,6 +46,12 @@ export async function submitVote (
 
   await withTimeout(
     setDoc(ref, { choice, contentVersion, createdAt: serverTimestamp() }))
+}
+
+export async function submitEmail (email: string): Promise<void> {
+  const uid = await withTimeout(getUid())
+  await withTimeout(
+    setDoc(doc(db, 'emails', uid), { email, createdAt: serverTimestamp() }))
 }
 
 export async function getResults (): Promise<Results> {
