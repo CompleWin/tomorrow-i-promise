@@ -138,6 +138,7 @@ export default function Play () {
           <Sprite name={novel.sprite}
                   version={novel.version}
                   hidden={novel.dark || veiling}
+                  instant={novel.resumed}
           />
 
           <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
@@ -151,6 +152,8 @@ export default function Play () {
           <Subtitles speaker={veiling ? null : novel.speaker}
                      text={veiling ? '' : novel.text}
                      shown={typing.shown}
+                     instant={novel.resumed}
+                     intro
           />
 
           {typing.done && novel.choices.length > 0 && (
