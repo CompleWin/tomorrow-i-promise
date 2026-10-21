@@ -1,8 +1,12 @@
-import { Text, Pressable, StyleSheet, View } from 'react-native'
-import { Link, router, useFocusEffect } from 'expo-router'
+import { StyleSheet, View } from 'react-native'
+import { router, useFocusEffect } from 'expo-router'
 import app from '../../app.json'
 import { useCallback, useState } from 'react'
 import { clearSave, loadSave } from '@/novel/storage'
+import { Stage } from '@/novel/components/Stage'
+import UIText from '@/novel/components/UIText'
+import MenuItem from '@/novel/components/MenuItem'
+import { COLORS } from '@/novel/theme'
 
 export default function Index () {
 
@@ -21,42 +25,30 @@ export default function Index () {
   }
 
   return (
-    <>
+    <Stage>
       <View style={styles.screen}>
-        <Text>{app.expo.name}</Text>
+        <UIText size={132} color={COLORS.cream} style={styles.title}>{app.expo.name}</UIText>
 
         {hasSave === null && (
-          <Text style={styles.start}>Загрузка, пожалуйста подождите</Text>
+          <UIText size={52} color={COLORS.cream2}>Загрузка, пожалуйста подождите</UIText>
         )
         }
 
         {hasSave === false && (
-          <Link href="/play" asChild>
-            <Pressable style={styles.start}>
-              <Text style={styles.startText}>Начать</Text>
-            </Pressable>
-          </Link>
+          <MenuItem label="Начать" active onPress={() => router.push('/play')} />
         )
         }
 
         {hasSave === true && (
           <>
-            <Link href="/play" asChild>
-              <Pressable style={styles.start}>
-                <Text style={styles.startText}>Продолжить</Text>
-              </Pressable>
-            </Link>
-            <Pressable style={styles.start}
-                       onPress={restart}
-            >
-              <Text style={styles.startText}>Начать заново</Text>
-            </Pressable>
+            <MenuItem label="Продолжить" active onPress={() => router.push('/play')} />
+            <MenuItem label="Начать заново" onPress={restart} />
           </>
         )
         }
 
       </View>
-    </>
+    </Stage>
   )
 }
 
@@ -64,17 +56,10 @@ const styles = StyleSheet.create({
   screen: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'column',
-    gap: 12,
+    alignItems: 'flex-start',
+    paddingLeft: 240,
   },
-  start: {
-    minWidth: 240,
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.65)',
-  },
-  startText: {
-    color: '#fff',
+  title: {
+    marginBottom: 80,
   },
 })

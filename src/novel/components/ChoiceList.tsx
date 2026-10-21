@@ -1,4 +1,5 @@
 import { View, StyleSheet, Pressable, Text } from 'react-native'
+import { FONT } from '@/novel/theme'
 
 type Props = {
   choices: {
@@ -26,17 +27,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 30,
   },
   button: {
-    minWidth: 240,
+    minWidth: 600,
     alignItems: 'center',
-    padding: 16,
+    padding: 40,
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
   },
   label: {
     color: '#fff',
-    fontSize: 18,
-    lineHeight: 26,
+    fontFamily: FONT,
+    fontSize: 44,
+    lineHeight: 60,
   },
 })

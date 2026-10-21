@@ -11,7 +11,7 @@ export type SaveData = {
   voteStatus: VoteStatus
 }
 
-const SAVE_KEY = 'windturbine.save'
+const SAVE_KEY = 'tomorrow-i-promise.save'
 
 export async function loadSave() : Promise<SaveData | null> {
   try {

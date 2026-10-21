@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text } from 'react-native'
 import { useStageSize } from '@/novel/components/Stage'
+import { FONT } from '@/novel/theme'
 
 type Props = {
   speaker: string | null
@@ -56,10 +57,11 @@ const styles = StyleSheet.create({
   },
   speaker: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: FONT,
   },
   text: {
     color: '#fff',
+    fontFamily: FONT,
     textAlign: 'center',
   },
 

@@ -12,7 +12,7 @@ type CachedStory = {
 }
 export type LoadedStory = CachedStory & { offline: boolean }
 
-const STORY_KEY = 'windturbine.story'
+const STORY_KEY = 'tomorrow-i-promise.story'
 const TIMEOUT_MS = 8 * 1000
 
 async function readCache (): Promise<CachedStory | null> {

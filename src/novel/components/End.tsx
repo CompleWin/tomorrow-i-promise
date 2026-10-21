@@ -3,6 +3,7 @@ import { Link } from 'expo-router'
 import { Choice, getResults, Results } from '@/novel/vote'
 import { VoteStatus } from '@/novel/storage'
 import { useEffect, useState } from 'react'
+import { FONT } from '@/novel/theme'
 
 const LABELS: Record<Choice, string> = {
   A: 'Оставляем',
@@ -94,12 +95,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: 30,
   },
   text: {
     color: '#fff',
-    fontSize: 20,
+    fontFamily: FONT,
+    fontSize: 40,
     backgroundColor: 'rgba(0, 0, 0, 0.65)',
-    padding: 12,
+    padding: 30,
   },
 })
