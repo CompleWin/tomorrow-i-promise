@@ -4,8 +4,7 @@ import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { cachedVersion } from '@/novel/content'
 import { menuArtFor, MENU_ART_COMPLETED } from '@/novel/menuArt'
-import { setVolume } from '@/novel/sound'
-import { clearSave, loadCompleted, loadSave, loadSettings, writeSettings } from '@/novel/storage'
+import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuItem from '@/novel/components/MenuItem'
@@ -19,19 +18,17 @@ type Menu = {
   act: number | null
   completed: boolean
   version: string | null
-  volume: number
 }
 
 type MenuView = 'main' | 'settings'
 
 async function loadMenu (): Promise<Menu> {
-  const [save, completed, settings] = await Promise.all([loadSave(), loadCompleted(), loadSettings()])
+  const [save, completed] = await Promise.all([loadSave(), loadCompleted()])
   return {
     hasSave: save !== null,
     act: save?.act ?? null,
     completed: completed !== null,
     version: save?.contentVersion ?? await cachedVersion(),
-    volume: settings.volume,
   }
 }
 
@@ -88,15 +85,6 @@ export default function Index () {
     setView(next)
   }
 
-  function changeVolume (volume: number) {
-    if (menu === null) {
-      return
-    }
-    setMenu({ ...menu, volume })
-    setVolume(volume)
-    writeSettings({ volume })
-  }
-
   const onBack = useEffectEvent(() => {
     if (view !== 'settings') {
       return false
@@ -127,7 +115,7 @@ export default function Index () {
 
         {menu !== null && view === 'settings' && (
           <Animated.View style={itemsStyle}>
-            <VolumeControl label={'Громкость'} value={menu.volume} onChange={changeVolume} />
+            <VolumeControl label={'Громкость'} />
             <MenuItem label={'Назад'} onPress={() => switchView('main')} />
           </Animated.View>
         )}
