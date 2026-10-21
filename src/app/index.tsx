@@ -6,22 +6,32 @@ import { clearSave, loadSave } from '@/novel/storage'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import MenuItem from '@/novel/components/MenuItem'
+import { useFade } from '@/novel/components/Fade'
 import { COLORS } from '@/novel/theme'
 
 export default function Index () {
 
   const [hasSave, setHasSave] = useState<boolean | null>(null)
+  const fade = useFade()
 
   useFocusEffect(
     useCallback(() => {
       loadSave().then(save => setHasSave(save !== null))
-    }, []),
+      if (fade.isBlack()) {
+        fade.to(0, 700)
+      }
+    }, [fade]),
   )
+
+  async function play () {
+    await fade.to(1, 600)
+    router.push('/play')
+  }
 
   async function restart () {
     await clearSave()
     setHasSave(false)
-    router.push('/play')
+    await play()
   }
 
   return (
@@ -35,13 +45,13 @@ export default function Index () {
         }
 
         {hasSave === false && (
-          <MenuItem label="Начать" active onPress={() => router.push('/play')} />
+          <MenuItem label="Начать" active onPress={play} />
         )
         }
 
         {hasSave === true && (
           <>
-            <MenuItem label="Продолжить" active onPress={() => router.push('/play')} />
+            <MenuItem label="Продолжить" active onPress={play} />
             <MenuItem label="Начать заново" onPress={restart} />
           </>
         )

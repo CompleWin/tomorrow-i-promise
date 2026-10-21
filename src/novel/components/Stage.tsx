@@ -41,7 +41,26 @@ export function Stage ({ children }: { children: ReactNode }) {
   )
 }
 
+export function StageOverlay ({ children }: { children: ReactNode }) {
+  const { k, left, top } = useStageScale()
+  return (
+    <View style={styles.overlay}>
+      <View style={[styles.inner, styles.passThrough, { left, top, transform: [{ scale: k }] }]}>
+        {children}
+      </View>
+    </View>
+  )
+}
+
 const styles = StyleSheet.create({
+  overlay: {
+    ...StyleSheet.absoluteFill,
+    overflow: 'hidden',
+    pointerEvents: 'box-none',
+  },
+  passThrough: {
+    pointerEvents: 'box-none',
+  },
   outer: {
     flex: 1,
     backgroundColor: '#000',

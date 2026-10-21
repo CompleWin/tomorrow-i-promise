@@ -1,0 +1,19 @@
+{
+  "name": "Завтра точно",
+  "short_name": "Завтра точно",
+  "lang": "ru",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#050403",
+  "theme_color": "#050403",
+  "start_url": "/tomorrow-i-promise/",
+  "scope": "/tomorrow-i-promise/",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

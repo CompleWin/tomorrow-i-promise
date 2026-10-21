@@ -1,13 +1,18 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
-import { Pressable, StyleSheet, View } from 'react-native'
+import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
+import { router } from 'expo-router'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { LinearGradient } from 'expo-linear-gradient'
 import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
 import Background from '@/novel/components/Background'
+import { useBanner } from '@/novel/components/Banner'
 import ChoiceList from '@/novel/components/ChoiceList'
 import End from '@/novel/components/End'
+import { useFade } from '@/novel/components/Fade'
 import MenuItem from '@/novel/components/MenuItem'
+import PauseButton from '@/novel/components/PauseButton'
+import PauseOverlay from '@/novel/components/PauseOverlay'
 import { Stage } from '@/novel/components/Stage'
 import Sprite from '@/novel/components/Sprite'
 import Subtitles from '@/novel/components/Subtitles'
@@ -28,15 +33,24 @@ const SHAKE = {
 
 export default function Play () {
   const novel = useNovel()
+  const reload = novel.reload
+  const fade = useFade()
+  const banner = useBanner()
   const [readyLine, setReadyLine] = useState(-1)
+  const [paused, setPaused] = useState(false)
+  const [leaving, setLeaving] = useState(false)
+  const [updating, setUpdating] = useState(false)
+  const [slowLoad, setSlowLoad] = useState(false)
   const ready = readyLine === novel.lineId
-  const typing = useTypewriter(novel.text, { key: novel.lineId, paused: !ready })
+  const busy = leaving || updating
+  const typing = useTypewriter(novel.text, { key: novel.lineId, paused: !ready || paused || busy })
   const veiling = novel.fx === 'toBlack' && !ready
 
   const veil = useSharedValue(0)
   const shake = useSharedValue(1)
   const veilOn = useRef(false)
   const shownBg = useRef<string | null>(null)
+  const reveal = useRef(true)
 
   const veilStyle = useAnimatedStyle(() => ({
     opacity: veil.get(),
@@ -50,6 +64,14 @@ export default function Play () {
 
   const startLine = useEffectEvent(() => {
     let wait = 0
+
+    if (reveal.current) {
+      reveal.current = false
+      if (!slowLoad) {
+        fade.set(1)
+      }
+      fade.to(0, novel.resumed ? 700 : 500)
+    }
 
     if (novel.resumed) {
       veil.set(novel.dark ? 1 : 0)
@@ -94,8 +116,96 @@ export default function Play () {
     return () => clearTimeout(timer)
   }, [novel.lineId])
 
+  useEffect(() => {
+    if (!fade.isBlack()) {
+      fade.set(1)
+    }
+  }, [fade])
+
+  useEffect(() => {
+    if (!novel.loading) {
+      return
+    }
+    const timer = setTimeout(() => {
+      setSlowLoad(true)
+      fade.to(0, 300)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [novel.loading, fade])
+
+  useEffect(() => {
+    if (novel.error !== null) {
+      fade.to(0, 300)
+    }
+  }, [novel.error, fade])
+
+  useEffect(() => {
+    if (novel.notice === null || novel.loading) {
+      return
+    }
+    const id = banner.show(novel.notice, { duration: 3200 })
+    return () => banner.hide(id)
+  }, [novel.notice, novel.loading, banner])
+
+  useEffect(() => {
+    if (!novel.updateAvailable) {
+      return
+    }
+    const id = banner.show('Доступна новая версия истории', {
+      action: 'Обновить',
+      onPress: () => {
+        setPaused(false)
+        setUpdating(true)
+      },
+    })
+    return () => banner.hide(id)
+  }, [novel.updateAvailable, banner])
+
+  useEffect(() => {
+    if (!updating) {
+      return
+    }
+    let cancelled = false
+    banner.hide()
+    fade.to(1, 600).then(() => {
+      if (cancelled) {
+        return
+      }
+      reveal.current = true
+      setUpdating(false)
+      reload()
+    })
+    return () => { cancelled = true }
+  }, [updating, banner, fade, reload])
+
+  const onBack = useEffectEvent(() => {
+    if (novel.loading || novel.error !== null) {
+      return false
+    }
+    if (!busy) {
+      setPaused(p => !p)
+    }
+    return true
+  })
+
+  useEffect(() => {
+    const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
+    return () => subscription.remove()
+  }, [])
+
+  async function toMenu () {
+    setPaused(false)
+    setLeaving(true)
+    await fade.to(1, 600)
+    if (router.canGoBack()) {
+      router.back()
+    } else {
+      router.replace('/')
+    }
+  }
+
   const tap = () => {
-    if (!ready || novel.ended) {
+    if (!ready || novel.ended || paused || busy) {
       return
     }
     if (!typing.done) {
@@ -112,7 +222,7 @@ export default function Play () {
     return (
       <Stage>
         <View style={styles.status}>
-          <UIText size={30} color={COLORS.muted}>Загрузка...</UIText>
+          {slowLoad && <UIText size={30} color={COLORS.muted}>Загрузка...</UIText>}
         </View>
       </Stage>
     )
@@ -167,19 +277,9 @@ export default function Play () {
                                voteStatus={novel.voteStatus} />}
         </Animated.View>
 
-        {novel.notice !== null && (
-          <UIText size={34} color={COLORS.cream} style={styles.notice}>
-            {novel.notice}
-          </UIText>
-        )}
+        <PauseButton onPress={() => setPaused(true)} />
 
-        {novel.updateAvailable && (
-          <Pressable style={styles.banner} onPress={novel.reload}>
-            <UIText size={34} color={COLORS.cream}>Доступна новая версия истории.
-              Обновить</UIText>
-          </Pressable>
-        )}
-
+        {paused && <PauseOverlay onResume={() => setPaused(false)} onMenu={toMenu} />}
       </Stage>
     </Pressable>
   )
@@ -210,19 +310,5 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: -GRADIENT_OVERSCAN,
     height: GRADIENT_H + GRADIENT_OVERSCAN,
-  },
-  notice: {
-    position: 'absolute',
-    top: '4%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 24,
-  },
-  banner: {
-    position: 'absolute',
-    top: '4%',
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    padding: 24,
   },
 })
