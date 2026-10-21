@@ -49,6 +49,17 @@ for (const fx of effects) {
   }
 }
 
+const menuArt = JSON.parse(fs.readFileSync('src/novel/menuArt.json', 'utf8'))
+const menuFiles = [...Object.values(menuArt.acts), menuArt.completed]
+  .flatMap(art => [art.base, art.flicker])
+  .filter(path => path !== undefined)
+for (const path of menuFiles) {
+  if (!fs.existsSync(`${ASSETS_DIR}/${path}`)) {
+    console.error(`menu art does not exist: ${path} (src/novel/menuArt.json)`)
+    process.exit(1)
+  }
+}
+
 const json = story.ToJson()
 fs.writeFileSync('public/content/story.json', json)
 

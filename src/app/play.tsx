@@ -5,7 +5,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } f
 import useNovel from '@/novel/useNovel'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
-import { clearSave } from '@/novel/storage'
+import { clearSave, markCompleted } from '@/novel/storage'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -196,6 +196,12 @@ export default function Play () {
     })
     return () => { cancelled = true }
   }, [updating, banner, fade, reload])
+
+  useEffect(() => {
+    if (phase === 'result' && novel.finalChoice !== null) {
+      markCompleted(novel.finalChoice)
+    }
+  }, [phase, novel.finalChoice])
 
   const onBack = useEffectEvent(() => {
     if (novel.loading || novel.error !== null) {

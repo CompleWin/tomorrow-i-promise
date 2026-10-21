@@ -41,6 +41,8 @@ const NO_VOTE: Vote = {
   voteStatus: 'none',
 }
 
+const ACT = /^act_(\d+)/
+
 function parseTags (tags: string[] | null): Record<string, string> {
   const result: Record<string, string> = {}
   for (const tag of tags ?? []) {
@@ -59,6 +61,7 @@ export default function useNovel () {
   const storyRef = useRef<Story | null>(null)
   const bgRef = useRef<string | null>(null)
   const darkRef = useRef(false)
+  const actRef = useRef<number | null>(null)
   const versionRef = useRef<string | null>(null)
   const lineIdRef = useRef(0)
 
@@ -102,6 +105,7 @@ export default function useNovel () {
       finalChoice: voteRef.current.finalChoice,
       voteStatus: voteRef.current.voteStatus,
       dark: darkRef.current,
+      act: actRef.current,
     })
   }, [])
 
@@ -117,6 +121,10 @@ export default function useNovel () {
     }
     if (tags.fx === 'toBlack') {
       darkRef.current = true
+    }
+    const act = ACT.exec(story.state.currentPathString ?? '')
+    if (act !== null) {
+      actRef.current = Number(act[1])
     }
     lineIdRef.current += 1
 
@@ -175,6 +183,7 @@ export default function useNovel () {
         voteRef.current = NO_VOTE
         bgRef.current = null
         darkRef.current = false
+        actRef.current = null
 
         const save = await loadSave()
         if (cancelled) {
@@ -186,6 +195,7 @@ export default function useNovel () {
             storyRef.current.state.LoadJson(save.inkState)
             bgRef.current = save.currentBg
             darkRef.current = save.dark
+            actRef.current = save.act
             voteRef.current = {
               finalChoice: save.finalChoice,
               voteStatus: save.voteStatus,
@@ -198,6 +208,7 @@ export default function useNovel () {
             storyRef.current = new Story(loaded.json)
             bgRef.current = null
             darkRef.current = false
+            actRef.current = null
 
             if (save.contentVersion !== loaded.version) {
               setNotice('История обновилась, начинаем сначала')

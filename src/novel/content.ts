@@ -36,6 +36,11 @@ async function readCache (): Promise<CachedStory | null> {
   }
 }
 
+export async function cachedVersion (): Promise<string | null> {
+  const cached = await readCache()
+  return cached?.version ?? null
+}
+
 async function writeCache(cache: CachedStory): Promise<void> {
   try {
     await AsyncStorage.setItem(STORY_KEY, JSON.stringify(cache))

@@ -16,6 +16,11 @@ export type Results = {
   b: number
 }
 
+export const LABELS: Record<Choice, string> = {
+  A: 'Оставляем',
+  B: 'Не оставляем',
+}
+
 const TIMEOUT_MS = 8 * 1000
 
 function withTimeout<T> (promise: Promise<T>): Promise<T> {
