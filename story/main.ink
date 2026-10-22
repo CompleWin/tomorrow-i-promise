@@ -157,11 +157,79 @@ VAR final_choice = ""
 -> act_4
 === act_4 ===
 
-PLACEHOLDER
+# bg: act4/bg/winston_smoking.webp # fx: fadeIn # music: act4/music/field-wind.mp3
+Глубокая ночь.
+Гай добрался до ветряной электростанции.
+Красные сигнальные огни мерцали на вершинах огромных башен.
+У входа его уже ждал коллега.
 
+# bg: act4/bg/guy_approaches.webp
+О, явился! Я уж думал, без тебя начинать придется. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
+Да я всего на пять минут задержался. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Ладно, пошли уже. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
+
+# bg: act4/bg/boot1.png # music: stop
+Уинстон затушил сигарету
+
+# bg: act4/bg/boot2.png
+...
+
+# fx: toBlack # sfx: act4/sfx/turbine-climb.mp3
+...
+
+# bg: act4/bg/on_turbine.webp # music: act4/music/turbine-top-wind.mp3
+мужчины поднялись на обслуживающую площадку и приступили к осмотру оборудования.
+
+# bg: act4/bg/guy_thoughtful.webp
+Во время работы Гай то и дело отвлекался, поглядывая то на небо, то на город внизу.
+Слушай, ты чего сегодня такой прибитый? # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Да так, задумался. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+О чем? # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+
+# bg: act4/bg/workers_waving.webp
+На соседнем генераторе работали еще двое техников. Один из них помахал фонарем.
+
+# bg: act4/bg/winston_guy_waving.webp
+Гай и его коллега ответили тем же.
+
+# bg: act4/bg/winston_guy_talking.webp
+Марта беременна. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Да ты что! Поздравляю! # speaker: Уинстон # sprite: act4/sprites/winston_smile.png
+Спасибо. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+А что с лицом тогда? Не рад, что ли? # speaker: Уинстон # sprite: act4/sprites/winston_smile.png
+Да рад я. Просто не ожидал, что всё так быстро получится. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Ну это нормально. Я когда узнал, что у нас двойня будет, вообще чуть не поседел. # speaker: Уинстон # sprite: act4/sprites/winston_smile.png
+Двойня? Ничего себе. И как вы справились? # speaker: Гай # sprite: act4/sprites/guy_smile.png
+А куда деваться? Сначала тяжело было, естественно. Хорошо, что соседи помогали. # speaker: Уинстон # sprite: act4/sprites/winston_smile.png
+И как сейчас? # speaker: Гай # sprite: act4/sprites/guy_smile.png
+Да растут потихоньку. Уже в школу ходят. # speaker: Уинстон # sprite: act4/sprites/winston_giggle.png
+Шумят, конечно, дерутся постоянно. Бывает домой приходишь, а там дурдом полный. # speaker: Уинстон # sprite: act4/sprites/winston_giggle.png
+Гай усмехнулся. # sprite: act4/sprites/guy_giggle.png
+Мы с Мартой вот думаем, может, стоило еще подождать немного... # speaker: Гай # sprite: act4/sprites/guy_normal.png
+А чего ждать-то? # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Ну, пока всё хоть немного успокоится. Война закончится, жизнь наладится. # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Слушай, мы с женой тоже так рассуждали. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Думали, вот весь бедлам этот закончится, тогда и о детях подумаем. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+А потом одна война закончилась, другая началась. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+И вы решили больше не ждать? # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Ага. Сам подумай, когда вообще времена хорошие были? # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+То понос, то золотуха. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Всё время что-нибудь происходит. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Так ведь и всю жизнь прождать можно. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+Ну да, наверное... # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Да и кто знает, что через десять лет будет? Может, лучше станет. Может, хуже. Не угадаешь. # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
+И не жалеешь? # speaker: Гай # sprite: act4/sprites/guy_normal.png
+Да ты что! Конечно нет. Сейчас смотрю на своих оболтусов и даже представить не могу, как бы мы без них жили. # speaker: Уинстон # sprite: act4/sprites/winston_giggle.png
+Гай невольно улыбнулся. # sprite: act4/sprites/guy_smile.png
+Ладно, давай заканчивать. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
+А то до утра тут проторчим. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
+Давай. # speaker: Гай # sprite: act4/sprites/guy_smile.png
+
+# fx: toBlack
 
 -> act_5
 === act_5 ===
+
 
 PLACEHOLDER
 

@@ -111,6 +111,7 @@ function SpriteLayer ({ layerKey, name, enter, leave, version, onDone }: LayerPr
         source={assetSource(name, version)}
         style={[StyleSheet.absoluteFill, !loaded && styles.hidden]}
         contentFit={'contain'}
+        contentPosition={'bottom'}
         onLoad={() => setLoaded(true)}
       />
     </Animated.View>
