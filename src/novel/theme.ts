@@ -18,7 +18,7 @@ export const COLORS = {
   pauseBtnPressed: 'rgba(6,4,3,.85)',
   pauseOverlay: 'rgba(5,4,3,.8)',
   creditsDim: 'rgba(5,4,3,.5)',
-  resultDim: 'rgba(5,4,3,.38)',
+  resultDim: 'rgba(5,4,3,.2)',
 }
 
 export const FONT = 'Galmuri11'

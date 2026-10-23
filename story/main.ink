@@ -377,9 +377,9 @@ VAR final_choice = ""
 
 * [Сохранить беременность]
     ~ final_choice = "A"
-    # music: act6/music/ending.mp3
+    # music: act6/music/ending.wav
     -> END
 * [Прервать беременность]
     ~ final_choice = "B"
-    # music: act6/music/ending.mp3
+    # music: act6/music/ending.wav
     -> END

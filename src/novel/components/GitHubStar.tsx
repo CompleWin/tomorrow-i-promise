@@ -32,10 +32,10 @@ export default function GitHubStar () {
 const styles = StyleSheet.create({
   block: {
     alignItems: 'center',
-    gap: 24,
+    gap: 40,
   },
   logo: {
-    width: 80,
-    height: 80,
+    width: 100,
+    height: 100,
   },
 })

@@ -5,15 +5,12 @@ import { cachedVersion } from '@/novel/content'
 import sleep from '@/novel/sleep'
 import { Completed, loadCompleted, loadSave } from '@/novel/storage'
 import { LABELS } from '@/novel/vote'
-import Background from '@/novel/components/Background'
-import BottomGradient from '@/novel/components/BottomGradient'
+import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
-
-const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.84)', 'rgba(4,3,2,.95)'] as const
 
 type Info = {
   completed: Completed | null
@@ -102,9 +99,7 @@ export default function Stats () {
   return (
     <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>
       <Stage>
-        {info !== null && <Background name={'act1/bg/bg3.png'} fx={null} instant version={info.version} />}
-        <View style={styles.dim} />
-        <BottomGradient height={720} colors={GRADIENT} middle={0.42} />
+        {info !== null && <EndingBackdrop version={info.version} result />}
 
         <View style={styles.content}>
           <VoteStats message={statusOn ? message : null}
@@ -131,10 +126,6 @@ const styles = StyleSheet.create({
   },
   waiting: {
     cursor: 'auto',
-  },
-  dim: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: COLORS.resultDim,
   },
   content: {
     position: 'absolute',

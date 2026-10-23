@@ -15,6 +15,7 @@ import BottomGradient from '@/novel/components/BottomGradient'
 import ChoicePlates from '@/novel/components/ChoicePlates'
 import Credits from '@/novel/components/Credits'
 import End from '@/novel/components/End'
+import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
 import MenuItem from '@/novel/components/MenuItem'
 import PauseButton from '@/novel/components/PauseButton'
@@ -373,6 +374,8 @@ export default function Play () {
           </Animated.View>
         )}
 
+        {(outro || phase === 'result') && <EndingBackdrop version={novel.version} result={phase === 'result'} />}
+
         {phase === 'credits' && (
           <Credits onDone={() => setStagePhase('thanks')} />
         )}
@@ -384,7 +387,6 @@ export default function Play () {
         {phase === 'result' && (
           <End finalChoice={novel.finalChoice}
                voteStatus={novel.voteStatus}
-               version={novel.version}
                onExit={toMenu}
           />
         )}

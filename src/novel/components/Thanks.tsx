@@ -37,7 +37,6 @@ export default function Thanks ({ onDone }: Props) {
     leaving.current = true
     out.set(withTiming(1, { duration: 400 }))
     await sleep(400)
-    await fade.to(1, 700)
     if (alive.current) {
       onDone()
     }
@@ -56,7 +55,6 @@ export default function Thanks ({ onDone }: Props) {
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: COLORS.inkBlack,
     alignItems: 'center',
     justifyContent: 'center',
   },

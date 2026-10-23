@@ -1,8 +1,11 @@
 import { AudioPlayer, createAudioPlayer, preload, setAudioModeAsync } from 'expo-audio'
+import { createLoop, LoopPlayer } from '@/novel/loopPlayer'
 import { DEFAULT_SETTINGS, loadSettings, Settings } from '@/novel/storage'
 
 const FADE_MS = 500
 const FADE_STEPS = 10
+const RISE_MS = 3000
+const RISE_STEPS = 30
 
 type Loop = {
   url: string
@@ -10,9 +13,11 @@ type Loop = {
 }
 
 let player: AudioPlayer | null = null
-let music: AudioPlayer | null = null
+let music: LoopPlayer | null = null
 let track: string | null = null
 let loops: Loop[] = []
+let rise = 1
+let riseTimer: ReturnType<typeof setInterval> | null = null
 let modeSet = false
 let levels: Settings = DEFAULT_SETTINGS
 
@@ -24,7 +29,7 @@ function musicLevel () {
   return levels.volume * levels.music / 10000
 }
 
-function fadeOut (fading: AudioPlayer) {
+function fadeOut (fading: Pick<LoopPlayer, 'volume' | 'pause' | 'remove'>) {
   let from = 0
   try {
     from = fading.volume
@@ -48,13 +53,41 @@ function fadeOut (fading: AudioPlayer) {
   }, FADE_MS / FADE_STEPS)
 }
 
+function stopRise () {
+  if (riseTimer !== null) {
+    clearInterval(riseTimer)
+    riseTimer = null
+  }
+  rise = 1
+}
+
+function fadeIn () {
+  stopRise()
+  rise = 0
+  let step = 0
+  riseTimer = setInterval(() => {
+    step += 1
+    rise = (step / RISE_STEPS) ** 2
+    try {
+      if (music !== null && musicLevel() > 0) {
+        music.volume = musicLevel() * rise
+      }
+    } catch (error) {
+      console.warn('music fade failed', error)
+    }
+    if (step >= RISE_STEPS) {
+      stopRise()
+    }
+  }, RISE_MS / RISE_STEPS)
+}
+
 function resumeMusic () {
   if (music === null || musicLevel() === 0) {
     return
   }
   try {
-    music.volume = musicLevel()
-    if (!music.currentStatus.playing) {
+    music.volume = musicLevel() * rise
+    if (!music.playing) {
       music.play()
     }
   } catch (error) {
@@ -167,16 +200,17 @@ export function playMusic (url: string | null) {
   }
   music = null
   track = url
+  stopRise()
   if (url === null) {
     return
   }
   try {
-    music = createAudioPlayer(url)
-    music.loop = true
+    music = createLoop(url)
   } catch (error) {
     console.warn('music failed', url, error)
     return
   }
+  fadeIn()
   resumeMusic()
 }
 
@@ -202,6 +236,7 @@ export function releaseSound () {
       console.warn('sound release failed', error)
     }
   }
+  stopRise()
   player = null
   music = null
   track = null

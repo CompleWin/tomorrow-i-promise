@@ -2,11 +2,12 @@ import { BackHandler, StyleSheet, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { cachedVersion } from '@/novel/content'
+import { cachedVersion, fetchManifest } from '@/novel/content'
 import { menuArtFor, MENU_ART_COMPLETED } from '@/novel/menuArt'
 import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
+import MenuFooter from '@/novel/components/MenuFooter'
 import MenuItem from '@/novel/components/MenuItem'
 import VolumeSettings from '@/novel/components/VolumeSettings'
 import { Stage } from '@/novel/components/Stage'
@@ -35,6 +36,7 @@ async function loadMenu (): Promise<Menu> {
 export default function Index () {
 
   const [menu, setMenu] = useState<Menu | null>(null)
+  const [latest, setLatest] = useState<string | null>(null)
   const [view, setView] = useState<MenuView>('main')
   const fade = useFade()
   const shown = useSharedValue(0)
@@ -62,6 +64,11 @@ export default function Index () {
           setMenu(data)
         }
       })
+      fetchManifest().then(manifest => {
+        if (!cancelled) {
+          setLatest(manifest.version)
+        }
+      }).catch(error => console.warn('manifest failed', error))
       if (fade.isBlack()) {
         fade.to(0, 700)
       }
@@ -137,6 +144,12 @@ export default function Index () {
           </Animated.View>
         )}
       </Animated.View>
+
+      {menu !== null && (
+        <Animated.View pointerEvents={'box-none'} style={[StyleSheet.absoluteFill, columnStyle]}>
+          <MenuFooter version={latest ?? menu.version} />
+        </Animated.View>
+      )}
     </Stage>
   )
 }

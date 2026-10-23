@@ -4,26 +4,20 @@ import { Choice, LABELS } from '@/novel/vote'
 import { VoteStatus } from '@/novel/storage'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
-import Background from '@/novel/components/Background'
-import BottomGradient from '@/novel/components/BottomGradient'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
 import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
 
-const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.84)', 'rgba(4,3,2,.95)'] as const
-
 type Props = {
   finalChoice: Choice | null
   voteStatus: VoteStatus
-  version: string | null
   onExit: () => void
 }
 
-export default function End ({ finalChoice, voteStatus, version, onExit }: Props) {
+export default function End ({ finalChoice, voteStatus, onExit }: Props) {
   const fade = useFade()
-  const [lit, setLit] = useState(false)
   const [typingOn, setTypingOn] = useState(false)
   const [statusOn, setStatusOn] = useState(false)
   const [held, setHeld] = useState(false)
@@ -38,11 +32,6 @@ export default function End ({ finalChoice, voteStatus, version, onExit }: Props
     fade.set(0)
 
     async function intro () {
-      await sleep(600)
-      if (cancelled) {
-        return
-      }
-      setLit(true)
       await sleep(1400)
       if (!cancelled) {
         setTypingOn(true)
@@ -92,10 +81,6 @@ export default function End ({ finalChoice, voteStatus, version, onExit }: Props
 
   return (
     <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>
-      <Background name={lit ? 'act1/bg/bg3.png' : null} fx={'lightsOn'} version={version} />
-      <View style={styles.dim} />
-      <BottomGradient height={720} colors={GRADIENT} middle={0.42} />
-
       <View style={styles.content}>
         <VoteStats message={statusOn ? message : null}
                    results={showStats ? results ?? null : null}
@@ -118,14 +103,9 @@ export default function End ({ finalChoice, voteStatus, version, onExit }: Props
 const styles = StyleSheet.create({
   screen: {
     ...StyleSheet.absoluteFill,
-    backgroundColor: '#000',
   },
   waiting: {
     cursor: 'auto',
-  },
-  dim: {
-    ...StyleSheet.absoluteFill,
-    backgroundColor: COLORS.resultDim,
   },
   content: {
     position: 'absolute',
