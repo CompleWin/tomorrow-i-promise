@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
+import useTapKeys from '@/novel/useTapKeys'
 import { AUTHORS } from '@/novel/credits'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
@@ -69,6 +70,8 @@ export default function Credits ({ onDone }: Props) {
     }
     leave()
   }
+
+  useTapKeys(tap)
 
   const typed = [left.shown, right.shown]
 

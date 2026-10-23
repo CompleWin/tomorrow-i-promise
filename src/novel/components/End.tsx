@@ -4,6 +4,7 @@ import { Choice, LABELS } from '@/novel/vote'
 import { VoteStatus } from '@/novel/storage'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
+import useTapKeys from '@/novel/useTapKeys'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
@@ -78,6 +79,8 @@ export default function End ({ finalChoice, voteStatus, onExit }: Props) {
     exiting.current = true
     onExit()
   }
+
+  useTapKeys(tap)
 
   return (
     <Pressable onPress={tap} style={[styles.screen, !settled && styles.waiting]}>

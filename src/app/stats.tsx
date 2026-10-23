@@ -3,6 +3,7 @@ import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { router } from 'expo-router'
 import { cachedVersion } from '@/novel/content'
 import sleep from '@/novel/sleep'
+import useTapKeys from '@/novel/useTapKeys'
 import { Completed, loadCompleted, loadSave } from '@/novel/storage'
 import { LABELS } from '@/novel/vote'
 import EndingBackdrop from '@/novel/components/EndingBackdrop'
@@ -93,6 +94,8 @@ export default function Stats () {
       leave()
     }
   }
+
+  useTapKeys(tap)
 
   const choice = info?.completed?.choice
 

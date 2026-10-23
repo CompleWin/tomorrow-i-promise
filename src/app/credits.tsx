@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { router } from 'expo-router'
 import { cachedVersion } from '@/novel/content'
-import { loadSave } from '@/novel/storage'
+import { loadCompleted, loadSave } from '@/novel/storage'
 import Credits from '@/novel/components/Credits'
 import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
@@ -10,13 +10,15 @@ import { Stage } from '@/novel/components/Stage'
 export default function CreditsScreen () {
   const fade = useFade()
   const [version, setVersion] = useState<string | null>(null)
+  const [completed, setCompleted] = useState(false)
 
   useEffect(() => {
     let cancelled = false
-    loadSave().then(async save => {
+    Promise.all([loadSave(), loadCompleted()]).then(async ([save, done]) => {
       const found = save?.contentVersion ?? await cachedVersion()
       if (!cancelled) {
         setVersion(found)
+        setCompleted(done !== null)
       }
     })
     return () => { cancelled = true }
@@ -33,7 +35,7 @@ export default function CreditsScreen () {
 
   return (
     <Stage>
-      <EndingBackdrop version={version} />
+      {completed && <EndingBackdrop version={version} />}
       <Credits onDone={done} />
     </Stage>
   )

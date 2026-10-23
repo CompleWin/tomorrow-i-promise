@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Pressable, StyleSheet } from 'react-native'
 import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import sleep from '@/novel/sleep'
+import useTapKeys from '@/novel/useTapKeys'
 import { useFade } from '@/novel/components/Fade'
 import GitHubStar from '@/novel/components/GitHubStar'
 import UIText from '@/novel/components/UIText'
@@ -41,6 +42,8 @@ export default function Thanks ({ onDone }: Props) {
       onDone()
     }
   }
+
+  useTapKeys(leave)
 
   return (
     <Pressable onPress={leave} style={styles.screen}>

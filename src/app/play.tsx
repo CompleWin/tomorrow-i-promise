@@ -302,6 +302,10 @@ export default function Play () {
   }
 
   const tap = () => {
+    if (novel.error) {
+      novel.reload()
+      return
+    }
     if (phase !== 'play' || !ready || paused || busy) {
       return
     }
@@ -385,7 +389,7 @@ export default function Play () {
             />
 
             {phase === 'choice' && hasChoices && (
-              <ChoicePlates choices={novel.choices} onPick={pick} />
+              <ChoicePlates choices={novel.choices} active={!paused} onPick={pick} />
             )}
           </Animated.View>
         )}
