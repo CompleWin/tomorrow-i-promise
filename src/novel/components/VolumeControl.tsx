@@ -3,12 +3,14 @@ import { useState } from 'react'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
 
-const STEP = 10
+export const STEP = 10
 const CELLS = 100 / STEP
 
 type Props = {
   label: string
   value: number
+  selected: boolean
+  onHover: () => void
   onChange: (value: number) => void
 }
 
@@ -28,32 +30,31 @@ function StepButton ({ sign, onPress }: { sign: string, onPress: () => void }) {
   )
 }
 
-export default function VolumeControl ({ label, value, onChange }: Props) {
+export default function VolumeControl ({ label, value, selected, onHover, onChange }: Props) {
   const lit = Math.round(value / STEP)
-  const set = (next: number) => onChange(Math.min(100, Math.max(0, next)))
 
   return (
-    <View style={styles.control}>
-      <UIText size={52} color={COLORS.cream2} style={styles.label}>{label}</UIText>
+    <Pressable onHoverIn={onHover} style={styles.control}>
+      <UIText size={52} color={selected ? COLORS.lamp : COLORS.cream2} style={styles.label}>{label}</UIText>
       <View style={styles.row}>
-        <StepButton sign={'−'} onPress={() => set(value - STEP)} />
+        <StepButton sign={'−'} onPress={() => onChange(value - STEP)} />
         {Array.from({ length: CELLS }, (_, i) => (
-          <Pressable key={i} onPress={() => set((i + 1) * STEP)} style={styles.hit}>
+          <Pressable key={i} onPress={() => onChange((i + 1) * STEP)} style={styles.hit}>
             <View style={[styles.cell, i < lit && styles.cellOn]} />
           </Pressable>
         ))}
-        <StepButton sign={'+'} onPress={() => set(value + STEP)} />
+        <StepButton sign={'+'} onPress={() => onChange(value + STEP)} />
         <UIText size={52} color={COLORS.lamp} style={styles.value}>{`${value}%`}</UIText>
       </View>
-    </View>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
   control: {
-    paddingLeft: 36,
     flexDirection: 'row',
     alignItems: 'center',
+    cursor: 'auto',
   },
   label: {
     width: 580,

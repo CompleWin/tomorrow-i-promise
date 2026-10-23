@@ -9,10 +9,11 @@ import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuFooter from '@/novel/components/MenuFooter'
 import MenuItem from '@/novel/components/MenuItem'
-import VolumeSettings from '@/novel/components/VolumeSettings'
+import VolumeSettings, { useVolumeSettings } from '@/novel/components/VolumeSettings'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
+import useMenuSelection, { MenuAction } from '@/novel/useMenuSelection'
 
 type Menu = {
   hasSave: boolean
@@ -38,6 +39,7 @@ export default function Index () {
   const [menu, setMenu] = useState<Menu | null>(null)
   const [latest, setLatest] = useState<string | null>(null)
   const [view, setView] = useState<MenuView>('main')
+  const [focused, setFocused] = useState(false)
   const fade = useFade()
   const shown = useSharedValue(0)
   const items = useSharedValue(1)
@@ -59,6 +61,7 @@ export default function Index () {
   useFocusEffect(
     useCallback(() => {
       let cancelled = false
+      setFocused(true)
       loadMenu().then(data => {
         if (!cancelled) {
           setMenu(data)
@@ -72,7 +75,10 @@ export default function Index () {
       if (fade.isBlack()) {
         fade.to(0, 700)
       }
-      return () => { cancelled = true }
+      return () => {
+        cancelled = true
+        setFocused(false)
+      }
     }, [fade]),
   )
 
@@ -105,6 +111,25 @@ export default function Index () {
     return () => subscription.remove()
   }, [])
 
+  const volume = useVolumeSettings(view === 'settings')
+  const volumeRows = view === 'settings' ? volume.actions : []
+
+  const entries: MenuAction[] = menu === null ? [] : view === 'settings' ? [
+    { label: 'Назад', onPress: () => switchView('main') },
+  ] : [
+    ...(menu.hasSave ? [
+      { label: 'Продолжить', onPress: () => open('/play') },
+      { label: 'Начать заново', onPress: restart },
+    ] : [
+      { label: 'Начать', onPress: restart },
+    ]),
+    ...(menu.completed ? [{ label: 'Статистика', onPress: () => open('/stats') }] : []),
+    { label: 'Настройки', onPress: () => switchView('settings') },
+    { label: 'Авторы', onPress: () => open('/credits') },
+  ]
+
+  const { selected, select } = useMenuSelection([...volumeRows, ...entries], { screen: view, enabled: focused })
+
   const art = menu?.completed ? MENU_ART_COMPLETED : menuArtFor(menu?.act ?? null)
 
   return (
@@ -119,28 +144,17 @@ export default function Index () {
           </View>
         </View>
 
-        {menu !== null && view === 'settings' && (
+        {menu !== null && (
           <Animated.View style={itemsStyle}>
-            <VolumeSettings />
-            <MenuItem label={'Назад'} onPress={() => switchView('main')} />
-          </Animated.View>
-        )}
-
-        {menu !== null && view === 'main' && (
-          <Animated.View style={itemsStyle}>
-            {menu.hasSave ? (
-              <>
-                <MenuItem label={'Продолжить'} active onPress={() => open('/play')} />
-                <MenuItem label={'Начать заново'} onPress={restart} />
-              </>
-            ) : (
-              <MenuItem label={'Начать'} active onPress={restart} />
-            )}
-            {menu.completed && (
-              <MenuItem label={'Статистика'} onPress={() => open('/stats')} />
-            )}
-            <MenuItem label={'Настройки'} onPress={() => switchView('settings')} />
-            <MenuItem label={'Авторы'} onPress={() => open('/credits')} />
+            {view === 'settings' && <VolumeSettings volume={volume} selected={selected} onHover={select} />}
+            {entries.map((action, index) => (
+              <MenuItem key={action.label}
+                        label={action.label}
+                        selected={volumeRows.length + index === selected}
+                        onHover={() => select(volumeRows.length + index)}
+                        onPress={action.onPress}
+              />
+            ))}
           </Animated.View>
         )}
       </Animated.View>

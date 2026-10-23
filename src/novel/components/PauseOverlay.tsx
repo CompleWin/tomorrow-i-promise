@@ -2,8 +2,9 @@ import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { useEffect, useState } from 'react'
 import MenuItem from '@/novel/components/MenuItem'
 import UIText from '@/novel/components/UIText'
-import VolumeSettings from '@/novel/components/VolumeSettings'
+import VolumeSettings, { useVolumeSettings } from '@/novel/components/VolumeSettings'
 import { COLORS } from '@/novel/theme'
+import useMenuSelection, { MenuAction } from '@/novel/useMenuSelection'
 
 type Props = {
   onResume: () => void
@@ -24,28 +25,36 @@ export default function PauseOverlay ({ onResume, onMenu }: Props) {
     return () => subscription.remove()
   }, [settings])
 
-  if (settings) {
-    return (
-      <Pressable onPress={() => setSettings(false)} style={styles.overlay}>
-        <View style={styles.column}>
-          <UIText size={30} color={COLORS.muted} spacing={0.3} upper style={styles.title}>Настройки</UIText>
-          <View style={styles.list}>
-            <VolumeSettings />
-            <MenuItem label={'Назад'} onPress={() => setSettings(false)} style={styles.item} />
-          </View>
-        </View>
-      </Pressable>
-    )
-  }
+  const volume = useVolumeSettings(settings)
+  const volumeRows = settings ? volume.actions : []
+
+  const entries: MenuAction[] = settings ? [
+    { label: 'Назад', onPress: () => setSettings(false) },
+  ] : [
+    { label: 'Продолжить', onPress: onResume },
+    { label: 'Настройки', onPress: () => setSettings(true) },
+    { label: 'В меню', onPress: onMenu },
+  ]
+
+  const { selected, select } = useMenuSelection([...volumeRows, ...entries], { screen: settings ? 'settings' : 'pause' })
 
   return (
-    <Pressable onPress={onResume} style={styles.overlay}>
+    <Pressable onPress={settings ? () => setSettings(false) : onResume} style={styles.overlay}>
       <View style={styles.column}>
-        <UIText size={30} color={COLORS.muted} spacing={0.3} upper style={styles.title}>Пауза</UIText>
+        <UIText size={30} color={COLORS.muted} spacing={0.3} upper>
+          {settings ? 'Настройки' : 'Пауза'}
+        </UIText>
         <View style={styles.list}>
-          <MenuItem label={'Продолжить'} active onPress={onResume} style={styles.item} />
-          <MenuItem label={'Настройки'} onPress={() => setSettings(true)} style={styles.item} />
-          <MenuItem label={'В меню'} onPress={onMenu} style={styles.item} />
+          {settings && <VolumeSettings volume={volume} selected={selected} onHover={select} />}
+          {entries.map((action, index) => (
+            <MenuItem key={action.label}
+                      label={action.label}
+                      selected={volumeRows.length + index === selected}
+                      onHover={() => select(volumeRows.length + index)}
+                      onPress={action.onPress}
+                      style={styles.item}
+            />
+          ))}
         </View>
       </View>
     </Pressable>
@@ -63,9 +72,6 @@ const styles = StyleSheet.create({
   column: {
     alignItems: 'flex-start',
     gap: 60,
-  },
-  title: {
-    paddingLeft: 36,
   },
   list: {
     alignItems: 'flex-start',

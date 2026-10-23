@@ -1,43 +1,37 @@
-import { Pressable, StyleSheet, View } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { useState } from 'react'
 import type { StyleProp, ViewStyle } from 'react-native'
 import UIText from '@/novel/components/UIText'
-import LampDot from '@/novel/components/LampDot'
 import { COLORS } from '@/novel/theme'
 
 const SIZE = 52
-const DOT = 14
-const GAP = 22
 
 type Props = {
   label: string
-  active?: boolean
+  selected?: boolean
+  onHover?: () => void
   onPress: () => void
   style?: StyleProp<ViewStyle>
 }
 
-export default function MenuItem ({ label, active = false, onPress, style }: Props) {
+export default function MenuItem ({ label, selected, onHover, onPress, style }: Props) {
   const [hovered, setHovered] = useState(false)
 
   return (
     <Pressable onPress={onPress}
-               onHoverIn={() => setHovered(true)}
+               onHoverIn={() => {
+                 setHovered(true)
+                 onHover?.()
+               }}
                onHoverOut={() => setHovered(false)}
                style={[styles.item, style]}
     >
       {({ pressed }) => (
-        <>
-          {active && (
-            <View style={styles.dot}>
-              <LampDot />
-            </View>
-          )}
-          <UIText size={SIZE}
-                  color={active || hovered || pressed ? COLORS.lamp : COLORS.cream2}
-          >
-            {label}
-          </UIText>
-        </>
+        <UIText size={SIZE}
+                color={(selected ?? hovered) || pressed ? COLORS.lamp : COLORS.cream2}
+        >
+          {label}
+        </UIText>
       )}
     </Pressable>
   )
@@ -48,12 +42,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     minHeight: 110,
-    paddingLeft: DOT + GAP,
-  },
-  dot: {
-    position: 'absolute',
-    left: 0,
-    top: '50%',
-    marginTop: -DOT / 2,
   },
 })
