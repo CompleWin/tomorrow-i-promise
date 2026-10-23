@@ -65,8 +65,13 @@ export default function Play () {
   const reveal = useRef(true)
   const soundLine = useRef(0)
 
+  const waitShade = useSharedValue(0)
+
   const veilStyle = useAnimatedStyle(() => ({
     opacity: veil.get(),
+  }))
+  const waitStyle = useAnimatedStyle(() => ({
+    opacity: waitShade.get(),
   }))
   const cameraStyle = useAnimatedStyle(() => ({
     transform: [
@@ -200,6 +205,17 @@ export default function Play () {
     }, 300)
     return () => clearTimeout(timer)
   }, [novel.loading, fade])
+
+  useEffect(() => {
+    if (!novel.waiting) {
+      waitShade.set(withTiming(0, { duration: 500, easing: EASE.inOut }))
+      return
+    }
+    const timer = setTimeout(() => {
+      waitShade.set(withTiming(1, { duration: 300, easing: EASE.inOut }))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [novel.waiting, waitShade])
 
   useEffect(() => {
     if (novel.error !== null) {
@@ -373,6 +389,10 @@ export default function Play () {
             )}
           </Animated.View>
         )}
+
+        <Animated.View pointerEvents={'none'} style={[styles.status, waitStyle]}>
+          <UIText size={30} color={COLORS.muted}>Загрузка...</UIText>
+        </Animated.View>
 
         {(outro || phase === 'result') && <EndingBackdrop version={novel.version} result={phase === 'result'} />}
 

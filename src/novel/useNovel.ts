@@ -1,7 +1,7 @@
 import { Story } from 'inkjs'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { clearSave, loadSave, VoteStatus, writeSave } from '@/novel/storage'
-import { fetchManifest, getStory, preloadStory } from '@/novel/content'
+import { actReady, enterAct, fetchManifest, getStory, loadAct, preloadStory } from '@/novel/content'
 import { AppState } from 'react-native'
 import { Choice, submitVote } from '@/novel/vote'
 
@@ -86,9 +86,11 @@ export default function useNovel (startAct?: string) {
   const loopsRef = useRef<string[]>([])
   const versionRef = useRef<string | null>(null)
   const lineIdRef = useRef(0)
+  const waitingRef = useRef(false)
 
   const [line, setLine] = useState<Line>(EMPTY)
   const [loading, setLoading] = useState(true)
+  const [waiting, setWaiting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [notice, setNotice] = useState<string | null>(null)
   const [version, setVersion] = useState<string | null>(null)
@@ -171,6 +173,7 @@ export default function useNovel (startAct?: string) {
     if (act !== null) {
       actRef.current = Number(act[1])
     }
+    enterAct(actRef.current ?? 1)
     lineIdRef.current += 1
 
     const shown: Line = {
@@ -203,12 +206,27 @@ export default function useNovel (startAct?: string) {
 
   const step = useCallback((): Line | null => {
     const story = storyRef.current
-    if (!story) {
+    if (!story || waitingRef.current) {
       return null
     }
 
     if (story.canContinue) {
       story.Continue()
+    }
+
+    const act = ACT.exec(story.state.currentPathString ?? '')
+    if (act !== null && !actReady(Number(act[1]))) {
+      waitingRef.current = true
+      setWaiting(true)
+      loadAct(Number(act[1])).then(() => {
+        if (storyRef.current !== story) {
+          return
+        }
+        waitingRef.current = false
+        setWaiting(false)
+        show(story)
+      })
+      return null
     }
 
     return show(story)
@@ -227,7 +245,14 @@ export default function useNovel (startAct?: string) {
         versionRef.current = loaded.version
         setVersion(loaded.version)
         storyRef.current = new Story(loaded.json)
-        await preloadStory(loaded.json, loaded.version)
+
+        const save = startAct ? null : await loadSave()
+        if (cancelled) {
+          return
+        }
+
+        const firstAct = startAct ? Number(startAct) : save?.act ?? 1
+        await preloadStory(loaded.json, loaded.version, firstAct, save?.currentBg ?? null)
         if (cancelled) {
           return
         }
@@ -238,11 +263,8 @@ export default function useNovel (startAct?: string) {
         actRef.current = null
         musicRef.current = null
         loopsRef.current = []
-
-        const save = startAct ? null : await loadSave()
-        if (cancelled) {
-          return
-        }
+        waitingRef.current = false
+        setWaiting(false)
 
         if (save) {
           try {
@@ -363,6 +385,7 @@ export default function useNovel (startAct?: string) {
   return {
     ...line,
     loading,
+    waiting,
     error,
     notice,
     version,
