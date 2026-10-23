@@ -163,7 +163,7 @@ VAR final_choice = ""
 Красные сигнальные огни мерцали на вершинах огромных башен.
 У входа его уже ждал коллега.
 
-# bg: act4/bg/guy_approaches.webp
+# bg: act4/bg/guy_approaches.webp # fx: move
 О, явился! Я уж думал, без тебя начинать придется. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
 Да я всего на пять минут задержался. # speaker: Гай # sprite: act4/sprites/guy_normal.png
 Ладно, пошли уже. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
@@ -171,14 +171,14 @@ VAR final_choice = ""
 # bg: act4/bg/boot1.png # music: stop
 Уинстон затушил сигарету
 
-# bg: act4/bg/boot2.png
+# bg: act4/bg/boot2.png # fx: move
 ...
 
 # fx: toBlack # sfx: act4/sfx/turbine-climb.mp3
 ...
 
-# bg: act4/bg/on_turbine.webp # music: act4/music/turbine-top-wind.mp3
-мужчины поднялись на обслуживающую площадку и приступили к осмотру оборудования.
+# bg: act4/bg/on_turbine.webp # music: act4/music/turbine-top-wind.mp3 # sfx: stop all
+Мужчины поднялись на обслуживающую площадку и приступили к осмотру оборудования.
 
 # bg: act4/bg/guy_thoughtful.webp
 Во время работы Гай то и дело отвлекался, поглядывая то на небо, то на город внизу.
@@ -187,7 +187,7 @@ VAR final_choice = ""
 О чем? # speaker: Уинстон # sprite: act4/sprites/winston_surprised.png
 
 # bg: act4/bg/workers_waving.webp
-На соседнем генераторе работали еще двое техников. Один из них помахал фонарем.
+На соседнем генераторе работали еще двое техников. Увидев Гая и Уинстона, они помахали.
 
 # bg: act4/bg/winston_guy_waving.webp
 Гай и его коллега ответили тем же.
@@ -225,14 +225,131 @@ VAR final_choice = ""
 А то до утра тут проторчим. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
 Давай. # speaker: Гай # sprite: act4/sprites/guy_smile.png
 
-# fx: toBlack
-
 -> act_5
 === act_5 ===
 
+# fx: toBlack # sfx: act5/sfx/shahed.mp3
+Ночную тишину внезапно нарушил резкий свист. Гай поднял голову, пытаясь понять, откуда доносится звук.
+В следующую секунду соседний ветрогенератор озарила яркая вспышка. Раздался оглушительный взрыв, от которого задрожала металлическая площадка под ногами.
+Пригнись! # speaker: Уинстон # sprite: act5/sprites/winston_crouching.png
+Гай пригнулся и прикрыл голову руками. Ему казалось, что еще секунда, и перепонки вот-вот лопнут от этого свиста. # sprite: act5/sprites/guy_crouching.png
+
+# bg: act5/bg/turbine_burning.webp # fx: fadeIn # music: act5/music/after-strike.mp3
+Когда он снова посмотрел на соседнюю башню, ее верхняя часть уже была охвачена огнем. Из поврежденного корпуса поднимался густой дым.
+Твою мать! Там же ребята! # speaker: Гай # sprite: act5/sprites/guy_shocked.png
+Черт! # speaker: Уинстон # sprite: act5/sprites/winston_radio.png
+Уинстон хватает рацию.  # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/radio-button.mp3
+Диспетчерская, прием! Попадание в четвертый генератор! Сильный пожар! На площадке находились двое рабочих! # speaker: Уинстон # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/winston-radio-talk.mp3
+
+# bg: act5/bg/slums1.png # sfx: stop all
+Гай посмотрел вниз.
+
+# bg: act5/bg/slums2.png
+Огни поселения начали блоками затухать.
+
+# bg: act5/bg/slums3.png
+Через несколько секунд целые улицы одна за другой погрузились в темноту.
+
+# bg: act5/bg/slums4.png
+Вдалеке, на противоположном берегу, мегаполис продолжал безразлично сиять.
+Гай вспомнил о Марте. Наверняка она слышала взрыв.
+Он представил, как беременная жена сидит одна в темном доме, не зная, жив он, или нет.
+Черт... Марта! # speaker: Гай # sprite: act5/sprites/guy_shocked.png
+Гай, быстрее! Надо спускаться! # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
+
+# fx: toBlack
+Мужчины быстро спускаются по тросам вниз # sfx: act5/sfx/guy-winston-descend.mp3
+... # sfx: act5/sfx/descended.mp3 # fx: shake
+
+# bg: act5/bg/standing_watching.webp # fx: fadeIn # sfx: act5/music/distant-bangs.mp3 loop
+Где они?! Ты кого-нибудь видишь? # speaker: Гай # sprite: act5/sprites/guy_normal.png
+Нет... Может, с другой стороны спустились? # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
+...
+...
+...
+Прошла минута, затем другая. Но никто не появлялся.
+Ну же, парни, ну давайте... # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
+Уинстон не смог договорить. Оба понимали, насколько мало времени было у рабочих после взрыва.
+
+# bg: act5/bg/winston_supports.webp
+Беги к Марте. # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
+У Гая встал ком в горле.
+А вдруг они выбрались? # speaker: Гай # sprite: act5/sprites/guy_normal.png
+Спасатели уже едут, я разберусь. # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
+
+# fx: toBlack
+
+Гай поспешил в сторону поселения. Позади все еще слышался треск горящего оборудования. # sfx: stop # sfx: act5/music/distant-fighting.mp3 loop
+
+# bg: act5/bg/guy_walks_flashlight.webp # fx: fadeIn # sfx: act5/sfx/guy-walks-mud.mp3
+
+Уличные фонари не работали. Гай освещал дорогу фонариком, стараясь не наступать в глубокие лужи и разбросанный мусор.
+
+# bg: act5/bg/guy_walks_mud.webp
+Он несколько раз пытался дозвониться Марте, но сеть была недоступна.
+Вскоре он убрал телефон и ускорил шаг.
+
+# bg: act5/bg/women_with_lamp.webp
+Проходя мимо одного из домов, Гай заметил небольшую группу людей.
+Две женщины стояли у входа, пытаясь зажечь лампу.
+У тебя спичек не осталось? У нас всё закончилось. # speaker: Женщина 1
+Сейчас, подожди. Вот, возьми коробок. Мне пока хватит. # speaker: Женщина 2
+Спасибо тебе! # speaker: Женщина 1
+
+# bg: act5/bg/men_repairing.webp
+Чуть дальше несколько мужчин возились возле старого генератора.
+Один держал фонарь, пока остальные пытались разобраться с запуском. # sfx: act5/sfx/men-start-generator.mp3
+Посвети сюда, я ничего не вижу! # speaker: Мужчина 1
+Да свечу я! Попробуй придержать # speaker: Мужчина 2
+
+# bg: act5/bg/guy_walks_mud.webp
+Гай продолжал идти, когда позади раздался чей-то радостный голос.
+О! Заработало! # speaker: Мужчина 1 # sfx: act5/sfx/hum.mp3
+Только было Гай хотел обернуться и порадоваться, как вдалеке послышалась сирена скорой помощи. # sfx: act5/sfx/ambulance.mp3
+Гай снова вспомнил о Марте и поспешил домой.
+
+# bg: act5/bg/guy_house.webp
+Через некоторое время, наконец, сквозь тьму вырисовались знакомые окна и ступеньки.
+
+# bg:  act5/bg/martha_sees_guy.png
+Марта только собрала сумку и, похоже, собиралась вот-вот отправиться на поиски мужа.
+Заметив Гая, она на мгновение замерла, а затем бросилась к нему. # sprite: act5/sprites/martha_crying.png
+
+# bg: act5/bg/guy_martha_hug.png # fx: move
+Гай! Господи, ты живой! # speaker: Марта # sprite: act5/sprites/martha_hug.png # sfx: act5/sfx/crying1.mp3
+Марта крепко обнимает его.
+Тихо, тихо... Всё хорошо, я здесь. # speaker: Гай # sprite: act5/sprites/guy_smile.png
+Я услышала взрыв... Потом свет выключился, телефон не работал... # speaker: Марта # sprite: act5/sprites/martha_crying.png
+Я так испугалась, я думала это твой генератор! # speaker: Марта # sprite: act5/sprites/martha_crying.png
+Нет, соседний. Со мной всё нормально. # speaker: Гай # sprite: act5/sprites/guy_normal.png
+Я так испугалась... # speaker: Марта # sprite: act5/sprites/martha_crying.png
+
+# bg: act5/bg/crying_hugging.png # music: stop # sfx: stop all # sfx: act5/sfx/crying2.mp3
+Марта начинает плакать еще сильнее. Гай обнимает ее крепче и гладит по голове.
+Прости, я пытался позвонить, но связи нигде нет. # speaker: Гай # sprite: act5/sprites/guy_normal.png
+Главное, что ты вернулся. # speaker: Марта # sprite: act5/sprites/martha_crying.png
+
+# bg: act5/bg/guy_martha_hug.png # music: act5/music/after-strike.mp3 # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
+Некоторое время они стояли молча. Марта постепенно успокоилась, но продолжала крепко обнимать мужа.
+А остальные? Там ведь тоже люди работали... # speaker: Марта # sprite: act5/sprites/martha_normal.png
+Я не знаю. Снаряд прилетел прям в турбину... Не хочу ничего утверждать. # speaker: Гай # sprite: act5/sprites/guy_normal.png
+Гай замечает сумку на плече Марты.
+Ты куда-то собиралась? # speaker: Гай # sprite: act5/sprites/guy_normal.png
+К тебе бежать. Не могла дома сидеть. # speaker: Марта # sprite: act5/sprites/martha_normal.png
+Гай слабо улыбается и снова прижимает ее к себе. # sprite: act5/sprites/guy_smile.png
+Побежать прям на звуки взрывов? Обычно бегут от них. # speaker: Гай # sprite: act5/sprites/guy_smile.png
+Марта кивает.
+Ладно, пошли, а то тебя продует. # speaker: Гай # sprite: act5/sprites/guy_smile.png # sfx: act5/sfx/guy-closes-door.mp3
+
+# fx: toBlack # sfx: act5/sfx/couple-leaves.mp3
+...
+
+-> act_6
+=== act_6 ===
 
 PLACEHOLDER
-
+PLACEHOLDER
+PLACEHOLDER
 
 * [Оставляем]
     ~ final_choice = "A"

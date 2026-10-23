@@ -9,6 +9,12 @@
     },
     "3": {
       "base": "act3/bg/city1.webp"
+    },
+    "4": {
+      "base": "act4/bg/guy_approaches.webp"
+    },
+    "5": {
+      "base": "act5/bg/standing_watching.webp"
     }
   },
   "completed": {

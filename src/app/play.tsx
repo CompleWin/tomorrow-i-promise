@@ -326,13 +326,13 @@ export default function Play () {
                         version={novel.version}
             />
 
+            <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
+
             <Sprite name={novel.sprite}
                     version={novel.version}
-                    hidden={novel.dark || veiling}
+                    hidden={veiling}
                     instant={novel.resumed}
             />
-
-            <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
 
             <BottomGradient height={470} colors={GRADIENT} middle={0.52} />
 

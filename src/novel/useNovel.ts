@@ -153,7 +153,6 @@ export default function useNovel (startAct?: string) {
       if (path === 'stop') {
         loopsRef.current = []
         if (mode === 'all') {
-          musicRef.current = null
           silence = true
           sfx = null
         }
