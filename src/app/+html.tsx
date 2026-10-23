@@ -23,8 +23,9 @@ export default function Root ({ children }: { children: ReactNode }) {
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content={TITLE} />
         <meta name="theme-color" content="#050403" />
+        <link rel="icon" href={`${BASE}/favicon.ico`} sizes="16x16 32x32 48x48" />
         <link rel="manifest" href={`${BASE}/manifest.json`} />
-        <link rel="apple-touch-icon" href={`${BASE}/icon.png`} />
+        <link rel="apple-touch-icon" href={`${BASE}/apple-touch-icon.png`} />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: CSS }} />
         {headNodes}

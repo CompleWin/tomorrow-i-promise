@@ -84,6 +84,7 @@ const menuArt = JSON.parse(fs.readFileSync('src/novel/menuArt.json', 'utf8'))
 const menuFiles = [...Object.values(menuArt.acts), menuArt.completed]
   .flatMap(art => [art.base, art.flicker])
   .filter(path => path !== undefined)
+  .concat(menuArt.music.file)
 for (const path of menuFiles) {
   if (!fs.existsSync(`${ASSETS_DIR}/${path}`)) {
     console.error(`menu art does not exist: ${path} (src/novel/menuArt.json)`)

@@ -1,4 +1,4 @@
-import type { LoopPlayer } from './loopPlayer'
+import type { LoopPlayer } from '@/novel/streamLoop'
 
 let context: AudioContext | null = null
 

@@ -1,5 +1,7 @@
+import { Platform } from 'react-native'
 import { AudioPlayer, createAudioPlayer, preload, setAudioModeAsync } from 'expo-audio'
-import { createLoop, LoopPlayer } from '@/novel/loopPlayer'
+import { createLoop } from '@/novel/loopPlayer'
+import { Crossfade, crossfadeLoop, LoopPlayer } from '@/novel/streamLoop'
 import { DEFAULT_SETTINGS, loadSettings, Settings } from '@/novel/storage'
 
 const FADE_MS = 500
@@ -138,6 +140,14 @@ export function startSound () {
     return
   }
   modeSet = true
+  if (Platform.OS === 'web') {
+    for (const event of ['pointerdown', 'keydown']) {
+      window.addEventListener(event, () => {
+        resumeMusic()
+        resumeLoops()
+      })
+    }
+  }
   setAudioModeAsync({ playsInSilentMode: true, interruptionMode: 'mixWithOthers' })
     .catch(error => console.warn('audio mode failed', error))
 }
@@ -190,7 +200,7 @@ export function playLoops (urls: string[]) {
   resumeLoops()
 }
 
-export function playMusic (url: string | null) {
+export function playMusic (url: string | null, crossfade?: Crossfade) {
   if (url === track) {
     resumeMusic()
     return
@@ -205,7 +215,7 @@ export function playMusic (url: string | null) {
     return
   }
   try {
-    music = createLoop(url)
+    music = crossfade === undefined ? createLoop(url) : crossfadeLoop(url, crossfade)
   } catch (error) {
     console.warn('music failed', url, error)
     return

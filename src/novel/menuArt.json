@@ -22,5 +22,10 @@
   },
   "completed": {
     "base": "act6/bg/antonio_embrionio.webp"
+  },
+  "music": {
+    "file": "menu/main_menu_sound.mp3",
+    "at": 430,
+    "fade": 4
   }
 }

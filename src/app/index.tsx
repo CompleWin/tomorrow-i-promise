@@ -3,7 +3,9 @@ import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { cachedVersion, fetchManifest } from '@/novel/content'
-import { menuArtFor, MENU_ART_COMPLETED } from '@/novel/menuArt'
+import { assetUrl } from '@/novel/config'
+import { menuArtFor, MENU_ART_COMPLETED, MENU_MUSIC } from '@/novel/menuArt'
+import { playMusic, startSound } from '@/novel/sound'
 import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
@@ -62,9 +64,11 @@ export default function Index () {
     useCallback(() => {
       let cancelled = false
       setFocused(true)
+      startSound()
       loadMenu().then(data => {
         if (!cancelled) {
           setMenu(data)
+          playMusic(assetUrl(MENU_MUSIC.file, data.version), MENU_MUSIC)
         }
       })
       fetchManifest().then(manifest => {
