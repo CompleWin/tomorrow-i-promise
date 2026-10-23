@@ -347,13 +347,39 @@ VAR final_choice = ""
 -> act_6
 === act_6 ===
 
-PLACEHOLDER
-PLACEHOLDER
-PLACEHOLDER
+# bg: act6/bg/bag1.png # music: act6/music/home.mp3
+Наступило утро.
+Гай и Марта в этот день не смогли нормально поспать, так как в голове роилось много мыслей, и далеко не самых приятных.
+Пара решила пропустить завтрак и молча собиралась в больницу. # sfx: act6/sfx/papers-in-bag.mp3
+Марта складывала необходимые документы в сумку, а Гай ее уже ждал. # sfx: act6/sfx/whoosh.mp3
 
-* [Оставляем]
+# bg: act6/bg/bag2.png # fx: move
+Ну что, идем? # speaker: Марта # sprite: act6/sprites/martha_normal.png # sfx: act6/sfx/bag.mp3
+
+# bg: act6/bg/bag3.png
+Да, пойдем. # speaker: Гай # sprite: act6/sprites/guy_normal.png
+
+{""} # fx: toBlack # wait: 500
+
+# bg: act6/bg/knocking1.png # fx: fadeIn # music: act6/music/hospital.mp3
+... # sfx: act6/sfx/door-knock.mp3
+
+# bg: act6/bg/knocking2.png # fx: move # sfx: act6/sfx/hospital-door.mp3
+Здравствуйте, у нас талон на 9. # speaker: Гай # sprite: act6/sprites/guy_normal.png
+Доброе утро. Проходите, присаживайтесь. # speaker: Врач # sprite: act6/sprites/doctor_smile.png
+
+# bg: act6/bg/choice.png # sfx: act6/sfx/footsteps.mp3
+Пара села напротив врача.
+Вы приняли решение насчет беременности? # speaker: Врач # sprite: act6/sprites/doctor_normal.png # sfx: stop all
+Гай и Марта переглянулись.
+Марта взяла Гая за руку. Он посмотрел на нее, затем перевел взгляд на врача.
+...
+
+* [Сохранить беременность]
     ~ final_choice = "A"
+    # music: act6/music/ending.mp3
     -> END
-* [Не оставляем]
+* [Прервать беременность]
     ~ final_choice = "B"
+    # music: act6/music/ending.mp3
     -> END

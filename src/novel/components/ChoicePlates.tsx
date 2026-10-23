@@ -77,7 +77,10 @@ function Plate ({ text, order, chosen, dropped, onPress }: PlateProps) {
             <View style={styles.label}>
               <UIText size={44}
                       spacing={0.06}
+                      lineHeight={1.15}
+                      align={'center'}
                       upper
+                      style={styles.labelText}
                       color={hovered || pressed ? COLORS.lamp : COLORS.cream}
               >
                 {text}
@@ -149,7 +152,10 @@ const styles = StyleSheet.create({
   },
   label: {
     ...StyleSheet.absoluteFill,
-    alignItems: 'center',
+    paddingHorizontal: 56,
     justifyContent: 'center',
+  },
+  labelText: {
+    alignSelf: 'stretch',
   },
 })

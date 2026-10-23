@@ -332,6 +332,27 @@ export default function useNovel (startAct?: string) {
     step()
   }, [step])
 
+  const choiceMusic = useCallback((index: number): string | null => {
+    const story = storyRef.current
+    if (!story) {
+      return musicRef.current
+    }
+    const saved = story.state.ToJson()
+    try {
+      story.ChooseChoiceIndex(index)
+      if (story.canContinue) {
+        story.Continue()
+      }
+      const music = parseTags(story.currentTags).music
+      if (music === undefined) {
+        return musicRef.current
+      }
+      return music === 'stop' ? null : music
+    } finally {
+      story.state.LoadJson(saved)
+    }
+  }, [])
+
   const reload = useCallback(() => {
     setUpdateAvailable(false)
     setError(null)
@@ -350,6 +371,7 @@ export default function useNovel (startAct?: string) {
     voteStatus: vote.voteStatus,
     next,
     choose,
+    choiceMusic,
     reload,
   }
 

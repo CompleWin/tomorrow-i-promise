@@ -110,14 +110,14 @@ export default function VoteStats ({ message, results, onCounted }: Props) {
           <View style={styles.numbers}>
             <View style={styles.side}>
               <UIText size={96} color={COLORS.cream}>{Math.round(percentA * progress)}%</UIText>
-              <UIText size={28} spacing={0.06} color={COLORS.sub}>оставляем</UIText>
+              <UIText size={28} spacing={0.06} color={COLORS.sub}>сохранить беременность</UIText>
             </View>
             <UIText size={26} color={COLORS.muted} style={styles.total}>
               Всего голосов — {total.toLocaleString('ru-RU')}
             </UIText>
             <View style={[styles.side, styles.sideRight]}>
               <UIText size={96} color={COLORS.cream}>{Math.round(percentB * progress)}%</UIText>
-              <UIText size={28} spacing={0.06} color={COLORS.sub}>не оставляем</UIText>
+              <UIText size={28} spacing={0.06} color={COLORS.sub}>прервать беременность</UIText>
             </View>
           </View>
 

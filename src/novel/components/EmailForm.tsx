@@ -5,7 +5,7 @@ import { EMAIL_PATTERN, submitEmail } from '@/novel/vote'
 import UIText from '@/novel/components/UIText'
 import { COLORS, FONT } from '@/novel/theme'
 
-const INTRO = 'Спасибо за игру! Пока сыграло слишком мало людей, чтобы показать, как выбрали другие. ' +
+const INTRO = 'Пока сыграло слишком мало игроков, чтобы показать, как выбрали другие. ' +
   'Оставьте почту, и мы напишем, когда соберём статистику.'
 const THANKS = 'Спасибо! Напишем, как только соберём статистику.'
 

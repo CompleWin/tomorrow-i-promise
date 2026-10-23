@@ -17,8 +17,8 @@ export type Results = {
 }
 
 export const LABELS: Record<Choice, string> = {
-  A: 'Оставляем',
-  B: 'Не оставляем',
+  A: 'Сохранить беременность',
+  B: 'Прервать беременность',
 }
 
 export const MIN_VOTES = 12

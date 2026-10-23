@@ -8,7 +8,7 @@ import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
-import { playLoops, playMusic, playSfx, releaseSound, startSound, stopAll, stopSfx } from '@/novel/sound'
+import { playLoops, playMusic, playSfx, preloadSounds, releaseSound, startSound, stopAll, stopSfx } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -22,12 +22,13 @@ import PauseOverlay from '@/novel/components/PauseOverlay'
 import { Stage } from '@/novel/components/Stage'
 import Sprite from '@/novel/components/Sprite'
 import Subtitles from '@/novel/components/Subtitles'
+import Thanks from '@/novel/components/Thanks'
 import UIText from '@/novel/components/UIText'
 import { BG_DURATION, COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
 
 const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
 
-type Phase = 'play' | 'choice' | 'credits' | 'result'
+type Phase = 'play' | 'choice' | 'credits' | 'thanks' | 'result'
 
 const SHAKE = {
   offsets: [0, 0.1, 0.22, 0.36, 0.52, 0.7, 1],
@@ -47,7 +48,8 @@ export default function Play () {
   const [updating, setUpdating] = useState(false)
   const [slowLoad, setSlowLoad] = useState(false)
   const [stagePhase, setStagePhase] = useState<Phase>('play')
-  const phase: Phase = novel.ended && stagePhase !== 'credits' ? 'result' : stagePhase
+  const outro = stagePhase === 'credits' || stagePhase === 'thanks'
+  const phase: Phase = novel.ended && !outro ? 'result' : stagePhase
   const ready = readyLine === novel.lineId
   const busy = leaving || updating
   const hasChoices = novel.choices.length > 0
@@ -144,6 +146,12 @@ export default function Play () {
   }, [novel.lineId, novel.ended])
 
   useEffect(() => {
+    if (novel.ended) {
+      playMusic(novel.music === null ? null : assetUrl(novel.music, novel.version))
+    }
+  }, [novel.ended, novel.music, novel.version])
+
+  useEffect(() => {
     if (!fade.isBlack()) {
       fade.set(1)
     }
@@ -166,6 +174,20 @@ export default function Play () {
     const timer = setTimeout(() => setStagePhase('choice'), 500)
     return () => clearTimeout(timer)
   }, [ready, typing.done, hasChoices])
+
+  const preloadChoiceMusic = useEffectEvent(() => {
+    const urls = novel.choices.flatMap(choice => {
+      const music = novel.choiceMusic(choice.index)
+      return music === null ? [] : [assetUrl(music, novel.version)]
+    })
+    preloadSounds(urls)
+  })
+
+  useEffect(() => {
+    if (hasChoices) {
+      preloadChoiceMusic()
+    }
+  }, [hasChoices])
 
   useEffect(() => {
     if (!novel.loading) {
@@ -234,7 +256,7 @@ export default function Play () {
     if (novel.loading || novel.error !== null) {
       return false
     }
-    if (!busy && phase !== 'credits') {
+    if (!busy && !outro) {
       setPaused(p => !p)
     }
     return true
@@ -283,6 +305,8 @@ export default function Play () {
   useKeys({ onNext: tap, onPause: togglePause })
 
   async function pick (index: number) {
+    const music = novel.choiceMusic(index)
+    playMusic(music === null ? null : assetUrl(music, novel.version))
     await sleep(1100)
     if (!alive.current) {
       return
@@ -350,7 +374,11 @@ export default function Play () {
         )}
 
         {phase === 'credits' && (
-          <Credits onDone={() => setStagePhase('result')} />
+          <Credits onDone={() => setStagePhase('thanks')} />
+        )}
+
+        {phase === 'thanks' && (
+          <Thanks onDone={() => setStagePhase('result')} />
         )}
 
         {phase === 'result' && (
@@ -361,7 +389,7 @@ export default function Play () {
           />
         )}
 
-        {phase !== 'credits' && <PauseButton onPress={() => setPaused(true)} />}
+        {!outro && <PauseButton onPress={() => setPaused(true)} />}
 
         {paused && <PauseOverlay onResume={() => setPaused(false)} onMenu={toMenu} />}
       </Stage>

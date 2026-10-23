@@ -5,7 +5,7 @@
       "flicker": "act1/bg/bg3.png"
     },
     "2": {
-      "base": "act2/bg/bg2.png"
+      "base": "act2/bg/bg10.webp"
     },
     "3": {
       "base": "act3/bg/city1.webp"
@@ -15,9 +15,12 @@
     },
     "5": {
       "base": "act5/bg/standing_watching.webp"
+    },
+    "6": {
+      "base": "act6/bg/choice.png"
     }
   },
   "completed": {
-    "base": "act1/bg/bg6.png"
+    "base": "act6/bg/choice.png"
   }
 }
