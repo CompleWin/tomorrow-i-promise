@@ -2,15 +2,16 @@ import { BackHandler, StyleSheet, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
-import { cachedVersion, fetchManifest } from '@/novel/content'
+import { cachedVersion, fetchManifest, warmStory } from '@/novel/content'
 import { assetUrl } from '@/novel/config'
 import { menuArtFor, MENU_ART_COMPLETED, MENU_MUSIC } from '@/novel/menuArt'
-import { playMusic, startSound } from '@/novel/sound'
+import { musicReady, playMusic, prepareMusic, startSound } from '@/novel/sound'
 import { clearSave, loadCompleted, loadSave } from '@/novel/storage'
 import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuFooter from '@/novel/components/MenuFooter'
 import MenuItem from '@/novel/components/MenuItem'
+import MenuSkeleton from '@/novel/components/MenuSkeleton'
 import VolumeSettings, { useVolumeSettings } from '@/novel/components/VolumeSettings'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
@@ -20,17 +21,23 @@ import useMenuSelection, { MenuAction } from '@/novel/useMenuSelection'
 type Menu = {
   hasSave: boolean
   act: number | null
+  currentBg: string | null
   completed: boolean
   version: string | null
 }
 
 type MenuView = 'main' | 'settings'
 
+const REVEAL_WAIT_MS = 8 * 1000
+const REVEAL_MS = 500
+const SKELETON_LABELS = ['Продолжить', 'Начать заново', 'Настройки', 'Авторы']
+
 async function loadMenu (): Promise<Menu> {
   const [save, completed] = await Promise.all([loadSave(), loadCompleted()])
   return {
     hasSave: save !== null,
     act: save?.act ?? null,
+    currentBg: save?.currentBg ?? null,
     completed: completed !== null,
     version: save?.contentVersion ?? await cachedVersion(),
   }
@@ -42,19 +49,56 @@ export default function Index () {
   const [latest, setLatest] = useState<string | null>(null)
   const [view, setView] = useState<MenuView>('main')
   const [focused, setFocused] = useState(false)
+  const [artReady, setArtReady] = useState(false)
+  const [soundReady, setSoundReady] = useState(false)
+  const [late, setLate] = useState(false)
+  const [skeleton, setSkeleton] = useState(true)
   const fade = useFade()
   const shown = useSharedValue(0)
   const items = useSharedValue(1)
-  const loaded = menu !== null
+  const loaded = menu !== null && ((artReady && soundReady) || late)
 
   useEffect(() => {
-    if (loaded) {
-      shown.set(withTiming(1, { duration: 400 }))
+    if (!loaded || !focused || menu === null) {
+      return
     }
+    playMusic(assetUrl(MENU_MUSIC.file, menu.version), MENU_MUSIC)
+    warmStory(menu.act ?? 1, menu.currentBg)
+  }, [loaded, focused, menu])
+
+  const markArtReady = useCallback(() => setArtReady(true), [])
+
+  useEffect(() => {
+    if (menu === null) {
+      return
+    }
+    let cancelled = false
+    musicReady().then(() => {
+      if (!cancelled) {
+        setSoundReady(true)
+      }
+    })
+    const timer = setTimeout(() => setLate(true), REVEAL_WAIT_MS)
+    return () => {
+      cancelled = true
+      clearTimeout(timer)
+    }
+  }, [menu])
+
+  useEffect(() => {
+    if (!loaded) {
+      return
+    }
+    shown.set(withTiming(1, { duration: REVEAL_MS }))
+    const timer = setTimeout(() => setSkeleton(false), REVEAL_MS)
+    return () => clearTimeout(timer)
   }, [loaded, shown])
 
   const columnStyle = useAnimatedStyle(() => ({
     opacity: shown.get(),
+  }))
+  const skeletonStyle = useAnimatedStyle(() => ({
+    opacity: 1 - shown.get(),
   }))
   const itemsStyle = useAnimatedStyle(() => ({
     opacity: items.get(),
@@ -67,8 +111,8 @@ export default function Index () {
       startSound()
       loadMenu().then(data => {
         if (!cancelled) {
+          prepareMusic(assetUrl(MENU_MUSIC.file, data.version), MENU_MUSIC)
           setMenu(data)
-          playMusic(assetUrl(MENU_MUSIC.file, data.version), MENU_MUSIC)
         }
       })
       fetchManifest().then(manifest => {
@@ -87,6 +131,9 @@ export default function Index () {
   )
 
   async function open (path: '/play' | '/credits' | '/stats') {
+    if (path === '/play') {
+      playMusic(null)
+    }
     await fade.to(1, 600)
     router.push(path)
   }
@@ -138,7 +185,17 @@ export default function Index () {
 
   return (
     <Stage>
-      {menu !== null && <MenuBackground art={art} version={menu.version} />}
+      {menu !== null && (
+        <Animated.View style={[StyleSheet.absoluteFill, columnStyle]}>
+          <MenuBackground art={art} version={menu.version} onReady={markArtReady} />
+        </Animated.View>
+      )}
+
+      {skeleton && (
+        <Animated.View pointerEvents={'none'} style={[StyleSheet.absoluteFill, skeletonStyle]}>
+          <MenuSkeleton labels={menu === null ? SKELETON_LABELS : entries.map(entry => entry.label)} />
+        </Animated.View>
+      )}
 
       <Animated.View style={[styles.column, columnStyle]}>
         <View style={styles.title}>

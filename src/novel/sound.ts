@@ -18,6 +18,7 @@ let player: AudioPlayer | null = null
 let queue: string[] = []
 let music: LoopPlayer | null = null
 let track: string | null = null
+let started = false
 let loops: Loop[] = []
 let rise = 1
 let riseTimer: ReturnType<typeof setInterval> | null = null
@@ -69,6 +70,9 @@ function fadeIn () {
   rise = 0
   let step = 0
   riseTimer = setInterval(() => {
+    if (music !== null && !music.ready) {
+      return
+    }
     step += 1
     rise = (step / RISE_STEPS) ** 2
     try {
@@ -85,7 +89,7 @@ function fadeIn () {
 }
 
 function resumeMusic () {
-  if (music === null || musicLevel() === 0) {
+  if (music === null || !started || musicLevel() === 0) {
     return
   }
   try {
@@ -221,9 +225,8 @@ export function playLoops (urls: string[]) {
   resumeLoops()
 }
 
-export function playMusic (url: string | null, crossfade?: Crossfade) {
+export function prepareMusic (url: string | null, crossfade?: Crossfade) {
   if (url === track) {
-    resumeMusic()
     return
   }
   if (music !== null) {
@@ -231,6 +234,7 @@ export function playMusic (url: string | null, crossfade?: Crossfade) {
   }
   music = null
   track = url
+  started = false
   stopRise()
   if (url === null) {
     return
@@ -239,10 +243,30 @@ export function playMusic (url: string | null, crossfade?: Crossfade) {
     music = crossfade === undefined ? createLoop(url) : crossfadeLoop(url, crossfade)
   } catch (error) {
     console.warn('music failed', url, error)
+  }
+}
+
+export function playMusic (url: string | null, crossfade?: Crossfade) {
+  prepareMusic(url, crossfade)
+  if (music === null) {
     return
   }
-  fadeIn()
+  if (!started) {
+    started = true
+    fadeIn()
+  }
   resumeMusic()
+}
+
+export function musicReady (): Promise<void> {
+  return new Promise(resolve => {
+    const timer = setInterval(() => {
+      if (music === null || music.ready) {
+        clearInterval(timer)
+        resolve()
+      }
+    }, 100)
+  })
 }
 
 export function stopSfx () {
@@ -261,17 +285,14 @@ export function stopAll () {
 }
 
 export function releaseSound () {
-  for (const released of [player, music, ...loops.map(loop => loop.player)]) {
+  for (const released of [player, ...loops.map(loop => loop.player)]) {
     try {
       released?.remove()
     } catch (error) {
       console.warn('sound release failed', error)
     }
   }
-  stopRise()
   player = null
   queue = []
-  music = null
-  track = null
   loops = []
 }

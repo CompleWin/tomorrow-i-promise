@@ -17,6 +17,7 @@ import Credits from '@/novel/components/Credits'
 import End from '@/novel/components/End'
 import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
+import LoadingBar from '@/novel/components/LoadingBar'
 import MenuItem from '@/novel/components/MenuItem'
 import PauseButton from '@/novel/components/PauseButton'
 import PauseOverlay from '@/novel/components/PauseOverlay'
@@ -344,7 +345,7 @@ export default function Play () {
     return (
       <Stage>
         <View style={styles.status}>
-          {slowLoad && <UIText size={30} color={COLORS.muted}>Загрузка...</UIText>}
+          {slowLoad && <LoadingBar />}
         </View>
       </Stage>
     )
@@ -355,6 +356,7 @@ export default function Play () {
         <View style={styles.status}>
           <UIText size={30} color={COLORS.muted}>Не удалось загрузить историю</UIText>
           <MenuItem label={'Повторить'} onPress={novel.reload} style={styles.retry} />
+          <MenuItem label={'В меню'} onPress={toMenu} />
         </View>
       </Stage>
     )
@@ -396,7 +398,7 @@ export default function Play () {
         )}
 
         <Animated.View pointerEvents={'none'} style={[styles.status, waitStyle]}>
-          <UIText size={30} color={COLORS.muted}>Загрузка...</UIText>
+          <LoadingBar active={novel.waiting} />
         </Animated.View>
 
         {(outro || phase === 'result') && <EndingBackdrop version={novel.version} result={phase === 'result'} />}

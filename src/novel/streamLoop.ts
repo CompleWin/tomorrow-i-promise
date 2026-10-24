@@ -3,6 +3,7 @@ import { createAudioPlayer } from 'expo-audio'
 export type LoopPlayer = {
   volume: number
   readonly playing: boolean
+  readonly ready: boolean
   play (): void
   pause (): void
   remove (): void
@@ -20,6 +21,9 @@ export function streamLoop (url: string): LoopPlayer {
     },
     get playing () {
       return player.currentStatus.playing
+    },
+    get ready () {
+      return player.isLoaded
     },
     play: () => player.play(),
     pause: () => player.pause(),
@@ -94,6 +98,9 @@ export function crossfadeLoop (url: string, { at, fade, from }: Crossfade): Loop
     },
     get playing () {
       return players[current].currentStatus.playing
+    },
+    get ready () {
+      return players[current].isLoaded
     },
     play () {
       wanted = true

@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Story } from 'inkjs'
 import { assetUrl, CONTENT_URL } from '@/novel/config'
-import { fetchAssets, keepDecoded, loadAssets } from '@/novel/preload'
+import { fetchAssets, keepDecoded, loadAssets, loadedShare, loadMusic } from '@/novel/preload'
 import { preloadSounds } from '@/novel/sound'
 
 export type Manifest = {
@@ -117,12 +117,13 @@ export async function getStory (): Promise<LoadedStory> {
 }
 
 const PRELOAD_TIMEOUT_MS = 2 * 60 * 1000
-const ASSET_TAG = /"\^(bg|sprite|sfx):\s*([^"]*)"/g
+const ASSET_TAG = /"\^(bg|sprite|sfx|music):\s*([^"]*)"/g
 const ACT_PATH = /^act(\d+)\//
 
 type ActAssets = {
   images: string[]
   sounds: string[]
+  music: string[]
 }
 
 let acts = new Map<number, ActAssets>()
@@ -131,6 +132,8 @@ let enteredAct: number | null = null
 let generation = 0
 let readyActs = new Set<number>()
 let loadingActs = new Map<number, Promise<void>>()
+let preloading: { key: string, promise: Promise<void> } | null = null
+let tracked: { paths: string[], version: string } = { paths: [], version: '' }
 
 function collectAssets (json: string): Map<number, ActAssets> {
   const result = new Map<number, ActAssets>()
@@ -150,10 +153,10 @@ function addAsset (result: Map<number, ActAssets>, kind: string, path: string) {
   const act = Number(ACT_PATH.exec(path)?.[1] ?? 0)
   let assets = result.get(act)
   if (assets === undefined) {
-    assets = { images: [], sounds: [] }
+    assets = { images: [], sounds: [], music: [] }
     result.set(act, assets)
   }
-  const list = kind === 'sfx' ? assets.sounds : assets.images
+  const list = kind === 'sfx' ? assets.sounds : kind === 'music' ? assets.music : assets.images
   if (!list.includes(path)) {
     list.push(path)
   }
@@ -189,12 +192,26 @@ async function prefetchRest (act: number, version: string, run: number) {
       return
     }
     await fetchAssets(acts.get(n)?.images ?? [], version)
+    await loadMusic(acts.get(n)?.music ?? [], version)
     if (run !== generation) {
       return
     }
     markReady(n, run)
     preloadActSounds(n, version)
   }
+}
+
+async function loadActMedia (images: string[], act: number, version: string): Promise<void> {
+  const music = acts.get(act)?.music ?? []
+  tracked = { paths: [...images, ...music], version }
+  await Promise.all([
+    loadAssets(images, version),
+    loadMusic(music, version),
+  ])
+}
+
+export function loadProgress (): number {
+  return loadedShare(tracked.paths, tracked.version)
 }
 
 export function actReady (act: number): boolean {
@@ -206,7 +223,7 @@ export function loadAct (act: number): Promise<void> {
   if (loading === undefined) {
     const run = generation
     preloadActSounds(act, assetsVersion)
-    loading = withTimeout(loadAssets(acts.get(act)?.images ?? [], assetsVersion))
+    loading = withTimeout(loadActMedia(acts.get(act)?.images ?? [], act, assetsVersion))
       .then(() => markReady(act, run))
     loadingActs.set(act, loading)
   }
@@ -231,7 +248,24 @@ export function enterAct (act: number) {
     .catch(error => console.warn('preload failed', error))
 }
 
-export async function preloadStory (json: string, version: string, act: number, currentBg: string | null): Promise<void> {
+export function preloadStory (json: string, version: string, act: number, currentBg: string | null): Promise<void> {
+  const key = `${version} ${act} ${currentBg}`
+  if (preloading?.key !== key) {
+    preloading = { key, promise: startPreload(json, version, act, currentBg) }
+  }
+  return preloading.promise
+}
+
+export async function warmStory (act: number, currentBg: string | null): Promise<void> {
+  try {
+    const loaded = await getStory()
+    await preloadStory(loaded.json, loaded.version, act, currentBg)
+  } catch (error) {
+    console.warn('warm up failed', error)
+  }
+}
+
+async function startPreload (json: string, version: string, act: number, currentBg: string | null): Promise<void> {
   generation += 1
   const run = generation
   acts = collectAssets(json)
@@ -243,7 +277,7 @@ export async function preloadStory (json: string, version: string, act: number, 
   preloadActSounds(act, version)
   const images = acts.get(act)?.images ?? []
   const required = currentBg === null || images.includes(currentBg) ? images : [...images, currentBg]
-  await withTimeout(loadAssets(required, version))
+  await withTimeout(loadActMedia(required, act, version))
   markReady(act, run)
 
   prefetchRest(act, version, run).catch(error => console.warn('prefetch failed', error))

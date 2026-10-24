@@ -1,3 +1,4 @@
+import { fetchSound } from '@/novel/preload'
 import type { LoopPlayer } from '@/novel/streamLoop'
 
 let context: AudioContext | null = null
@@ -33,7 +34,8 @@ export function createLoop (url: string): LoopPlayer {
     source = null
   }
 
-  fetch(url)
+  fetchSound(url)
+    .then(blobUrl => fetch(blobUrl))
     .then(res => res.arrayBuffer())
     .then(data => ctx.decodeAudioData(data))
     .then(decoded => {
@@ -51,6 +53,9 @@ export function createLoop (url: string): LoopPlayer {
     },
     get playing () {
       return wanted && ctx.state === 'running'
+    },
+    get ready () {
+      return buffer !== null
     },
     play () {
       wanted = true

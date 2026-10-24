@@ -27,15 +27,17 @@ const GRADIENT = ['rgba(6,4,3,.95)', 'rgba(6,4,3,.84)', 'rgba(6,4,3,0)'] as cons
 type Props = {
   art: MenuArt
   version: string | null
+  onReady?: () => void
 }
 
 type LayerProps = {
   path: string
   version: string | null
   flick?: SharedValue<number>
+  onLoad: (path: string) => void
 }
 
-function ArtLayer ({ path, version, flick }: LayerProps) {
+function ArtLayer ({ path, version, flick, onLoad }: LayerProps) {
   const appear = useSharedValue(0)
   const [loaded, setLoaded] = useState(false)
 
@@ -54,14 +56,30 @@ function ArtLayer ({ path, version, flick }: LayerProps) {
       <Image source={assetSource(path, version)}
              style={StyleSheet.absoluteFill}
              contentFit={'cover'}
-             onLoad={() => setLoaded(true)}
+             onLoad={() => {
+               setLoaded(true)
+               onLoad(path)
+             }}
+             onError={() => onLoad(path)}
       />
     </Animated.View>
   )
 }
 
-export default function MenuBackground ({ art, version }: Props) {
+export default function MenuBackground ({ art, version, onReady }: Props) {
   const flick = useSharedValue(0)
+  const [loadedPaths, setLoadedPaths] = useState<string[]>([])
+  const ready = loadedPaths.includes(art.base) && (art.flicker === undefined || loadedPaths.includes(art.flicker))
+
+  useEffect(() => {
+    if (ready) {
+      onReady?.()
+    }
+  }, [ready, onReady])
+
+  function markLoaded (path: string) {
+    setLoadedPaths(paths => paths.includes(path) ? paths : [...paths, path])
+  }
 
   useEffect(() => {
     flick.set(withRepeat(withTiming(1, { duration: FLICK_MS, easing: Easing.linear }), -1, false))
@@ -69,9 +87,9 @@ export default function MenuBackground ({ art, version }: Props) {
 
   return (
     <View style={styles.root} pointerEvents={'none'}>
-      <ArtLayer key={art.base} path={art.base} version={version} />
+      <ArtLayer key={art.base} path={art.base} version={version} onLoad={markLoaded} />
       {art.flicker !== undefined && (
-        <ArtLayer key={art.flicker} path={art.flicker} version={version} flick={flick} />
+        <ArtLayer key={art.flicker} path={art.flicker} version={version} flick={flick} onLoad={markLoaded} />
       )}
       <LinearGradient colors={GRADIENT}
                       locations={[0, 0.27, 0.57]}
