@@ -354,7 +354,7 @@ export default function Play () {
     if (!alive.current) {
       return
     }
-    await fade.to(1, 1500)
+    await fade.to(1, 3000)
     if (!alive.current) {
       return
     }

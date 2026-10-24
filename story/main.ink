@@ -361,7 +361,7 @@ VAR final_choice = ""
 # bg: act6/bg/knocking1.webp # fx: fadeIn # music: act6/music/hospital.mp3
 ... # sfx: act6/sfx/door-knock.mp3
 
-# bg: act6/bg/knocking2.webp # fx: move # sfx: act6/sfx/hospital-door.mp3
+# bg: act6/bg/knocking2.webp # sfx: act6/sfx/hospital-door.mp3
 Здравствуйте, у нас талон на 9. # speaker: Гай # sprite: act6/sprites/guy_normal.png
 Доброе утро. Проходите, присаживайтесь. # speaker: Врач # sprite: act6/sprites/doctor_smile.png
 
