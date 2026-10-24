@@ -8,7 +8,7 @@ import useKeys from '@/novel/useKeys'
 import sleep from '@/novel/sleep'
 import { clearSave, markCompleted } from '@/novel/storage'
 import { assetUrl } from '@/novel/config'
-import { playLoops, playMusic, playSfx, preloadSounds, releaseSound, startSound, stopAll, stopSfx } from '@/novel/sound'
+import { fadeOutMusic, playLoops, playMusic, playSfx, preloadSounds, releaseSound, startSound, stopAll, stopSfx } from '@/novel/sound'
 import Background from '@/novel/components/Background'
 import { useBanner } from '@/novel/components/Banner'
 import BottomGradient from '@/novel/components/BottomGradient'
@@ -24,9 +24,12 @@ import PauseOverlay from '@/novel/components/PauseOverlay'
 import { Stage } from '@/novel/components/Stage'
 import Sprite from '@/novel/components/Sprite'
 import Subtitles from '@/novel/components/Subtitles'
+import Teaser, { TEASER_MUSIC } from '@/novel/components/Teaser'
 import Thanks from '@/novel/components/Thanks'
 import UIText from '@/novel/components/UIText'
 import { BG_DURATION, COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
+
+const TEASER_FADE = 2500
 
 const GRADIENT = ['rgba(4,3,2,0)', 'rgba(4,3,2,.8)', 'rgba(4,3,2,.94)'] as const
 
@@ -50,6 +53,7 @@ export default function Play () {
   const [updating, setUpdating] = useState(false)
   const [slowLoad, setSlowLoad] = useState(false)
   const [stagePhase, setStagePhase] = useState<Phase>('play')
+  const [teasing, setTeasing] = useState(false)
   const outro = stagePhase === 'credits' || stagePhase === 'thanks'
   const phase: Phase = novel.ended && !outro ? 'result' : stagePhase
   const ready = readyLine === novel.lineId
@@ -270,6 +274,12 @@ export default function Play () {
     }
   }, [phase, novel.finalChoice])
 
+  useEffect(() => {
+    if (phase === 'result') {
+      preloadSounds([assetUrl(TEASER_MUSIC, novel.version)])
+    }
+  }, [phase, novel.version])
+
   function togglePause () {
     if (novel.loading || novel.error !== null) {
       return false
@@ -286,6 +296,17 @@ export default function Play () {
     const subscription = BackHandler.addEventListener('hardwareBackPress', onBack)
     return () => subscription.remove()
   }, [])
+
+  async function toTeaser () {
+    setLeaving(true)
+    stopSfx()
+    playLoops([])
+    fadeOutMusic(TEASER_FADE)
+    await fade.to(1, TEASER_FADE)
+    if (alive.current) {
+      setTeasing(true)
+    }
+  }
 
   async function toMenu () {
     setPaused(false)
@@ -401,7 +422,7 @@ export default function Play () {
           <LoadingBar active={novel.waiting} />
         </Animated.View>
 
-        {(outro || phase === 'result') && <EndingBackdrop version={novel.version} result={phase === 'result'} />}
+        {(outro || (phase === 'result' && !teasing)) && <EndingBackdrop version={novel.version} result={phase === 'result'} />}
 
         {phase === 'credits' && (
           <Credits onDone={() => setStagePhase('thanks')} />
@@ -411,14 +432,18 @@ export default function Play () {
           <Thanks onDone={() => setStagePhase('result')} />
         )}
 
-        {phase === 'result' && (
+        {phase === 'result' && !teasing && (
           <End finalChoice={novel.finalChoice}
                voteStatus={novel.voteStatus}
-               onExit={toMenu}
+               onExit={toTeaser}
           />
         )}
 
-        {!outro && <PauseButton onPress={() => setPaused(true)} />}
+        {phase === 'result' && teasing && (
+          <Teaser version={novel.version} onDone={toMenu} />
+        )}
+
+        {!outro && !teasing && <PauseButton onPress={() => setPaused(true)} />}
 
         {paused && <PauseOverlay onResume={() => setPaused(false)} onMenu={toMenu} />}
       </Stage>

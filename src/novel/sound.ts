@@ -15,6 +15,7 @@ type Loop = {
 }
 
 let player: AudioPlayer | null = null
+let cue: AudioPlayer | null = null
 let queue: string[] = []
 let music: LoopPlayer | null = null
 let track: string | null = null
@@ -33,7 +34,7 @@ function musicLevel () {
   return levels.volume * levels.music / 10000
 }
 
-function fadeOut (fading: Pick<LoopPlayer, 'volume' | 'pause' | 'remove'>) {
+function fadeOut (fading: Pick<LoopPlayer, 'volume' | 'pause' | 'remove'>, duration = FADE_MS) {
   let from = 0
   try {
     from = fading.volume
@@ -54,7 +55,7 @@ function fadeOut (fading: Pick<LoopPlayer, 'volume' | 'pause' | 'remove'>) {
       console.warn('music fade failed', error)
     }
     clearInterval(timer)
-  }, FADE_MS / FADE_STEPS)
+  }, duration / FADE_STEPS)
 }
 
 function stopRise () {
@@ -258,6 +259,16 @@ export function playMusic (url: string | null, crossfade?: Crossfade) {
   resumeMusic()
 }
 
+export function fadeOutMusic (duration: number) {
+  if (music !== null) {
+    fadeOut(music, duration)
+  }
+  music = null
+  track = null
+  started = false
+  stopRise()
+}
+
 export function musicReady (): Promise<void> {
   return new Promise(resolve => {
     const timer = setInterval(() => {
@@ -278,7 +289,40 @@ export function stopSfx () {
   }
 }
 
+export function playCue (url: string, onStart: (at: number) => void) {
+  stopCue()
+  if (musicLevel() === 0) {
+    onStart(0)
+    return
+  }
+  let heard = false
+  try {
+    const created = createAudioPlayer(url, { updateInterval: 50 })
+    created.volume = musicLevel()
+    created.addListener('playbackStatusUpdate', status => {
+      if (!heard && status.playing && status.currentTime > 0) {
+        heard = true
+        onStart(status.currentTime)
+      }
+    })
+    created.play()
+    cue = created
+  } catch (error) {
+    console.warn('cue failed', url, error)
+    onStart(0)
+  }
+}
+
+export function stopCue () {
+  if (cue === null) {
+    return
+  }
+  fadeOut(cue)
+  cue = null
+}
+
 export function stopAll () {
+  stopCue()
   stopSfx()
   playLoops([])
   playMusic(null)
