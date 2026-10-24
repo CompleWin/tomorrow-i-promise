@@ -3,7 +3,7 @@ import { useState, useSyncExternalStore } from 'react'
 import { useBanner } from '@/novel/components/Banner'
 import { COLORS, IDLE_OPACITY } from '@/novel/theme'
 
-const HINT = 'Чтобы играть на весь экран: «Поделиться» → «На экран «Домой»»'
+const HINT = 'Чтобы играть на весь экран: Поделиться → На экран Домой'
 
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null
