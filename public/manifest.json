@@ -6,8 +6,8 @@
   "orientation": "landscape",
   "background_color": "#050403",
   "theme_color": "#050403",
-  "start_url": "/tomorrow-i-promise/",
-  "scope": "/tomorrow-i-promise/",
+  "start_url": "/",
+  "scope": "/",
   "icons": [
     {
       "src": "icon-192.png",

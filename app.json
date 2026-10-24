@@ -36,7 +36,7 @@
     ],
     "experiments": {
       "typedRoutes": true,
-      "baseUrl": "/tomorrow-i-promise",
+      "baseUrl": "",
       "reactCompiler": true
     }
   }

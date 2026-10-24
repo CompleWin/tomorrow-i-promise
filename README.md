@@ -7,7 +7,7 @@
 </p>
 
 <p align="center">
-  <a href="https://complewin.github.io/tomorrow-i-promise/"><b>🎮 Играть</b></a>
+  <a href="https://tomorrow-i-promise.ru/"><b>🎮 Играть</b></a>
 
 </p>
 
