@@ -2,7 +2,7 @@ VAR final_choice = ""
 -> act_1
 === act_1 ===
 
-# bg: act1/bg/bg1.png # fx: fadeIn # music: act1/music/home.mp3
+# bg: act1/bg/bg1.webp # fx: fadeIn # music: act1/music/home.mp3
 Опять без соли? # speaker: Гай # sprite: act1/sprites/guy_normal.png # sfx: act1/sfx/spoons.mp3
 А ты её купил? # speaker: Марта # sprite: act1/sprites/martha_normal.png
 Я думал, у нас ещё оставалась. # speaker: Гай # sprite: act1/sprites/guy_normal.png
@@ -13,24 +13,24 @@ VAR final_choice = ""
 Они продолжили ужинать. # sfx: act1/sfx/spoons.mp3
 Внезапно лампа над столом гаснет.
 
-# bg: act1/bg/bg2.png # fx: blackout # sfx: act1/sfx/lamp-off.mp3
+# bg: act1/bg/bg2.webp # fx: blackout # sfx: act1/sfx/lamp-off.mp3
 Комната погружается в темноту. Слышен только шум улицы.
 Да чтоб тебя... # speaker: Гай # sprite: act1/sprites/guy_normal_dark.png
 Может, уже достанем свечи? # speaker: Марта # sprite: act1/sprites/martha_smile_dark.png
 Подожди, сейчас включат. # speaker: Гай # sprite: act1/sprites/guy_smile_dark.png
 ...
 
-# bg: act1/bg/bg3.png # fx: lightsOn # sfx: act1/sfx/light-on.mp3
+# bg: act1/bg/bg3.webp # fx: lightsOn # sfx: act1/sfx/light-on.mp3
 Ну вот, я же говорил. # speaker: Гай # sprite: act1/sprites/guy_smile.png
 По дому проходит лёгкий ветерок.
 Гай... # speaker: Марта # sprite: act1/sprites/martha_normal.png
 Что такое? # speaker: Гай # sprite: act1/sprites/guy_normal.png
 Я тебе кое-что сказать хотела. # speaker: Марта # sprite: act1/sprites/martha_normal.png
 
-# bg: act1/bg/bg4.png # fx: close # music: stop
+# bg: act1/bg/bg4.webp # fx: close # music: stop
 Марта берёт его за руку.
 
-# bg: act1/bg/bg5.png # fx: close # sfx: act1/sfx/hand-on-hand.mp3
+# bg: act1/bg/bg5.webp # fx: close # sfx: act1/sfx/hand-on-hand.mp3
 Кажется, я беременна. # speaker: Марта # sprite: act1/sprites/martha_normal.png
 Гай замирает. Несколько секунд он молча смотрит на неё. # sprite: act1/sprites/guy_suprised.png
 Подожди... Серьёзно? # speaker: Гай # sprite: act1/sprites/guy_suprised.png
@@ -40,7 +40,7 @@ VAR final_choice = ""
 То есть... у нас будет двойня? # speaker: Гай # sprite: act1/sprites/guy_suprised.png
 Смеётся. Не знаю, но думаю, что всё-таки один. # speaker: Марта # sprite: act1/sprites/martha_pregnant.png
 
-# bg: act1/bg/bg6.png # music: act1/music/home.mp3
+# bg: act1/bg/bg6.webp # music: act1/music/home.mp3
 Гай начинает улыбаться. Он подползает к Марте и крепко обнимает её. Марта смеётся. # sfx: act1/sfx/guy-moves-closer.mp3
 Ничего себе... # speaker: Гай # sprite: act1/sprites/guy_smile.png
 Надо будет сходить в больницу. Убедиться, что всё нормально. # speaker: Марта # sprite: act1/sprites/martha_smile.png
@@ -54,28 +54,28 @@ VAR final_choice = ""
 -> act_2
 === act_2 ===
 
-# bg: act2/bg/bg1.png # fx: fadeIn # music: act2/music/hospital.mp3 # sfx: act2/sfx/ultrasound.mp3 loop
+# bg: act2/bg/bg1.webp # fx: fadeIn # music: act2/music/hospital.mp3 # sfx: act2/sfx/ultrasound.mp3 loop
 Так... Ну что ж, поздравляю. Беременность подтверждается. Пока всё выглядит нормально. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Правда? # speaker: Марта # sprite: act2/sprites/martha_normal.png
 Да. Срок еще небольшой. # speaker: Врач # sprite: act2/sprites/doctor_smile.png
 
-# bg: act2/bg/bg2.png
+# bg: act2/bg/bg2.webp
 Марта улыбается и поворачивается к Гаю. Тот с облегчением выдыхает и улыбается ей в ответ.
 Скажите, вы планируете сохранять беременность? # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 
-# bg: act2/bg/bg3.png
+# bg: act2/bg/bg3.webp
 Гай и Марта удивленно переглядываются.
 
-# bg: act2/bg/bg4.png # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
+# bg: act2/bg/bg4.webp # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
 Простите, что? # speaker: Марта # sprite: act2/sprites/martha_worried.png
 Вы уже приняли решение насчет ребенка? # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Мы... как-то еще не думали об этом. # speaker: Гай # sprite: act2/sprites/guy_normal.png
 
-# bg: act2/bg/bg5.png
+# bg: act2/bg/bg5.webp
 Мы только недавно узнали. # speaker: Марта # sprite: act2/sprites/martha_worried.png
 Понимаю. Но советую не затягивать с решением. Чем больше срок, тем меньше у вас будет вариантов. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 
-# bg: act2/bg/bg4.png # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
+# bg: act2/bg/bg4.webp # fx: move # sfx: act2/sfx/martha-rises-rustle.mp3
 А с ребенком точно всё в порядке? # speaker: Гай # sprite: act2/sprites/guy_sad.png
 На данный момент я не вижу никаких отклонений. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Но вы должны понимать, что у нас нет оборудования для генетического скрининга. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
@@ -84,16 +84,16 @@ VAR final_choice = ""
 К сожалению, здесь такой возможности нет. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Можно нам немного времени подумать? # speaker: Гай # sprite: act2/sprites/guy_sad.png
 
-# bg: act2/bg/bg7.png # sfx: stop
+# bg: act2/bg/bg7.webp # sfx: stop
 Конечно. Обсудите всё дома. Когда будете готовы, приходите. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Только, пожалуйста, не откладывайте надолго, иначе может стать поздно. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 
-{""} # bg: act2/bg/bg8.png # sfx: act2/sfx/martha-wipes-belly.mp3
+{""} # bg: act2/bg/bg8.webp # sfx: act2/sfx/martha-wipes-belly.mp3
 
-# bg: act2/bg/bg9.png
+# bg: act2/bg/bg9.webp
 На сегодня всё. Можете одеваться. # speaker: Врач # sprite: act2/sprites/doctor_normal.png # sfx: act2/sfx/doctor-throws-napkin.mp3
 
-# fx: toBlack # music: stop # sfx: act2/sfx/martha-gets-off-couch.mp3
+{""} # fx: toBlack # wait: 500 # music: stop # sfx: act2/sfx/martha-gets-off-couch.mp3
 
 -> act_3
 === act_3 ===
@@ -108,7 +108,7 @@ VAR final_choice = ""
 Где-то за горизонтом продолжались бои, горели промышленные районы и нефтехранилища.
 Дым смешивался с городским смогом, окрашивая облака в кровавые оттенки.
 
-# bg: act3/bg/bg3.png
+# bg: act3/bg/bg3.webp
 Издалека город казался почти идеальным.
 Там всегда было электричество, из кранов текла чистая вода, а улицы не утопали в грязи.
 Однако Гай прекрасно знал, что за красивыми фасадами скрывалась совсем другая жизнь. # sfx: act3/sfx/office.mp3 loop
@@ -117,12 +117,12 @@ VAR final_choice = ""
 # bg: act3/bg/city1.webp  # sfx: stop
 ...
 
-# bg: act3/bg/bg1.png
+# bg: act3/bg/bg1.webp
 Еще несколько десятилетий назад люди представляли будущее совсем иначе.
 Они мечтали, что технологии избавят их от бедности, голода и войн.
 Теперь технологии окружали человека повсюду, но старые проблемы никуда не исчезли.
 
-# bg: act3/bg/bg2.png
+# bg: act3/bg/bg2.webp
 Человечество всегда стремилось к утопии, мечтая о мире, в котором каждый мог бы жить спокойно и счастливо.
 Но попытки построить идеальное общество раз за разом оборачивались новыми конфликтами и трагедиями.
 Люди научились создавать невероятные машины и возводить огромные города, но так и не смогли научиться действовать сообща.
@@ -168,10 +168,10 @@ VAR final_choice = ""
 Да я всего на пять минут задержался. # speaker: Гай # sprite: act4/sprites/guy_normal.png
 Ладно, пошли уже. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
 
-# bg: act4/bg/boot1.png # music: stop
+# bg: act4/bg/boot1.webp # music: stop
 Уинстон затушил сигарету
 
-# bg: act4/bg/boot2.png # fx: move
+# bg: act4/bg/boot2.webp # fx: move
 ...
 
 # fx: toBlack # sfx: act4/sfx/turbine-climb.mp3
@@ -241,16 +241,16 @@ VAR final_choice = ""
 Уинстон хватает рацию.  # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/radio-button.mp3
 Диспетчерская, прием! Попадание в четвертый генератор! Сильный пожар! На площадке находились двое рабочих! # speaker: Уинстон # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/winston-radio-talk.mp3
 
-# bg: act5/bg/slums1.png # sfx: stop all
+# bg: act5/bg/slums1.webp # sfx: stop all
 Гай посмотрел вниз.
 
-# bg: act5/bg/slums2.png
+# bg: act5/bg/slums2.webp
 Огни поселения начали блоками затухать.
 
-# bg: act5/bg/slums3.png
+# bg: act5/bg/slums3.webp
 Через несколько секунд целые улицы одна за другой погрузились в темноту.
 
-# bg: act5/bg/slums4.png
+# bg: act5/bg/slums4.webp
 Вдалеке, на противоположном берегу, мегаполис продолжал безразлично сиять.
 Гай вспомнил о Марте. Наверняка она слышала взрыв.
 Он представил, как беременная жена сидит одна в темном доме, не зная, жив он, или нет.
@@ -311,11 +311,11 @@ VAR final_choice = ""
 # bg: act5/bg/guy_house.webp
 Через некоторое время, наконец, сквозь тьму вырисовались знакомые окна и ступеньки.
 
-# bg:  act5/bg/martha_sees_guy.png
+# bg:  act5/bg/martha_sees_guy.webp
 Марта только собрала сумку и, похоже, собиралась вот-вот отправиться на поиски мужа.
 Заметив Гая, она на мгновение замерла, а затем бросилась к нему. # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/guy_martha_hug.png # fx: move
+# bg: act5/bg/guy_martha_hug.webp # fx: move
 Гай! Господи, ты живой! # speaker: Марта # sprite: act5/sprites/martha_hug.png # sfx: act5/sfx/crying1.mp3
 Марта крепко обнимает его.
 Тихо, тихо... Всё хорошо, я здесь. # speaker: Гай # sprite: act5/sprites/guy_smile.png
@@ -324,12 +324,12 @@ VAR final_choice = ""
 Нет, соседний. Со мной всё нормально. # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Я так испугалась... # speaker: Марта # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/crying_hugging.png # music: stop # sfx: stop all # sfx: act5/sfx/crying2.mp3
+# bg: act5/bg/crying_hugging.webp # music: stop # sfx: stop all # sfx: act5/sfx/crying2.mp3
 Марта начинает плакать еще сильнее. Гай обнимает ее крепче и гладит по голове.
 Прости, я пытался позвонить, но связи нигде нет. # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Главное, что ты вернулся. # speaker: Марта # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/guy_martha_hug.png # music: act5/music/after-strike.mp3 # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
+# bg: act5/bg/guy_martha_hug.webp # music: act5/music/after-strike.mp3 # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
 Некоторое время они стояли молча. Марта постепенно успокоилась, но продолжала крепко обнимать мужа.
 А остальные? Там ведь тоже люди работали... # speaker: Марта # sprite: act5/sprites/martha_normal.png
 Я не знаю. Снаряд прилетел прям в турбину... Не хочу ничего утверждать. # speaker: Гай # sprite: act5/sprites/guy_normal.png
@@ -347,28 +347,28 @@ VAR final_choice = ""
 -> act_6
 === act_6 ===
 
-# bg: act6/bg/bag1.png # music: act6/music/home.mp3
+# bg: act6/bg/bag1.webp # music: act6/music/home.mp3
 Наступило утро.
 Гай и Марта в этот день не смогли нормально поспать, так как в голове роилось много мыслей, и далеко не самых приятных.
 Пара решила пропустить завтрак и молча собиралась в больницу. # sfx: act6/sfx/papers-in-bag.mp3
 Марта складывала необходимые документы в сумку, а Гай ее уже ждал. # sfx: act6/sfx/whoosh.mp3
 
-# bg: act6/bg/bag2.png # fx: move
+# bg: act6/bg/bag2.webp # fx: move
 Ну что, идем? # speaker: Марта # sprite: act6/sprites/martha_normal.png # sfx: act6/sfx/bag.mp3
 
-# bg: act6/bg/bag3.png
+# bg: act6/bg/bag3.webp
 Да, пойдем. # speaker: Гай # sprite: act6/sprites/guy_normal.png
 
 {""} # fx: toBlack # wait: 500
 
-# bg: act6/bg/knocking1.png # fx: fadeIn # music: act6/music/hospital.mp3
+# bg: act6/bg/knocking1.webp # fx: fadeIn # music: act6/music/hospital.mp3
 ... # sfx: act6/sfx/door-knock.mp3
 
-# bg: act6/bg/knocking2.png # fx: move # sfx: act6/sfx/hospital-door.mp3
+# bg: act6/bg/knocking2.webp # fx: move # sfx: act6/sfx/hospital-door.mp3
 Здравствуйте, у нас талон на 9. # speaker: Гай # sprite: act6/sprites/guy_normal.png
 Доброе утро. Проходите, присаживайтесь. # speaker: Врач # sprite: act6/sprites/doctor_smile.png
 
-# bg: act6/bg/choice.png # sfx: act6/sfx/footsteps.mp3
+# bg: act6/bg/choice.webp # sfx: act6/sfx/footsteps.mp3
 Пара села напротив врача.
 Вы приняли решение насчет беременности? # speaker: Врач # sprite: act6/sprites/doctor_normal.png # sfx: stop all
 Гай и Марта переглянулись.

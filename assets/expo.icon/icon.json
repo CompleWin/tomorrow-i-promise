@@ -1,32 +1,39 @@
 {
   "fill" : {
-    "automatic-gradient" : "extended-srgb:0.00000,0.47843,1.00000,1.00000"
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
   },
   "groups" : [
     {
+      "blur-material" : null,
       "layers" : [
         {
-          "image-name" : "expo-symbol 2.svg",
-          "name" : "expo-symbol 2",
-          "position" : {
-            "scale" : 1,
-            "translation-in-points" : [
-              1.1008400065293245e-05,
-              -16.046875
-            ]
-          }
+          "glass" : false,
+          "image-name" : "ios-foreground-1-turbine.png",
+          "name" : "ios-foreground-1-turbine"
         },
         {
-          "image-name" : "grid.png",
-          "name" : "grid"
+          "glass" : false,
+          "image-name" : "ios-foreground-3-lights.png",
+          "name" : "ios-foreground-3-lights"
+        },
+        {
+          "glass" : false,
+          "image-name" : "ios-foreground-2-settlement.png",
+          "name" : "ios-foreground-2-settlement"
+        },
+        {
+          "image-name" : "ios-background.png",
+          "name" : "ios-background"
         }
       ],
+      "lighting" : "individual",
       "shadow" : {
-        "kind" : "neutral",
+        "kind" : "none",
         "opacity" : 0.5
       },
+      "specular" : false,
       "translucency" : {
-        "enabled" : true,
+        "enabled" : false,
         "value" : 0.5
       }
     }
