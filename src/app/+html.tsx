@@ -32,10 +32,10 @@ export default function Root ({ children }: { children: ReactNode }) {
         <meta property="og:description" content={DESCRIPTION} />
         <meta property="og:url" content={SITE} />
         <meta property="og:locale" content="ru_RU" />
-        <meta property="og:image" content={`${SITE}og.jpg`} />
-        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image" content={`${SITE}og.png`} />
+        <meta property="og:image:type" content="image/png" />
         <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="675" />
+        <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={TITLE} />
         <meta name="twitter:card" content="summary_large_image" />
         <link rel="icon" href={`${BASE}/favicon.ico`} sizes="16x16 32x32 48x48" />

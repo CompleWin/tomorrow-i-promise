@@ -217,6 +217,9 @@ export default function Play () {
       return
     }
     const timer = setTimeout(() => {
+      fadeOutMusic(300)
+      playLoops([])
+      stopSfx()
       waitShade.set(withTiming(1, { duration: 300, easing: EASE.inOut }))
     }, 300)
     return () => clearTimeout(timer)

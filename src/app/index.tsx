@@ -1,4 +1,4 @@
-import { BackHandler, StyleSheet, View } from 'react-native'
+import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { router, useFocusEffect } from 'expo-router'
 import { useCallback, useEffect, useEffectEvent, useState } from 'react'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
@@ -11,12 +11,13 @@ import { useFade } from '@/novel/components/Fade'
 import MenuBackground from '@/novel/components/MenuBackground'
 import MenuFooter from '@/novel/components/MenuFooter'
 import MenuItem from '@/novel/components/MenuItem'
-import MenuSkeleton from '@/novel/components/MenuSkeleton'
+import LoadingScene from '@/novel/components/LoadingScene'
 import VolumeSettings, { useVolumeSettings } from '@/novel/components/VolumeSettings'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
 import useMenuSelection, { MenuAction } from '@/novel/useMenuSelection'
+import useTapKeys from '@/novel/useTapKeys'
 
 type Menu = {
   hasSave: boolean
@@ -30,7 +31,8 @@ type MenuView = 'main' | 'settings'
 
 const REVEAL_WAIT_MS = 8 * 1000
 const REVEAL_MS = 500
-const SKELETON_LABELS = ['Продолжить', 'Начать заново', 'Настройки', 'Авторы']
+
+let entered = false
 
 async function loadMenu (): Promise<Menu> {
   const [save, completed] = await Promise.all([loadSave(), loadCompleted()])
@@ -52,19 +54,32 @@ export default function Index () {
   const [artReady, setArtReady] = useState(false)
   const [soundReady, setSoundReady] = useState(false)
   const [late, setLate] = useState(false)
-  const [skeleton, setSkeleton] = useState(true)
+  const [loader, setLoader] = useState(true)
+  const [intro, setIntro] = useState(!entered)
   const fade = useFade()
   const shown = useSharedValue(0)
   const items = useSharedValue(1)
   const loaded = menu !== null && ((artReady && soundReady) || late)
+  const opened = loaded && !intro
+  const menuProgress = () => loaded ? 1 : [menu !== null, artReady, soundReady].filter(Boolean).length / 3
+
+  function enter () {
+    if (!loaded || !intro) {
+      return
+    }
+    entered = true
+    setIntro(false)
+  }
+
+  useTapKeys(enter, loaded && intro)
 
   useEffect(() => {
-    if (!loaded || !focused || menu === null) {
+    if (!opened || !focused || menu === null) {
       return
     }
     playMusic(assetUrl(MENU_MUSIC.file, menu.version), MENU_MUSIC)
     warmStory(menu.act ?? 1, menu.currentBg)
-  }, [loaded, focused, menu])
+  }, [opened, focused, menu])
 
   const markArtReady = useCallback(() => setArtReady(true), [])
 
@@ -86,18 +101,18 @@ export default function Index () {
   }, [menu])
 
   useEffect(() => {
-    if (!loaded) {
+    if (!opened) {
       return
     }
     shown.set(withTiming(1, { duration: REVEAL_MS }))
-    const timer = setTimeout(() => setSkeleton(false), REVEAL_MS)
+    const timer = setTimeout(() => setLoader(false), REVEAL_MS)
     return () => clearTimeout(timer)
-  }, [loaded, shown])
+  }, [opened, shown])
 
   const columnStyle = useAnimatedStyle(() => ({
     opacity: shown.get(),
   }))
-  const skeletonStyle = useAnimatedStyle(() => ({
+  const loaderStyle = useAnimatedStyle(() => ({
     opacity: 1 - shown.get(),
   }))
   const itemsStyle = useAnimatedStyle(() => ({
@@ -179,7 +194,7 @@ export default function Index () {
     { label: 'Авторы', onPress: () => open('/credits') },
   ]
 
-  const { selected, select } = useMenuSelection([...volumeRows, ...entries], { screen: view, enabled: focused })
+  const { selected, select } = useMenuSelection([...volumeRows, ...entries], { screen: view, enabled: focused && opened })
 
   const art = menu?.completed ? MENU_ART_COMPLETED : menuArtFor(menu?.act ?? null)
 
@@ -188,12 +203,6 @@ export default function Index () {
       {menu !== null && (
         <Animated.View style={[StyleSheet.absoluteFill, columnStyle]}>
           <MenuBackground art={art} version={menu.version} onReady={markArtReady} />
-        </Animated.View>
-      )}
-
-      {skeleton && (
-        <Animated.View pointerEvents={'none'} style={[StyleSheet.absoluteFill, skeletonStyle]}>
-          <MenuSkeleton labels={menu === null ? SKELETON_LABELS : entries.map(entry => entry.label)} />
         </Animated.View>
       )}
 
@@ -223,6 +232,14 @@ export default function Index () {
       {menu !== null && (
         <Animated.View pointerEvents={'box-none'} style={[StyleSheet.absoluteFill, columnStyle]}>
           <MenuFooter version={latest ?? menu.version} />
+        </Animated.View>
+      )}
+
+      {loader && (
+        <Animated.View pointerEvents={opened ? 'none' : 'auto'} style={[StyleSheet.absoluteFill, loaderStyle]}>
+          <Pressable onPress={enter} style={StyleSheet.absoluteFill}>
+            <LoadingScene progress={menuProgress} ready={loaded && intro} />
+          </Pressable>
         </Animated.View>
       )}
     </Stage>

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.webp" alt="Завтра точно" width="100%">
+  <img src="docs/cover.webp" alt="Завтра точно" width="100%">
 </p>
 
 <p align="center">
