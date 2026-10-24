@@ -60,4 +60,7 @@ export const BG_DURATION: Record<string, number> = {
   blackout: 1500,
   lightsOn: 1000,
   move: 1200,
+  frame: 1100,
 }
+
+export const FRAME_STEP = 800

@@ -18,17 +18,17 @@ VAR final_choice = ""
 Да чтоб тебя... # speaker: Гай # sprite: act1/sprites/guy_normal_dark.png
 Может, уже достанем свечи? # speaker: Марта # sprite: act1/sprites/martha_smile_dark.png
 Подожди, сейчас включат. # speaker: Гай # sprite: act1/sprites/guy_smile_dark.png
-...
+
+{""} # bg: act1/bg/bg2.webp # wait: 1500
 
 # bg: act1/bg/bg3.webp # fx: lightsOn # sfx: act1/sfx/light-on.mp3
 Ну вот, я же говорил. # speaker: Гай # sprite: act1/sprites/guy_smile.png
 По дому проходит лёгкий ветерок.
 Гай... # speaker: Марта # sprite: act1/sprites/martha_normal.png
 Что такое? # speaker: Гай # sprite: act1/sprites/guy_normal.png
-Я тебе кое-что сказать хотела. # speaker: Марта # sprite: act1/sprites/martha_normal.png
 
 # bg: act1/bg/bg4.webp # fx: close # music: stop
-Марта берёт его за руку.
+Я тебе кое-что сказать хотела. # speaker: Марта # sprite: act1/sprites/martha_normal.png
 
 # bg: act1/bg/bg5.webp # fx: close # sfx: act1/sfx/hand-on-hand.mp3
 Кажется, я беременна. # speaker: Марта # sprite: act1/sprites/martha_normal.png
@@ -88,35 +88,42 @@ VAR final_choice = ""
 Конечно. Обсудите всё дома. Когда будете готовы, приходите. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 Только, пожалуйста, не откладывайте надолго, иначе может стать поздно. # speaker: Врач # sprite: act2/sprites/doctor_normal.png
 
-{""} # bg: act2/bg/bg8.webp # sfx: act2/sfx/martha-wipes-belly.mp3
+{""} # bg: act2/bg/bg8.webp # wait: 500 # sfx: act2/sfx/martha-wipes-belly.mp3
 
 # bg: act2/bg/bg9.webp
 На сегодня всё. Можете одеваться. # speaker: Врач # sprite: act2/sprites/doctor_normal.png # sfx: act2/sfx/doctor-throws-napkin.mp3
 
 {""} # fx: toBlack # wait: 500 # music: stop # sfx: act2/sfx/martha-gets-off-couch.mp3
 
+После посещения больницы Гай и Марта возвращались домой почти молча.
+Слова врача не выходили у них из головы.
+Им предстояло принять решение, от которого зависела вся их дальнейшая жизнь, но ни один из них пока не знал, как поступить.
+Поздно ночью Гай, как обычно, вышел из дома и отправился на работу, в сторону ветрогенераторов.
+
 -> act_3
 === act_3 ===
 
 # bg: act3/bg/city1.webp # fx: fadeIn # music: act3/music/night.mp3
+Гай шёл знакомой дорогой, но сегодня всё вокруг казалось ему каким-то другим.
+Раньше он почти не замечал окружающего.
+Каждый день проходил одинаково: работа, дорога домой, короткий сон и снова работа.
+На размышления о чём-то большем попросту не оставалось времени.
+Но теперь мысли не давали ему покоя.
 Гай остановился у берега реки.
 На противоположной стороне возвышались десятки небоскребов, а их огни отражались в темной воде.
 Даже глубокой ночью мегаполис продолжал жить своей жизнью.
-По улицам двигались машины, на фасадах зданий мелькала реклама, а окна высоток светились до самого горизонта.
 Над городом нависало багрово-красное небо.
 Казалось, оно уже давно устало от бесконечных пожаров, которые не прекращались ни днем, ни ночью.
 Где-то за горизонтом продолжались бои, горели промышленные районы и нефтехранилища.
 Дым смешивался с городским смогом, окрашивая облака в кровавые оттенки.
 
-# bg: act3/bg/bg3.webp
+# bg: act3/bg/bg3.webp # music: act3/sfx/office.mp3
 Издалека город казался почти идеальным.
 Там всегда было электричество, из кранов текла чистая вода, а улицы не утопали в грязи.
-Однако Гай прекрасно знал, что за красивыми фасадами скрывалась совсем другая жизнь. # sfx: act3/sfx/office.mp3 loop
+Однако Гай прекрасно знал, что за красивыми фасадами скрывалась совсем другая жизнь.
 Люди работали почти без отдыха, большую часть заработанного отдавали за жилье и необходимые услуги, а война и постоянная тревога были знакомы им не меньше, чем жителям трущоб.
 
-# bg: act3/bg/city1.webp  # sfx: stop
-...
-
+{""} # bg: act3/bg/city1.webp # wait: 500 # music: act3/music/night.mp3
 # bg: act3/bg/bg1.webp
 Еще несколько десятилетий назад люди представляли будущее совсем иначе.
 Они мечтали, что технологии избавят их от бедности, голода и войн.
@@ -126,22 +133,21 @@ VAR final_choice = ""
 Человечество всегда стремилось к утопии, мечтая о мире, в котором каждый мог бы жить спокойно и счастливо.
 Но попытки построить идеальное общество раз за разом оборачивались новыми конфликтами и трагедиями.
 Люди научились создавать невероятные машины и возводить огромные города, но так и не смогли научиться действовать сообща.
-Каждый преследовал собственные интересы, и в конечном счете человечество само создало мир, в котором теперь вынуждено было жить.
 
 # bg: act3/bg/city1.webp
+Каждый преследовал собственные интересы, и в конечном счете человечество само создало мир, в котором теперь вынуждено было жить.
 Гай снова посмотрел на сияющие небоскребы.
 Город продолжал расти, появлялись все более совершенные технологии, но за этим великолепием он не видел того будущего, о котором когда-то мечтали люди.
 
 # bg: act3/bg/city2.webp
-...
-
-# bg: act3/bg/city3.webp
 Он перевел взгляд на свой берег.
 У покосившихся домов громоздились кучи мусора, над крышами тянулись спутанные провода.
-Несколько женщин стирали одежду в реке при свете старого фонаря. Неподалеку дети играли среди строительных обломков.
+
+# bg: act3/bg/city3.webp
+Несколько женщин стирали одежду в реке при свете старого фонаря.
 
 # bg: act3/bg/city4.webp
-
+Неподалеку дети играли среди строительных обломков.
 Гай невольно представил среди них собственного ребенка.
 Ему тоже придется ходить по этим улицам, слышать ночные взрывы и привыкать к тому, что завтра может не быть ни воды, ни электричества.
 А что, если через двадцать лет ничего не изменится?
@@ -151,31 +157,27 @@ VAR final_choice = ""
 От этой мысли ему стало не по себе.
 Он еще несколько секунд смотрел на другой берег, после чего поправил сумку на плече и направился к ветрогенераторам. # sfx: act3/sfx/guy-hangs-bag.mp3 # sfx: act3/sfx/guy-walks.mp3
 
-# fx: toBlack # music: stop # sfx: stop all
+{""} # fx: toBlack # wait: 500
 
 
 -> act_4
 === act_4 ===
 
-# bg: act4/bg/winston_smoking.webp # fx: fadeIn # music: act4/music/field-wind.mp3
+# bg: act4/bg/winston_smoking.webp # fx: fadeIn # music: act4/music/field-wind.mp3 # sfx: stop all
 Глубокая ночь.
 Гай добрался до ветряной электростанции.
 Красные сигнальные огни мерцали на вершинах огромных башен.
 У входа его уже ждал коллега.
 
-# bg: act4/bg/guy_approaches.webp # fx: move
+# bg: act4/bg/guy_approaches.webp
 О, явился! Я уж думал, без тебя начинать придется. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
 Да я всего на пять минут задержался. # speaker: Гай # sprite: act4/sprites/guy_normal.png
 Ладно, пошли уже. # speaker: Уинстон # sprite: act4/sprites/winston_normal.png
 
-# bg: act4/bg/boot1.webp # music: stop
+# bg: act4/bg/boot1.webp act4/bg/boot2.webp # music: stop
 Уинстон затушил сигарету
 
-# bg: act4/bg/boot2.webp # fx: move
-...
-
-# fx: toBlack # sfx: act4/sfx/turbine-climb.mp3
-...
+{""} # fx: toBlack # wait: 2000 # sfx: act4/sfx/turbine-climb.mp3
 
 # bg: act4/bg/on_turbine.webp # music: act4/music/turbine-top-wind.mp3 # sfx: stop all
 Мужчины поднялись на обслуживающую площадку и приступили к осмотру оборудования.
@@ -241,16 +243,10 @@ VAR final_choice = ""
 Уинстон хватает рацию.  # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/radio-button.mp3
 Диспетчерская, прием! Попадание в четвертый генератор! Сильный пожар! На площадке находились двое рабочих! # speaker: Уинстон # sprite: act5/sprites/winston_radio.png # sfx: act5/sfx/winston-radio-talk.mp3
 
-# bg: act5/bg/slums1.webp # sfx: stop all
+# bg: act5/bg/slums1.webp act5/bg/slums2.webp act5/bg/slums3.webp act5/bg/slums4.webp # sfx: stop all
 Гай посмотрел вниз.
-
-# bg: act5/bg/slums2.webp
 Огни поселения начали блоками затухать.
-
-# bg: act5/bg/slums3.webp
 Через несколько секунд целые улицы одна за другой погрузились в темноту.
-
-# bg: act5/bg/slums4.webp
 Вдалеке, на противоположном берегу, мегаполис продолжал безразлично сиять.
 Гай вспомнил о Марте. Наверняка она слышала взрыв.
 Он представил, как беременная жена сидит одна в темном доме, не зная, жив он, или нет.
@@ -258,10 +254,10 @@ VAR final_choice = ""
 Гай, быстрее! Надо спускаться! # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
 
 # fx: toBlack
-Мужчины быстро спускаются по тросам вниз # sfx: act5/sfx/guy-winston-descend.mp3
+Мужчины быстро спустились по тросам вниз # sfx: act5/sfx/guy-winston-descend.mp3
 ... # sfx: act5/sfx/descended.mp3 # fx: shake
 
-# bg: act5/bg/standing_watching.webp # fx: fadeIn # sfx: act5/music/distant-bangs.mp3 loop
+# bg: act5/bg/standing_watching.webp # fx: fadeIn
 Где они?! Ты кого-нибудь видишь? # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Нет... Может, с другой стороны спустились? # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
 ...
@@ -279,7 +275,7 @@ VAR final_choice = ""
 
 # fx: toBlack
 
-Гай поспешил в сторону поселения. Позади все еще слышался треск горящего оборудования. # sfx: stop # sfx: act5/music/distant-fighting.mp3 loop
+Гай поспешил в сторону поселения. Позади все еще слышался треск горящего оборудования.
 
 # bg: act5/bg/guy_walks_flashlight.webp # fx: fadeIn # sfx: act5/sfx/guy-walks-mud.mp3
 
@@ -289,7 +285,7 @@ VAR final_choice = ""
 Он несколько раз пытался дозвониться Марте, но сеть была недоступна.
 Вскоре он убрал телефон и ускорил шаг.
 
-# bg: act5/bg/women_with_lamp.webp
+# bg: act5/bg/women_with_lamp.webp # sfx: stop all
 Проходя мимо одного из домов, Гай заметил небольшую группу людей.
 Две женщины стояли у входа, пытаясь зажечь лампу.
 У тебя спичек не осталось? У нас всё закончилось. # speaker: Женщина 1
@@ -308,7 +304,9 @@ VAR final_choice = ""
 Только было Гай хотел обернуться и порадоваться, как вдалеке послышалась сирена скорой помощи. # sfx: act5/sfx/ambulance.mp3
 Гай снова вспомнил о Марте и поспешил домой.
 
-# bg: act5/bg/guy_house.webp
+{""} # fx: toBlack # wait: 1000
+
+# bg: act5/bg/guy_house.webp # sfx: stop all
 Через некоторое время, наконец, сквозь тьму вырисовались знакомые окна и ступеньки.
 
 # bg:  act5/bg/martha_sees_guy.webp
@@ -329,7 +327,7 @@ VAR final_choice = ""
 Прости, я пытался позвонить, но связи нигде нет. # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Главное, что ты вернулся. # speaker: Марта # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/guy_martha_hug.webp # music: act5/music/after-strike.mp3 # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
+# bg: act5/bg/guy_martha_hug.webp # sfx: stop all
 Некоторое время они стояли молча. Марта постепенно успокоилась, но продолжала крепко обнимать мужа.
 А остальные? Там ведь тоже люди работали... # speaker: Марта # sprite: act5/sprites/martha_normal.png
 Я не знаю. Снаряд прилетел прям в турбину... Не хочу ничего утверждать. # speaker: Гай # sprite: act5/sprites/guy_normal.png
@@ -341,19 +339,18 @@ VAR final_choice = ""
 Марта кивает.
 Ладно, пошли, а то тебя продует. # speaker: Гай # sprite: act5/sprites/guy_smile.png # sfx: act5/sfx/guy-closes-door.mp3
 
-# fx: toBlack # sfx: act5/sfx/couple-leaves.mp3
-...
+{""} # fx: toBlack # wait: 2700 # sfx: act5/sfx/couple-leaves.mp3
 
 -> act_6
 === act_6 ===
 
-# bg: act6/bg/bag1.webp # music: act6/music/home.mp3
+# bg: act6/bg/bag1.webp # music: act6/music/home.mp3 # sfx: stop all
 Наступило утро.
 Гай и Марта в этот день не смогли нормально поспать, так как в голове роилось много мыслей, и далеко не самых приятных.
 Пара решила пропустить завтрак и молча собиралась в больницу. # sfx: act6/sfx/papers-in-bag.mp3
 Марта складывала необходимые документы в сумку, а Гай ее уже ждал. # sfx: act6/sfx/whoosh.mp3
 
-# bg: act6/bg/bag2.webp # fx: move
+# bg: act6/bg/bag2.webp
 Ну что, идем? # speaker: Марта # sprite: act6/sprites/martha_normal.png # sfx: act6/sfx/bag.mp3
 
 # bg: act6/bg/bag3.webp

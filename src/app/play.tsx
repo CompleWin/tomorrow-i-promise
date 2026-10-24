@@ -90,8 +90,8 @@ export default function Play () {
     if (line.silence) {
       stopSfx()
     }
-    if (line.sfx !== null) {
-      playSfx(assetUrl(line.sfx, novel.version))
+    if (line.sfx.length > 0) {
+      playSfx(line.sfx.map(sfx => assetUrl(sfx, novel.version)))
     }
   }
 
@@ -328,7 +328,7 @@ export default function Play () {
   async function pick (index: number) {
     const music = novel.choiceMusic(index)
     playMusic(music === null ? null : assetUrl(music, novel.version))
-    await sleep(1100)
+    await sleep(2000)
     if (!alive.current) {
       return
     }
@@ -366,6 +366,7 @@ export default function Play () {
         {(phase === 'play' || phase === 'choice') && (
           <Animated.View style={[StyleSheet.absoluteFill, cameraStyle]}>
             <Background name={novel.bg}
+                        frames={novel.frames}
                         fx={novel.fx}
                         instant={novel.resumed}
                         version={novel.version}

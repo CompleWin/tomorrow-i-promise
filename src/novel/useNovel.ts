@@ -10,10 +10,11 @@ export type Line = {
   text: string
   speaker: string | null
   bg: string | null
+  frames: string[]
   sprite: string | null
   fx: string | null
   wait: number
-  sfx: string | null
+  sfx: string[]
   music: string | null
   loops: string[]
   silence: boolean
@@ -28,10 +29,11 @@ const EMPTY: Line = {
   text: '',
   speaker: null,
   bg: null,
+  frames: [],
   sprite: null,
   fx: null,
   wait: 0,
-  sfx: null,
+  sfx: [],
   music: null,
   loops: [],
   silence: false,
@@ -141,14 +143,15 @@ export default function useNovel (startAct?: string) {
     const choices = story.currentChoices.map(
       c => ({ index: c.index, text: c.text }))
 
-    bgRef.current = tags.bg ?? bgRef.current
+    const frames = tags.bg?.split(/\s+/) ?? []
+    bgRef.current = frames[frames.length - 1] ?? bgRef.current
     if (tags.bg !== undefined) {
       darkRef.current = false
     }
     if (tags.fx === 'toBlack') {
       darkRef.current = true
     }
-    let sfx: string | null = null
+    let sfx: string[] = []
     let silence = false
     for (const value of tagValues(story.currentTags, 'sfx')) {
       const [path, mode] = value.split(/\s+/)
@@ -156,14 +159,14 @@ export default function useNovel (startAct?: string) {
         loopsRef.current = []
         if (mode === 'all') {
           silence = true
-          sfx = null
+          sfx = []
         }
       } else if (mode === 'loop') {
         if (!loopsRef.current.includes(path)) {
           loopsRef.current = [...loopsRef.current, path]
         }
       } else {
-        sfx = path
+        sfx = [...sfx, path]
       }
     }
     if (tags.music !== undefined) {
@@ -181,6 +184,7 @@ export default function useNovel (startAct?: string) {
       text: text,
       speaker: tags.speaker ?? null,
       bg: bgRef.current,
+      frames: frames,
       sprite: tags.sprite ?? null,
       fx: tags.fx ?? null,
       wait: Number(tags.wait ?? 0),

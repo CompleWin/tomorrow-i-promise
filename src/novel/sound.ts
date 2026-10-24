@@ -15,6 +15,7 @@ type Loop = {
 }
 
 let player: AudioPlayer | null = null
+let queue: string[] = []
 let music: LoopPlayer | null = null
 let track: string | null = null
 let loops: Loop[] = []
@@ -117,6 +118,7 @@ export function setLevels (next: Settings) {
   levels = next
   try {
     if (sfxLevel() === 0) {
+      queue = []
       player?.pause()
       for (const loop of loops) {
         loop.player.pause()
@@ -160,19 +162,38 @@ export function preloadSounds (urls: string[]) {
   }
 }
 
-export function playSfx (url: string) {
-  if (sfxLevel() === 0) {
+function sfxPlayer () {
+  if (player === null) {
+    player = createAudioPlayer(null)
+    player.addListener('playbackStatusUpdate', status => {
+      if (status.didJustFinish) {
+        playNext()
+      }
+    })
+  }
+  return player
+}
+
+function playNext () {
+  const url = queue.shift()
+  if (url === undefined || sfxLevel() === 0) {
     return
   }
   try {
-    player ??= createAudioPlayer(null)
-    player.replace(url)
-    player.volume = sfxLevel()
-    player.seekTo(0).catch(error => console.warn('sfx seek failed', error))
-    player.play()
+    const next = sfxPlayer()
+    next.replace(url)
+    next.volume = sfxLevel()
+    next.seekTo(0).catch(error => console.warn('sfx seek failed', error))
+    next.play()
   } catch (error) {
     console.warn('sfx failed', url, error)
+    playNext()
   }
+}
+
+export function playSfx (urls: string[]) {
+  queue = [...urls]
+  playNext()
 }
 
 export function playLoops (urls: string[]) {
@@ -225,6 +246,7 @@ export function playMusic (url: string | null, crossfade?: Crossfade) {
 }
 
 export function stopSfx () {
+  queue = []
   try {
     player?.pause()
   } catch (error) {
@@ -248,6 +270,7 @@ export function releaseSound () {
   }
   stopRise()
   player = null
+  queue = []
   music = null
   track = null
   loops = []

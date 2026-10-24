@@ -23,7 +23,7 @@ if (compiler.warnings.length > 0) {
   process.exit(1)
 }
 
-const backgrounds = [...text.matchAll(/#\s*bg:\s*(\S+)/g)].map(bg => bg[1])
+const backgrounds = [...text.matchAll(/#\s*bg:\s*([^#\n]+)/g)].flatMap(bg => bg[1].trim().split(/\s+/))
 for (const bg of backgrounds) {
   if (!fs.existsSync(`${ASSETS_DIR}/${bg}`)) {
     console.error(`bg does not exist: ${bg}`)

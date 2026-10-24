@@ -117,7 +117,7 @@ export async function getStory (): Promise<LoadedStory> {
 }
 
 const PRELOAD_TIMEOUT_MS = 2 * 60 * 1000
-const ASSET_TAG = /"\^(bg|sprite|sfx):\s*([^"\s]+)[^"]*"/g
+const ASSET_TAG = /"\^(bg|sprite|sfx):\s*([^"]*)"/g
 const ACT_PATH = /^act(\d+)\//
 
 type ActAssets = {
@@ -134,22 +134,29 @@ let loadingActs = new Map<number, Promise<void>>()
 
 function collectAssets (json: string): Map<number, ActAssets> {
   const result = new Map<number, ActAssets>()
-  for (const [, kind, path] of json.matchAll(ASSET_TAG)) {
-    if (path === 'stop') {
-      continue
-    }
-    const act = Number(ACT_PATH.exec(path)?.[1] ?? 0)
-    let assets = result.get(act)
-    if (assets === undefined) {
-      assets = { images: [], sounds: [] }
-      result.set(act, assets)
-    }
-    const list = kind === 'sfx' ? assets.sounds : assets.images
-    if (!list.includes(path)) {
-      list.push(path)
+  for (const [, kind, value] of json.matchAll(ASSET_TAG)) {
+    const tokens = value.trim().split(/\s+/)
+    for (const path of kind === 'bg' ? tokens : tokens.slice(0, 1)) {
+      addAsset(result, kind, path)
     }
   }
   return result
+}
+
+function addAsset (result: Map<number, ActAssets>, kind: string, path: string) {
+  if (path === 'stop' || path === '') {
+    return
+  }
+  const act = Number(ACT_PATH.exec(path)?.[1] ?? 0)
+  let assets = result.get(act)
+  if (assets === undefined) {
+    assets = { images: [], sounds: [] }
+    result.set(act, assets)
+  }
+  const list = kind === 'sfx' ? assets.sounds : assets.images
+  if (!list.includes(path)) {
+    list.push(path)
+  }
 }
 
 async function withTimeout (promise: Promise<void>): Promise<void> {

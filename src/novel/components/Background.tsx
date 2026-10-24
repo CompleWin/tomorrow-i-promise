@@ -11,9 +11,9 @@ import Animated, {
 } from 'react-native-reanimated'
 import { scheduleOnRN } from 'react-native-worklets'
 import { assetSource } from '@/novel/preload'
-import { BG_DURATION, EASE } from '@/novel/theme'
+import { BG_DURATION, EASE, FRAME_STEP } from '@/novel/theme'
 
-type Mode = 'default' | 'fadeIn' | 'close' | 'blackout' | 'lightsOn' | 'move' | 'instant'
+type Mode = 'default' | 'fadeIn' | 'close' | 'blackout' | 'lightsOn' | 'move' | 'frame' | 'instant'
 
 type Layer = {
   key: number
@@ -21,8 +21,15 @@ type Layer = {
   mode: Mode
 }
 
+type Sequence = {
+  name: string | null
+  frames: string[]
+  index: number
+}
+
 type Props = {
   name: string | null
+  frames?: string[]
   fx: string | null
   instant?: boolean
   version: string | null
@@ -37,6 +44,7 @@ const ENTER = {
   blackout: { duration: BG_DURATION.blackout, easing: Easing.linear },
   lightsOn: { duration: BG_DURATION.lightsOn, easing: Easing.linear },
   move: { duration: BG_DURATION.move, easing: EASE.move },
+  frame: { duration: BG_DURATION.frame, easing: EASE.inOut },
   instant: { duration: 0, easing: Easing.linear },
 }
 
@@ -130,22 +138,40 @@ function BackgroundLayer ({ layerKey, name, mode, leaving, version, onDone, onMo
   )
 }
 
-export default function Background ({ name, fx, instant = false, version }: Props) {
+export default function Background ({ name, frames = [], fx, instant = false, version }: Props) {
+  const [sequence, setSequence] = useState<Sequence>({ name: null, frames: [], index: 0 })
   const [stack, setStack] = useState<{ name: string | null, serial: number, layers: Layer[] }>(
     { name: null, serial: 0, layers: [] })
   const zoom = useSharedValue(1)
   const nudge = useSharedValue(0)
 
-  if (name !== stack.name) {
-    const mode = toMode(fx, instant)
+  let current = sequence
+  if (name !== sequence.name) {
+    current = { name, frames: instant || frames.length < 2 ? [] : frames, index: 0 }
+    setSequence(current)
+  }
+  const shown = current.frames[current.index] ?? name
+
+  if (shown !== stack.name) {
+    const mode = current.index > 0 ? 'frame' : toMode(fx, instant)
     const serial = stack.serial + 1
-    const kept = mode === 'fadeIn' || mode === 'instant' || name === null ? [] : stack.layers
+    const kept = mode === 'fadeIn' || mode === 'instant' || shown === null ? [] : stack.layers
     setStack({
-      name,
+      name: shown,
       serial,
-      layers: name === null ? [] : [...kept, { key: serial, name, mode }],
+      layers: shown === null ? [] : [...kept, { key: serial, name: shown, mode }],
     })
   }
+
+  useEffect(() => {
+    if (sequence.index >= sequence.frames.length - 1) {
+      return
+    }
+    const timer = setTimeout(() => {
+      setSequence(s => s.name === sequence.name ? { ...s, index: s.index + 1 } : s)
+    }, FRAME_STEP)
+    return () => clearTimeout(timer)
+  }, [sequence])
 
   useEffect(() => {
     zoom.set(withRepeat(withTiming(1.04, { duration: 30000, easing: EASE.inOut }), -1, true))
