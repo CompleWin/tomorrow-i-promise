@@ -25,7 +25,8 @@
   },
   "music": {
     "file": "menu/main_menu_sound.mp3",
-    "at": 430,
-    "fade": 4
+    "at": 152,
+    "fade": 8,
+    "from": 32
   }
 }

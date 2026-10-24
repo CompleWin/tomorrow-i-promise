@@ -30,9 +30,10 @@ export function streamLoop (url: string): LoopPlayer {
 export type Crossfade = {
   at: number
   fade: number
+  from: number
 }
 
-export function crossfadeLoop (url: string, { at, fade }: Crossfade): LoopPlayer {
+export function crossfadeLoop (url: string, { at, fade, from }: Crossfade): LoopPlayer {
   const players = [createAudioPlayer(url), createAudioPlayer(url)]
   for (const player of players) {
     player.loop = true
@@ -59,7 +60,6 @@ export function crossfadeLoop (url: string, { at, fade }: Crossfade): LoopPlayer
         if (mix === 1) {
           const old = players[1 - current]
           old.pause()
-          old.seekTo(0).catch(error => console.warn('music seek failed', error))
         }
         return
       }
@@ -68,7 +68,14 @@ export function crossfadeLoop (url: string, { at, fade }: Crossfade): LoopPlayer
         mix = 0
         fadeStart = Date.now()
         apply()
-        players[current].play()
+        const next = players[current]
+        next.seekTo(from)
+          .catch(error => console.warn('music seek failed', error))
+          .then(() => {
+            if (wanted && players[current] === next) {
+              next.play()
+            }
+          })
       }
     } catch (error) {
       console.warn('music crossfade failed', url, error)

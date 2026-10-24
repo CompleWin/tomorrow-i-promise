@@ -4,7 +4,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withTiming } f
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
 import useTapKeys from '@/novel/useTapKeys'
-import { AUTHORS } from '@/novel/credits'
+import { AUTHORS, MENU_MUSIC_CREDIT } from '@/novel/credits'
 import { useFade } from '@/novel/components/Fade'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
@@ -90,6 +90,11 @@ export default function Credits ({ onDone }: Props) {
           </View>
         ))}
       </Animated.View>
+      <Animated.View pointerEvents={'none'} style={[styles.music, columnStyle]}>
+        <UIText size={30} spacing={0.06} color={COLORS.kicker}>
+          Музыка в меню: {MENU_MUSIC_CREDIT.author}, «{MENU_MUSIC_CREDIT.title}»
+        </UIText>
+      </Animated.View>
     </Pressable>
   )
 }
@@ -108,6 +113,13 @@ const styles = StyleSheet.create({
   },
   row: {
     flexDirection: 'row',
+  },
+  music: {
+    position: 'absolute',
+    bottom: 120,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
   },
   column: {
     width: 960,

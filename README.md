@@ -34,5 +34,7 @@
 - Ивахненко Николай — telegram @complewin
 - Макарова Елизавета — telegram @displiceat
 
+Музыка главного меню: Gregor Quendel, «Ambient Pad VII»
+
 Шрифт [Galmuri11](https://github.com/quiple/galmuri) © Lee Minseo, лицензия SIL Open Font License 1.1
 
