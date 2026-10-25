@@ -49,7 +49,6 @@ VAR final_choice = ""
 # fx: toBlack # music: stop
 Ты рад? # speaker: Марта
 Конечно, рад. # speaker: Гай
-... # fx: shake # sfx: act1/sfx/bang.mp3
 
 -> act_2
 === act_2 ===
@@ -123,7 +122,7 @@ VAR final_choice = ""
 Однако Гай прекрасно знал, что за красивыми фасадами скрывалась совсем другая жизнь.
 Люди работали почти без отдыха, большую часть заработанного отдавали за жилье и необходимые услуги, а война и постоянная тревога были знакомы им не меньше, чем жителям трущоб.
 
-{""} # bg: act3/bg/city1.webp # wait: 500 # music: act3/music/night.mp3
+{""} # bg: act3/bg/city1.webp # wait: 500 # music: act3/music/paradise_sound.mp3
 # bg: act3/bg/bg1.webp
 Еще несколько десятилетий назад люди представляли будущее совсем иначе.
 Они мечтали, что технологии избавят их от бедности, голода и войн.
@@ -134,7 +133,7 @@ VAR final_choice = ""
 Но попытки построить идеальное общество раз за разом оборачивались новыми конфликтами и трагедиями.
 Люди научились создавать невероятные машины и возводить огромные города, но так и не смогли научиться действовать сообща.
 
-# bg: act3/bg/city1.webp
+# bg: act3/bg/city1.webp # music: act3/music/night.mp3
 Каждый преследовал собственные интересы, и в конечном счете человечество само создало мир, в котором теперь вынуждено было жить.
 Гай снова посмотрел на сияющие небоскребы.
 Город продолжал расти, появлялись все более совершенные технологии, но за этим великолепием он не видел того будущего, о котором когда-то мечтали люди.
@@ -257,7 +256,7 @@ VAR final_choice = ""
 Мужчины быстро спустились по тросам вниз # sfx: act5/sfx/guy-winston-descend.mp3
 ... # sfx: act5/sfx/descended.mp3 # fx: shake
 
-# bg: act5/bg/standing_watching.webp # fx: fadeIn
+# bg: act5/bg/standing_watching.webp # fx: fadeIn # sfx: act5/music/distant-bangs.mp3 loop
 Где они?! Ты кого-нибудь видишь? # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Нет... Может, с другой стороны спустились? # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
 ...
@@ -273,9 +272,9 @@ VAR final_choice = ""
 А вдруг они выбрались? # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Спасатели уже едут, я разберусь. # speaker: Уинстон # sprite: act5/sprites/winston_normal.png
 
-# fx: toBlack
+# fx: toBlack # sfx: stop
 
-Гай поспешил в сторону поселения. Позади все еще слышался треск горящего оборудования.
+Гай поспешил в сторону поселения. Позади все еще слышался треск горящего оборудования. # sfx: act5/music/distant-fighting.mp3 loop
 
 # bg: act5/bg/guy_walks_flashlight.webp # fx: fadeIn # sfx: act5/sfx/guy-walks-mud.mp3
 
@@ -285,7 +284,7 @@ VAR final_choice = ""
 Он несколько раз пытался дозвониться Марте, но сеть была недоступна.
 Вскоре он убрал телефон и ускорил шаг.
 
-# bg: act5/bg/women_with_lamp.webp # sfx: stop all
+# bg: act5/bg/women_with_lamp.webp # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
 Проходя мимо одного из домов, Гай заметил небольшую группу людей.
 Две женщины стояли у входа, пытаясь зажечь лампу.
 У тебя спичек не осталось? У нас всё закончилось. # speaker: Женщина 1
@@ -361,14 +360,15 @@ VAR final_choice = ""
 # bg: act6/bg/knocking1.webp # fx: fadeIn # music: act6/music/hospital.mp3
 ... # sfx: act6/sfx/door-knock.mp3
 
-# bg: act6/bg/knocking2.webp # sfx: act6/sfx/hospital-door.mp3
+# bg: act6/bg/knocking2.webp # sfx: act6/sfx/hospital-door-open.mp3
 Здравствуйте, у нас талон на 9. # speaker: Гай # sprite: act6/sprites/guy_normal.png
-Доброе утро. Проходите, присаживайтесь. # speaker: Врач # sprite: act6/sprites/doctor_smile.png
+Доброе утро. Проходите, присаживайтесь. # speaker: Врач # sprite: act6/sprites/doctor_smile.png # sfx: act6/sfx/footsteps.mp3
 
-# bg: act6/bg/choice.webp # sfx: act6/sfx/footsteps.mp3
+# bg: act6/bg/choice.webp # sfx: act6/sfx/hospital-door-close.mp3
 Пара села напротив врача.
 Вы приняли решение насчет беременности? # speaker: Врач # sprite: act6/sprites/doctor_normal.png # sfx: stop all
 Гай и Марта переглянулись.
+# bg: act6/bg/choice2.webp
 Марта взяла Гая за руку. Он посмотрел на нее, затем перевел взгляд на врача.
 ...
 

@@ -11,7 +11,7 @@ const RISE_STEPS = 30
 
 type Loop = {
   url: string
-  player: AudioPlayer
+  player: LoopPlayer
 }
 
 let player: AudioPlayer | null = null
@@ -110,7 +110,7 @@ function resumeLoops () {
   for (const loop of loops) {
     try {
       loop.player.volume = sfxLevel()
-      if (!loop.player.currentStatus.playing) {
+      if (!loop.player.playing) {
         loop.player.play()
       }
     } catch (error) {
@@ -210,9 +210,7 @@ export function playLoops (urls: string[]) {
       continue
     }
     try {
-      const created = createAudioPlayer(url)
-      created.loop = true
-      next.push({ url, player: created })
+      next.push({ url, player: createLoop(url) })
     } catch (error) {
       console.warn('sfx failed', url, error)
     }

@@ -1,8 +1,7 @@
 {
   "acts": {
     "1": {
-      "base": "act1/bg/bg2.webp",
-      "flicker": "act1/bg/bg3.webp"
+      "base": "menu/menu_bg.webp"
     },
     "2": {
       "base": "act2/bg/bg10.webp"
