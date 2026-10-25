@@ -1,10 +1,30 @@
 import type { ReactNode } from 'react'
 import { ScrollViewStyleReset, useServerDocumentContext } from 'expo-router/html'
+import { AUTHORS, REPO_URL } from '@/novel/credits'
 
 const BASE = __DEV__ ? '' : process.env.EXPO_BASE_URL ?? ''
 const TITLE = 'Завтра точно'
-const DESCRIPTION = 'Визуальная новелла в пиксельном стиле, которая идёт в браузере и на телефоне.'
+const DESCRIPTION = 'Завтра точно — визуальная новелла о сложном выборе в пиксельном стиле. Играйте бесплатно прямо в браузере или на телефоне, без установки и регистрации.'
+const CF_TOKEN = __DEV__ ? undefined : process.env.EXPO_PUBLIC_CF_ANALYTICS_TOKEN
 const SITE = `https://tomorrow-i-promise.ru${process.env.EXPO_BASE_URL ?? ''}/`
+const JSON_LD = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'VideoGame',
+  name: TITLE,
+  alternateName: 'Tomorrow, I Promise',
+  description: DESCRIPTION,
+  url: SITE,
+  image: `${SITE}og.png`,
+  inLanguage: 'ru',
+  genre: ['Визуальная новелла', 'Visual novel'],
+  gamePlatform: 'Web browser',
+  applicationCategory: 'Game',
+  operatingSystem: 'Any',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: 0, priceCurrency: 'RUB' },
+  author: AUTHORS.map(({ name }) => ({ '@type': 'Person', name })),
+  sameAs: [REPO_URL],
+}).replace(/</g, '\\u003c')
 const CSS = [
   'body{background-color:#000}',
   '*{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}',
@@ -38,14 +58,29 @@ export default function Root ({ children }: { children: ReactNode }) {
         <meta property="og:image:height" content="630" />
         <meta property="og:image:alt" content={TITLE} />
         <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={TITLE} />
+        <meta name="twitter:description" content={DESCRIPTION} />
+        <meta name="twitter:image" content={`${SITE}og.png`} />
+        <meta name="author" content={AUTHORS.map(({ name }) => name).join(', ')} />
+        <meta name="yandex-verification" content="3607e2ca274e5637" />
         <link rel="icon" href={`${BASE}/favicon.ico`} sizes="16x16 32x32 48x48" />
         <link rel="manifest" href={`${BASE}/manifest.json`} />
         <link rel="apple-touch-icon" href={`${BASE}/apple-touch-icon.png`} />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: CSS }} />
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON_LD }} />
+        {CF_TOKEN && (
+          <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
+            data-cf-beacon={JSON.stringify({ token: CF_TOKEN })} />
+        )}
         {headNodes}
       </head>
       <body {...bodyAttributes}>
+        <noscript>
+          <h1>{TITLE} — визуальная новелла</h1>
+          <p>{DESCRIPTION}</p>
+          <p>Для игры включите JavaScript.</p>
+        </noscript>
         {children}
         {bodyNodes}
       </body>

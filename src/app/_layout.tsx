@@ -1,4 +1,4 @@
-import { Stack } from 'expo-router'
+import { Stack, usePathname } from 'expo-router'
 import Head from 'expo-router/head'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
@@ -12,8 +12,12 @@ import { StageOverlay } from '@/novel/components/Stage'
 
 SplashScreen.preventAutoHideAsync()
 
+const TITLE = `${app.expo.name}`
+const SITE = 'https://tomorrow-i-promise.ru/'
+
 export default function RootLayout () {
   const [loaded, error] = useFonts({ Galmuri11: GALMURI })
+  const pathname = usePathname()
 
   useEffect(() => {
     if (loaded || error) {
@@ -33,9 +37,12 @@ export default function RootLayout () {
     <FadeProvider>
       <BannerProvider>
         <Head>
-          <title>{app.expo.name}</title>
+          <title>{TITLE}</title>
+          {pathname === '/'
+            ? <link rel="canonical" href={SITE} />
+            : <meta name="robots" content="noindex, follow" />}
         </Head>
-        <Stack screenOptions={{ headerShown: false, title: app.expo.name }} />
+        <Stack screenOptions={{ headerShown: false, title: TITLE }} />
         <StageOverlay>
           <FullscreenButton />
         </StageOverlay>
