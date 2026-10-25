@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="docs/cover.webp" alt="Завтра точно" width="100%">
+  <a href="https://tomorrow-i-promise.ru/">
+    <img src="docs/cover.webp" alt="Завтра точно" width="100%">
+  </a>
 </p>
 
 <p align="center">
