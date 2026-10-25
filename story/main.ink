@@ -11,10 +11,9 @@ VAR final_choice = ""
 Ты вчера так же говорил. # speaker: Марта # sprite: act1/sprites/martha_smile.png
 Завтра точно. # speaker: Гай # sprite: act1/sprites/guy_smile.png
 Они продолжили ужинать. # sfx: act1/sfx/spoons.mp3
-Внезапно лампа над столом гаснет.
 
-# bg: act1/bg/bg2.webp # fx: blackout # sfx: act1/sfx/lamp-off.mp3
-Комната погружается в темноту. Слышен только шум улицы.
+# bg: act1/bg/bg2.webp # sfx: act1/sfx/lamp-off.mp3
+Внезапно лампа над столом гаснет. Комната погружается в темноту. Слышен только шум улицы.
 Да чтоб тебя... # speaker: Гай # sprite: act1/sprites/guy_normal_dark.png
 Может, уже достанем свечи? # speaker: Марта # sprite: act1/sprites/martha_smile_dark.png
 Подожди, сейчас включат. # speaker: Гай # sprite: act1/sprites/guy_smile_dark.png
@@ -122,9 +121,9 @@ VAR final_choice = ""
 Однако Гай прекрасно знал, что за красивыми фасадами скрывалась совсем другая жизнь.
 Люди работали почти без отдыха, большую часть заработанного отдавали за жилье и необходимые услуги, а война и постоянная тревога были знакомы им не меньше, чем жителям трущоб.
 
-{""} # bg: act3/bg/city1.webp # wait: 500 # music: act3/music/paradise_sound.mp3
-# bg: act3/bg/bg1.webp
+# bg: act3/bg/city1.webp # music: act3/music/paradise_sound.mp3
 Еще несколько десятилетий назад люди представляли будущее совсем иначе.
+# bg: act3/bg/bg1.webp
 Они мечтали, что технологии избавят их от бедности, голода и войн.
 Теперь технологии окружали человека повсюду, но старые проблемы никуда не исчезли.
 
@@ -156,7 +155,7 @@ VAR final_choice = ""
 От этой мысли ему стало не по себе.
 Он еще несколько секунд смотрел на другой берег, после чего поправил сумку на плече и направился к ветрогенераторам. # sfx: act3/sfx/guy-hangs-bag.mp3 # sfx: act3/sfx/guy-walks.mp3
 
-{""} # fx: toBlack # wait: 500
+{""} # fx: toBlack # wait: 1500
 
 
 -> act_4
@@ -326,7 +325,7 @@ VAR final_choice = ""
 Прости, я пытался позвонить, но связи нигде нет. # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Главное, что ты вернулся. # speaker: Марта # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/guy_martha_hug.webp # sfx: stop all
+# bg: act5/bg/guy_martha_hug.webp # sfx: act5/music/distant-fighting.mp3 loop
 Некоторое время они стояли молча. Марта постепенно успокоилась, но продолжала крепко обнимать мужа.
 А остальные? Там ведь тоже люди работали... # speaker: Марта # sprite: act5/sprites/martha_normal.png
 Я не знаю. Снаряд прилетел прям в турбину... Не хочу ничего утверждать. # speaker: Гай # sprite: act5/sprites/guy_normal.png

@@ -27,7 +27,7 @@ import Subtitles from '@/novel/components/Subtitles'
 import Teaser, { TEASER_MUSIC } from '@/novel/components/Teaser'
 import Thanks from '@/novel/components/Thanks'
 import UIText from '@/novel/components/UIText'
-import { BG_DURATION, COLORS, EASE, TEXT_DELAY } from '@/novel/theme'
+import { BG_DURATION, COLORS, EASE, SPRITE_DIM, TEXT_DELAY } from '@/novel/theme'
 
 const TEASER_FADE = 2500
 
@@ -62,8 +62,10 @@ export default function Play () {
   const alive = useRef(true)
   const typing = useTypewriter(novel.text, { key: novel.lineId, paused: !ready || paused || busy })
   const veiling = novel.fx === 'toBlack' && !ready
+  const dimmed = !veiling && SPRITE_DIM.acts.some(act => novel.sprite?.startsWith(`${act}/`))
 
   const veil = useSharedValue(0)
+  const dim = useSharedValue(0)
   const shake = useSharedValue(1)
   const veilOn = useRef(false)
   const shownBg = useRef<string | null>(null)
@@ -78,6 +80,13 @@ export default function Play () {
   const waitStyle = useAnimatedStyle(() => ({
     opacity: waitShade.get(),
   }))
+  const dimStyle = useAnimatedStyle(() => ({
+    opacity: dim.get(),
+  }))
+
+  useEffect(() => {
+    dim.set(withTiming(dimmed ? SPRITE_DIM.opacity : 0, { duration: SPRITE_DIM.duration, easing: EASE.inOut }))
+  }, [dimmed, dim])
   const cameraStyle = useAnimatedStyle(() => ({
     transform: [
       { translateX: interpolate(shake.get(), SHAKE.offsets, SHAKE.x) },
@@ -397,6 +406,8 @@ export default function Play () {
                         instant={novel.resumed}
                         version={novel.version}
             />
+
+            <Animated.View pointerEvents={'none'} style={[styles.veil, dimStyle]} />
 
             <Animated.View pointerEvents={'none'} style={[styles.veil, veilStyle]} />
 

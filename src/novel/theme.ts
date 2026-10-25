@@ -64,3 +64,9 @@ export const BG_DURATION: Record<string, number> = {
 }
 
 export const FRAME_STEP = 800
+
+export const SPRITE_DIM = {
+  acts: ['act2', 'act4', 'act5'],
+  opacity: 0.35,
+  duration: 400,
+}
