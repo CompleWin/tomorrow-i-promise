@@ -325,7 +325,7 @@ VAR final_choice = ""
 Прости, я пытался позвонить, но связи нигде нет. # speaker: Гай # sprite: act5/sprites/guy_normal.png
 Главное, что ты вернулся. # speaker: Марта # sprite: act5/sprites/martha_crying.png
 
-# bg: act5/bg/guy_martha_hug.webp # sfx: act5/music/distant-fighting.mp3 loop
+# bg: act5/bg/guy_martha_hug.webp # sfx: stop all # sfx: act5/music/distant-fighting.mp3 loop
 Некоторое время они стояли молча. Марта постепенно успокоилась, но продолжала крепко обнимать мужа.
 А остальные? Там ведь тоже люди работали... # speaker: Марта # sprite: act5/sprites/martha_normal.png
 Я не знаю. Снаряд прилетел прям в турбину... Не хочу ничего утверждать. # speaker: Гай # sprite: act5/sprites/guy_normal.png
@@ -337,7 +337,7 @@ VAR final_choice = ""
 Марта кивает.
 Ладно, пошли, а то тебя продует. # speaker: Гай # sprite: act5/sprites/guy_smile.png # sfx: act5/sfx/guy-closes-door.mp3
 
-{""} # fx: toBlack # wait: 2700 # sfx: act5/sfx/couple-leaves.mp3
+{""} # fx: toBlack # wait: 4000 # sfx: stop all # sfx: act5/sfx/couple-leaves.mp3
 
 -> act_6
 === act_6 ===
