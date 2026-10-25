@@ -33,9 +33,9 @@
 
 ## Авторы
 
-- Ивахненко Николай — telegram @complewin
-- Макарова Елизавета — telegram @displiceat
-
+- Ивахненко Николай — [@complewin](https://t.me/complewin)
+- Макарова Елизавета — [@displiceat](https://t.me/displiceat)
+  
 Музыка главного меню: Gregor Quendel, «Ambient Pad VII»
 
 Шрифт [Galmuri11](https://github.com/quiple/galmuri) © Lee Minseo, лицензия SIL Open Font License 1.1
