@@ -33,7 +33,7 @@
 
 ## Авторы
 
-- Ивахненко Николай — [@complewin](https://t.me/complewin)
+- Ивахненко Николай — [@nikolayivakhnenko](https://t.me/nikolayivakhnenko)
 - Макарова Елизавета — [@displiceat](https://t.me/displiceat)
   
 Музыка главного меню: Gregor Quendel, «Ambient Pad VII»
