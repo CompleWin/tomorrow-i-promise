@@ -22,7 +22,7 @@ export const SEO: Record<Lang, Seo> = {
   },
   en: {
     title: 'Tomorrow, I Promise',
-    description: 'Tomorrow, I Promise is a pixel-art visual novel about a difficult choice. Play for free right in your browser or on your phone, no installation or sign-up needed.',
+    description: 'Tomorrow, I Promise is a pixel-art visual novel about a hard choice. Play free in your browser or on your phone, with no download and no sign-up.',
     ogLocale: 'en_US',
     og: 'og.en.png',
     genre: 'Visual novel',
