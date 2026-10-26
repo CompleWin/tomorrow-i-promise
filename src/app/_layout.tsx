@@ -3,17 +3,34 @@ import Head from 'expo-router/head'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
-import app from '../../app.json'
 import { GALMURI } from '@/novel/font'
+import { routeLang } from '@/novel/i18n'
+import { SEO } from '@/novel/i18n/seo'
 import { FadeProvider } from '@/novel/components/Fade'
 import { BannerProvider } from '@/novel/components/Banner'
 import FullscreenButton from '@/novel/components/FullscreenButton'
+import { LocaleProvider, useLocale } from '@/novel/components/Locale'
 import { StageOverlay } from '@/novel/components/Stage'
 
 SplashScreen.preventAutoHideAsync()
 
-const TITLE = `${app.expo.name}`
-const SITE = 'https://tomorrow-i-promise.ru/'
+function Screens () {
+  const { lang } = useLocale()
+  const title = SEO[lang].title
+
+  return (
+    <>
+      <Head>
+        <html lang={lang} />
+        <title>{title}</title>
+      </Head>
+      <Stack screenOptions={{ headerShown: false, title }} />
+      <StageOverlay>
+        <FullscreenButton />
+      </StageOverlay>
+    </>
+  )
+}
 
 export default function RootLayout () {
   const [loaded, error] = useFonts({ Galmuri11: GALMURI })
@@ -34,19 +51,19 @@ export default function RootLayout () {
   }
 
   return (
-    <FadeProvider>
-      <BannerProvider>
+    <>
+      {routeLang(pathname) === null && (
         <Head>
-          <title>{TITLE}</title>
-          {pathname === '/'
-            ? <link rel="canonical" href={SITE} />
-            : <meta name="robots" content="noindex, follow" />}
+          <meta name="robots" content="noindex, follow" />
         </Head>
-        <Stack screenOptions={{ headerShown: false, title: TITLE }} />
-        <StageOverlay>
-          <FullscreenButton />
-        </StageOverlay>
-      </BannerProvider>
-    </FadeProvider>
+      )}
+      <LocaleProvider>
+        <FadeProvider>
+          <BannerProvider>
+            <Screens />
+          </BannerProvider>
+        </FadeProvider>
+      </LocaleProvider>
+    </>
   )
 }

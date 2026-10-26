@@ -6,6 +6,7 @@ import sleep from '@/novel/sleep'
 import useTapKeys from '@/novel/useTapKeys'
 import { AUTHORS, MENU_MUSIC_CREDIT } from '@/novel/credits'
 import { useFade } from '@/novel/components/Fade'
+import { useLocale } from '@/novel/components/Locale'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE } from '@/novel/theme'
@@ -18,8 +19,10 @@ const HOLD = 4000
 
 export default function Credits ({ onDone }: Props) {
   const fade = useFade()
-  const left = useTypewriter(AUTHORS[0].name, { key: 1 })
-  const right = useTypewriter(AUTHORS[1].name, { key: 1 })
+  const { t } = useLocale()
+  const names = AUTHORS.map(({ handle }) => t.credits.authors[handle])
+  const left = useTypewriter(names[0], { key: 1 })
+  const right = useTypewriter(names[1], { key: 1 })
   const done = left.done && right.done
   const enter = useSharedValue(0)
   const out = useSharedValue(0)
@@ -78,13 +81,13 @@ export default function Credits ({ onDone }: Props) {
   return (
     <Pressable onPress={tap} style={styles.screen}>
       <Animated.View pointerEvents={'none'} style={[styles.title, columnStyle]}>
-        <UIText size={48} spacing={0.06} color={COLORS.kicker}>Авторы</UIText>
+        <UIText size={48} spacing={0.06} color={COLORS.kicker}>{t.credits.title}</UIText>
       </Animated.View>
       <Animated.View pointerEvents={'none'} style={[styles.row, columnStyle]}>
         {AUTHORS.map((author, i) => (
           <View key={author.handle} style={styles.column}>
             <UIText size={60} lineHeight={1.3} color={COLORS.cream} shadow numberOfLines={1}>
-              <TypedText text={author.name} shown={typed[i]} />
+              <TypedText text={names[i]} shown={typed[i]} />
             </UIText>
             <UIText size={34} spacing={0.06} color={COLORS.lamp}>{author.handle}</UIText>
           </View>
@@ -92,7 +95,7 @@ export default function Credits ({ onDone }: Props) {
       </Animated.View>
       <Animated.View pointerEvents={'none'} style={[styles.music, columnStyle]}>
         <UIText size={30} spacing={0.06} color={COLORS.kicker}>
-          Музыка в меню: {MENU_MUSIC_CREDIT.author}, «{MENU_MUSIC_CREDIT.title}»
+          {t.credits.music(MENU_MUSIC_CREDIT.author, MENU_MUSIC_CREDIT.title)}
         </UIText>
       </Animated.View>
     </Pressable>

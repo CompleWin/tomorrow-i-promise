@@ -1,9 +1,8 @@
 import { Platform, Pressable, StyleSheet, View } from 'react-native'
 import { useState, useSyncExternalStore } from 'react'
 import { useBanner } from '@/novel/components/Banner'
+import { useLocale } from '@/novel/components/Locale'
 import { COLORS, IDLE_OPACITY } from '@/novel/theme'
-
-const HINT = 'Чтобы играть на весь экран: Поделиться → На экран Домой'
 
 type FullscreenDocument = Document & {
   webkitFullscreenElement?: Element | null
@@ -58,9 +57,14 @@ function enterFullscreen (): boolean {
   return true
 }
 
+export function useFullscreenOffer (): boolean {
+  return useSyncExternalStore(subscribe, shouldOffer, () => false)
+}
+
 export default function FullscreenButton () {
-  const offer = useSyncExternalStore(subscribe, shouldOffer, () => false)
+  const offer = useFullscreenOffer()
   const banner = useBanner()
+  const { t } = useLocale()
   const [hovered, setHovered] = useState(false)
 
   if (!offer) {
@@ -69,7 +73,7 @@ export default function FullscreenButton () {
 
   const press = () => {
     if (!enterFullscreen()) {
-      banner.show(HINT, { duration: 5000 })
+      banner.show(t.fullscreenHint, { duration: 5000 })
     }
   }
 
@@ -91,6 +95,8 @@ export default function FullscreenButton () {
   )
 }
 
+export const FULLSCREEN_ZONE = { top: 30, right: 34, size: 72 }
+
 const INSET = 16
 const ARM = 20
 const LINE = 6
@@ -100,12 +106,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 0,
     top: 0,
-    paddingVertical: 30,
-    paddingHorizontal: 34,
+    paddingVertical: FULLSCREEN_ZONE.top,
+    paddingHorizontal: FULLSCREEN_ZONE.right,
   },
   square: {
-    width: 72,
-    height: 72,
+    width: FULLSCREEN_ZONE.size,
+    height: FULLSCREEN_ZONE.size,
     backgroundColor: COLORS.pauseBtn,
     opacity: IDLE_OPACITY,
   },

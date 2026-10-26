@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { Linking, Pressable, StyleSheet, View } from 'react-native'
 import { Image } from 'expo-image'
 import { REPO_URL } from '@/novel/credits'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { COLORS, IDLE_OPACITY } from '@/novel/theme'
 
 export default function MenuFooter ({ version }: { version: string | null }) {
+  const { t } = useLocale()
   const [hovered, setHovered] = useState(false)
 
   return (
@@ -19,7 +21,7 @@ export default function MenuFooter ({ version }: { version: string | null }) {
                  onHoverIn={() => setHovered(true)}
                  onHoverOut={() => setHovered(false)}
                  accessibilityRole={'link'}
-                 accessibilityLabel={'Репозиторий на GitHub'}
+                 accessibilityLabel={t.github}
                  hitSlop={12}
                  style={[styles.corner, styles.github]}
       >

@@ -1,5 +1,6 @@
 import { BackHandler, Pressable, StyleSheet, View } from 'react-native'
 import { useEffect, useState } from 'react'
+import { useLocale } from '@/novel/components/Locale'
 import MenuItem from '@/novel/components/MenuItem'
 import UIText from '@/novel/components/UIText'
 import VolumeSettings, { useVolumeSettings } from '@/novel/components/VolumeSettings'
@@ -12,6 +13,7 @@ type Props = {
 }
 
 export default function PauseOverlay ({ onResume, onMenu }: Props) {
+  const { t } = useLocale()
   const [settings, setSettings] = useState(false)
 
   useEffect(() => {
@@ -29,11 +31,11 @@ export default function PauseOverlay ({ onResume, onMenu }: Props) {
   const volumeRows = settings ? volume.actions : []
 
   const entries: MenuAction[] = settings ? [
-    { label: 'Назад', onPress: () => setSettings(false) },
+    { label: t.pause.back, onPress: () => setSettings(false) },
   ] : [
-    { label: 'Продолжить', onPress: onResume },
-    { label: 'Настройки', onPress: () => setSettings(true) },
-    { label: 'В меню', onPress: onMenu },
+    { label: t.pause.resume, onPress: onResume },
+    { label: t.pause.settings, onPress: () => setSettings(true) },
+    { label: t.pause.menu, onPress: onMenu },
   ]
 
   const { selected, select } = useMenuSelection([...volumeRows, ...entries], { screen: settings ? 'settings' : 'pause' })
@@ -42,7 +44,7 @@ export default function PauseOverlay ({ onResume, onMenu }: Props) {
     <Pressable onPress={settings ? () => setSettings(false) : onResume} style={styles.overlay}>
       <View style={styles.column}>
         <UIText size={30} color={COLORS.muted} spacing={0.3} upper>
-          {settings ? 'Настройки' : 'Пауза'}
+          {settings ? t.pause.settings : t.pause.title}
         </UIText>
         <View style={styles.list}>
           {settings && <VolumeSettings volume={volume} selected={selected} onHover={select} />}

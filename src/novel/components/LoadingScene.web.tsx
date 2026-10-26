@@ -1,6 +1,7 @@
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import ContinuePrompt from '@/novel/components/ContinuePrompt'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { ART_H, ART_W, drawArt, EARTH, hash, SKY } from '@/novel/coverArt'
 import { loadProgress } from '@/novel/content'
@@ -27,6 +28,7 @@ type Props = {
 }
 
 export default function LoadingScene ({ progress = loadProgress, ready = false }: Props) {
+  const { t } = useLocale()
   const canvas = useRef<HTMLCanvasElement>(null)
   const target = useRef(0)
   const [percent, setPercent] = useState(0)
@@ -113,7 +115,7 @@ export default function LoadingScene ({ progress = loadProgress, ready = false }
       <View style={styles.label}>
         {ready
           ? <ContinuePrompt />
-          : <UIText size={30} color={COLORS.muted}>{`Загрузка ${percent}%`}</UIText>}
+          : <UIText size={30} color={COLORS.muted}>{t.loading(percent)}</UIText>}
       </View>
     </View>
   )

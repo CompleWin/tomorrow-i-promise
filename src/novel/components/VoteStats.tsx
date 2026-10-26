@@ -3,10 +3,9 @@ import { StyleSheet, View } from 'react-native'
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated'
 import { getResults, MIN_VOTES, Results } from '@/novel/vote'
 import EmailForm from '@/novel/components/EmailForm'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { COLORS } from '@/novel/theme'
-
-export const COUNTING = 'Считаем голоса...'
 
 const CELLS = 50
 const COUNT_MS = 1400
@@ -32,20 +31,20 @@ export function useVoteResults (key: string): Results | null | undefined {
   return fetched !== null && fetched.key === key ? fetched.results : undefined
 }
 
-export function resultsMessage (results: Results | null): string | null {
-  if (results === null) {
-    return 'Статистика сейчас недоступна'
-  }
-  return null
+export type VoteMessage = 'counting' | 'unavailable' | 'pending'
+
+export function resultsMessage (results: Results | null): VoteMessage | null {
+  return results === null ? 'unavailable' : null
 }
 
 type Props = {
-  message: string | null
+  message: VoteMessage | null
   results: Results | null
   onCounted?: () => void
 }
 
 export default function VoteStats ({ message, results, onCounted }: Props) {
+  const { t } = useLocale()
   const [progress, setProgress] = useState(0)
   const statsIn = useSharedValue(0)
   const total = results === null ? 0 : results.a + results.b
@@ -99,7 +98,7 @@ export default function VoteStats ({ message, results, onCounted }: Props) {
     <View style={styles.block}>
       {message !== null && (
         <View style={styles.message}>
-          <UIText size={40} color={COLORS.cream2} align={'center'}>{message}</UIText>
+          <UIText size={40} color={COLORS.cream2} align={'center'}>{t.vote[message]}</UIText>
         </View>
       )}
 
@@ -110,14 +109,14 @@ export default function VoteStats ({ message, results, onCounted }: Props) {
           <View style={styles.numbers}>
             <View style={styles.side}>
               <UIText size={96} color={COLORS.cream}>{Math.round(percentA * progress)}%</UIText>
-              <UIText size={28} spacing={0.06} color={COLORS.sub}>сохранить беременность</UIText>
+              <UIText size={28} spacing={0.06} color={COLORS.sub}>{t.vote.scale.A}</UIText>
             </View>
             <UIText size={26} color={COLORS.muted} style={styles.total}>
-              Всего голосов — {total.toLocaleString('ru-RU')}
+              {t.vote.total(total)}
             </UIText>
             <View style={[styles.side, styles.sideRight]}>
               <UIText size={96} color={COLORS.cream}>{Math.round(percentB * progress)}%</UIText>
-              <UIText size={28} spacing={0.06} color={COLORS.sub}>прервать беременность</UIText>
+              <UIText size={28} spacing={0.06} color={COLORS.sub}>{t.vote.scale.B}</UIText>
             </View>
           </View>
 

@@ -5,29 +5,31 @@ import { cachedVersion } from '@/novel/content'
 import sleep from '@/novel/sleep'
 import useTapKeys from '@/novel/useTapKeys'
 import { Completed, loadCompleted, loadSave } from '@/novel/storage'
-import { LABELS } from '@/novel/vote'
 import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
+import { useLocale } from '@/novel/components/Locale'
 import { Stage } from '@/novel/components/Stage'
 import UIText from '@/novel/components/UIText'
-import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
+import VoteStats, { resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
+import type { Lang } from '@/novel/i18n'
 
 type Info = {
   completed: Completed | null
   version: string | null
 }
 
-async function loadInfo (): Promise<Info> {
+async function loadInfo (lang: Lang): Promise<Info> {
   const [save, completed] = await Promise.all([loadSave(), loadCompleted()])
   return {
     completed,
-    version: save?.contentVersion ?? await cachedVersion(),
+    version: save?.contentVersion ?? await cachedVersion(lang),
   }
 }
 
 export default function Stats () {
   const fade = useFade()
+  const { lang, t } = useLocale()
   const [info, setInfo] = useState<Info | null>(null)
   const [statusOn, setStatusOn] = useState(false)
   const [held, setHeld] = useState(false)
@@ -37,7 +39,7 @@ export default function Stats () {
 
   useEffect(() => {
     let cancelled = false
-    loadInfo().then(data => {
+    loadInfo(lang).then(data => {
       if (!cancelled) {
         setInfo(data)
       }
@@ -60,11 +62,11 @@ export default function Stats () {
 
     intro()
     return () => { cancelled = true }
-  }, [fade])
+  }, [fade, lang])
 
-  const message = !held || results === undefined ? COUNTING : resultsMessage(results)
+  const message = !held || results === undefined ? 'counting' : resultsMessage(results)
   const showStats = statusOn && message === null
-  const settled = showStats ? counted : statusOn && message !== COUNTING
+  const settled = showStats ? counted : statusOn && message !== 'counting'
 
   async function leave () {
     if (leaving.current) {
@@ -111,9 +113,9 @@ export default function Stats () {
           />
 
           <View style={[styles.answer, choice === undefined && styles.hidden]}>
-            <UIText size={34} spacing={0.06} color={COLORS.lamp}>Вы выбрали</UIText>
+            <UIText size={34} spacing={0.06} color={COLORS.lamp}>{t.vote.chosen}</UIText>
             <UIText size={56} lineHeight={1.3} color={COLORS.cream} shadow>
-              {choice === undefined ? ' ' : LABELS[choice]}
+              {choice === undefined ? ' ' : t.vote.labels[choice]}
             </UIText>
           </View>
         </View>

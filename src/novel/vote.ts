@@ -16,11 +16,6 @@ export type Results = {
   b: number
 }
 
-export const LABELS: Record<Choice, string> = {
-  A: 'Сохранить беременность',
-  B: 'Прервать беременность',
-}
-
 export const MIN_VOTES = 12
 
 export const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/

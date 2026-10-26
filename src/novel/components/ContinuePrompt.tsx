@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE } from '@/novel/theme'
 
 const BLINK_MS = 800
 
 export default function ContinuePrompt () {
+  const { t } = useLocale()
   const blink = useSharedValue(1)
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export default function ContinuePrompt () {
 
   return (
     <Animated.View style={blinkStyle}>
-      <UIText size={30} color={COLORS.cream}>Нажмите, чтобы продолжить</UIText>
+      <UIText size={30} color={COLORS.cream}>{t.tapToContinue}</UIText>
     </Animated.View>
   )
 }

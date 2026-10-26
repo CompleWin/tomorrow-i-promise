@@ -5,6 +5,7 @@ import sleep from '@/novel/sleep'
 import useTapKeys from '@/novel/useTapKeys'
 import { useFade } from '@/novel/components/Fade'
 import GitHubStar from '@/novel/components/GitHubStar'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { COLORS, EASE } from '@/novel/theme'
 
@@ -13,6 +14,7 @@ type Props = {
 }
 
 export default function Thanks ({ onDone }: Props) {
+  const { t } = useLocale()
   const fade = useFade()
   const enter = useSharedValue(0)
   const out = useSharedValue(0)
@@ -48,7 +50,7 @@ export default function Thanks ({ onDone }: Props) {
   return (
     <Pressable onPress={leave} style={styles.screen}>
       <Animated.View pointerEvents={'box-none'} style={[styles.column, columnStyle]}>
-        <UIText size={60} lineHeight={1.3} color={COLORS.cream} shadow>Спасибо за игру!</UIText>
+        <UIText size={60} lineHeight={1.3} color={COLORS.cream} shadow>{t.thanks}</UIText>
         <GitHubStar />
       </Animated.View>
     </Pressable>

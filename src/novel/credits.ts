@@ -1,7 +1,7 @@
 export const AUTHORS = [
-  { name: 'Ивахненко Николай', handle: '@complewin' },
-  { name: 'Макарова Елизавета', handle: '@displiceat' },
-]
+  { handle: '@nikolayivakhnenko' },
+  { handle: '@displiceat' },
+] as const
 
 export const MENU_MUSIC_CREDIT = { author: 'Gregor Quendel', title: 'Ambient Pad VII' }
 

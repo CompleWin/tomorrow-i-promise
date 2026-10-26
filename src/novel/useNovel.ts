@@ -4,6 +4,7 @@ import { clearSave, loadSave, VoteStatus, writeSave } from '@/novel/storage'
 import { actReady, enterAct, fetchManifest, getStory, loadAct, preloadStory } from '@/novel/content'
 import { AppState } from 'react-native'
 import { Choice, submitVote } from '@/novel/vote'
+import type { Lang } from '@/novel/i18n'
 
 export type Line = {
   lineId: number
@@ -48,6 +49,8 @@ type Vote = {
   voteStatus: VoteStatus
 }
 
+export type Notice = 'storyUpdated' | 'saveBroken'
+
 const NO_VOTE: Vote = {
   finalChoice: null,
   voteStatus: 'none',
@@ -79,8 +82,9 @@ function tagValues (tags: string[] | null, key: string): string[] {
   })
 }
 
-export default function useNovel (startAct?: string) {
+export default function useNovel (lang: Lang, startAct?: string) {
   const storyRef = useRef<Story | null>(null)
+  const prevRef = useRef<string | null>(null)
   const bgRef = useRef<string | null>(null)
   const darkRef = useRef(false)
   const actRef = useRef<number | null>(null)
@@ -94,7 +98,7 @@ export default function useNovel (startAct?: string) {
   const [loading, setLoading] = useState(true)
   const [waiting, setWaiting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
+  const [notice, setNotice] = useState<Notice | null>(null)
   const [version, setVersion] = useState<string | null>(null)
 
   const [updateAvailable, setUpdateAvailable] = useState(false)
@@ -134,8 +138,10 @@ export default function useNovel (startAct?: string) {
       act: actRef.current,
       music: musicRef.current,
       loops: loopsRef.current,
+      lang: lang,
+      prevInkState: prevRef.current,
     })
-  }, [])
+  }, [lang])
 
   const show = useCallback((story: Story, resumed = false): Line => {
     const text = (story.currentText ?? '').trim()
@@ -215,6 +221,7 @@ export default function useNovel (startAct?: string) {
     }
 
     if (story.canContinue) {
+      prevRef.current = story.state.ToJson()
       story.Continue()
     }
 
@@ -241,7 +248,7 @@ export default function useNovel (startAct?: string) {
 
     async function load () {
       try {
-        const loaded = await getStory()
+        const loaded = await getStory(lang)
         if (cancelled) {
           return
         }
@@ -267,12 +274,19 @@ export default function useNovel (startAct?: string) {
         actRef.current = null
         musicRef.current = null
         loopsRef.current = []
+        prevRef.current = null
         waitingRef.current = false
         setWaiting(false)
 
         if (save) {
           try {
-            storyRef.current.state.LoadJson(save.inkState)
+            if (save.lang !== lang && save.prevInkState !== null) {
+              storyRef.current.state.LoadJson(save.prevInkState)
+              storyRef.current.Continue()
+            } else {
+              storyRef.current.state.LoadJson(save.inkState)
+            }
+            prevRef.current = save.prevInkState
             bgRef.current = save.currentBg
             darkRef.current = save.dark
             actRef.current = save.act
@@ -293,12 +307,9 @@ export default function useNovel (startAct?: string) {
             actRef.current = null
             musicRef.current = null
             loopsRef.current = []
+            prevRef.current = null
 
-            if (save.contentVersion !== loaded.version) {
-              setNotice('История обновилась, начинаем сначала')
-            } else {
-              setNotice('Сохранение повреждено, начинаем сначала')
-            }
+            setNotice(save.contentVersion !== loaded.version ? 'storyUpdated' : 'saveBroken')
           }
         }
 
@@ -320,7 +331,7 @@ export default function useNovel (startAct?: string) {
 
     load()
     return () => { cancelled = true }
-  }, [step, show, reloadKey, startAct])
+  }, [step, show, reloadKey, startAct, lang])
 
   useEffect(() => {
     const { finalChoice, voteStatus } = vote

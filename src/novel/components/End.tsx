@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
 import { Pressable, StyleSheet, View } from 'react-native'
-import { Choice, LABELS } from '@/novel/vote'
+import type { Choice } from '@/novel/vote'
 import { VoteStatus } from '@/novel/storage'
 import useTypewriter from '@/novel/useTypewriter'
 import sleep from '@/novel/sleep'
 import useTapKeys from '@/novel/useTapKeys'
 import { useFade } from '@/novel/components/Fade'
+import { useLocale } from '@/novel/components/Locale'
 import TypedText from '@/novel/components/TypedText'
 import UIText from '@/novel/components/UIText'
-import VoteStats, { COUNTING, resultsMessage, useVoteResults } from '@/novel/components/VoteStats'
+import VoteStats, { resultsMessage, useVoteResults, VoteMessage } from '@/novel/components/VoteStats'
 import { COLORS } from '@/novel/theme'
 
 type Props = {
@@ -19,13 +20,14 @@ type Props = {
 
 export default function End ({ finalChoice, voteStatus, onExit }: Props) {
   const fade = useFade()
+  const { t } = useLocale()
   const [typingOn, setTypingOn] = useState(false)
   const [statusOn, setStatusOn] = useState(false)
   const [held, setHeld] = useState(false)
   const [counted, setCounted] = useState(false)
   const exiting = useRef(false)
 
-  const answer = finalChoice === null ? '' : LABELS[finalChoice]
+  const answer = finalChoice === null ? '' : t.vote.labels[finalChoice]
   const typing = useTypewriter(answer, { key: 1, paused: !typingOn })
 
   useEffect(() => {
@@ -61,16 +63,16 @@ export default function End ({ finalChoice, voteStatus, onExit }: Props) {
 
   const results = useVoteResults(voteStatus)
 
-  let message: string | null
+  let message: VoteMessage | null
   if (voteStatus === 'pending') {
-    message = 'Голос будет учтён, когда появится связь'
+    message = 'pending'
   } else if (!held || results === undefined) {
-    message = COUNTING
+    message = 'counting'
   } else {
     message = resultsMessage(results)
   }
   const showStats = statusOn && message === null
-  const settled = showStats ? counted : statusOn && message !== COUNTING
+  const settled = showStats ? counted : statusOn && message !== 'counting'
 
   const tap = () => {
     if (!settled || exiting.current) {
@@ -92,7 +94,7 @@ export default function End ({ finalChoice, voteStatus, onExit }: Props) {
 
         <View style={styles.answer}>
           <UIText size={34} spacing={0.06} color={COLORS.lamp} style={!typingOn && styles.hidden}>
-            Вы выбрали
+            {t.vote.chosen}
           </UIText>
           <UIText size={56} lineHeight={1.3} color={COLORS.cream} shadow>
             <TypedText text={answer} shown={typing.shown} />
