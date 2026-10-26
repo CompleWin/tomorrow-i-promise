@@ -46,4 +46,5 @@ example
 .claude
 
 public/content/story.json
+public/content/story.*.json
 public/content/manifest.json

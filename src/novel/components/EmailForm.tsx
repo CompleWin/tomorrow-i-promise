@@ -2,16 +2,14 @@ import { useEffect, useState } from 'react'
 import { Pressable, StyleSheet, TextInput, View } from 'react-native'
 import { loadEmailSent, markEmailSent } from '@/novel/storage'
 import { EMAIL_PATTERN, submitEmail } from '@/novel/vote'
+import { useLocale } from '@/novel/components/Locale'
 import UIText from '@/novel/components/UIText'
 import { COLORS, FONT } from '@/novel/theme'
-
-const INTRO = 'Пока сыграло слишком мало игроков, чтобы показать, как выбрали другие. ' +
-  'Оставьте почту, и мы напишем, когда соберём статистику.'
-const THANKS = 'Спасибо! Напишем, как только соберём статистику.'
 
 type Status = 'idle' | 'sending' | 'invalid' | 'failed' | 'sent'
 
 export default function EmailForm () {
+  const { t } = useLocale()
   const [sent, setSent] = useState<boolean | null>(null)
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<Status>('idle')
@@ -55,21 +53,21 @@ export default function EmailForm () {
   if (sent) {
     return (
       <View style={styles.form}>
-        <UIText size={40} lineHeight={1.35} color={COLORS.cream2} align={'center'}>{THANKS}</UIText>
+        <UIText size={40} lineHeight={1.35} color={COLORS.cream2} align={'center'}>{t.email.thanks}</UIText>
       </View>
     )
   }
 
   let note = ' '
   if (status === 'invalid') {
-    note = 'Проверьте адрес почты'
+    note = t.email.invalid
   } else if (status === 'failed') {
-    note = 'Не получилось отправить, попробуйте ещё раз'
+    note = t.email.failed
   }
 
   return (
     <Pressable onPress={() => {}} focusable={false} style={styles.form}>
-      <UIText size={34} lineHeight={1.35} color={COLORS.cream2} align={'center'}>{INTRO}</UIText>
+      <UIText size={34} lineHeight={1.35} color={COLORS.cream2} align={'center'}>{t.email.intro}</UIText>
 
       <View style={styles.row}>
         <TextInput value={email}
@@ -97,7 +95,7 @@ export default function EmailForm () {
         >
           {({ pressed }) => (
             <UIText size={34} color={hovered || pressed ? COLORS.lamp : COLORS.cream2}>
-              {status === 'sending' ? 'Отправляем...' : 'Отправить'}
+              {status === 'sending' ? t.email.sending : t.email.send}
             </UIText>
           )}
         </Pressable>

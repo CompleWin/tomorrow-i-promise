@@ -1,26 +1,34 @@
 import { Compiler } from 'inkjs/compiler/Compiler'
 import fs from 'node:fs'
 import crypto from 'node:crypto'
+import * as fontkit from 'fontkit'
+import { LANGUAGES, localePath, parse, readSource, readTable, SOURCE, translate } from './locale.mjs'
 
-const BOM = /^\uFEFF/
 const ASSETS_DIR = 'public/content/assets'
+const CONTENT_DIR = 'public/content'
+const FONT = 'assets/fonts/Galmuri11.ttf'
+const I18N_DIR = 'src/novel/i18n'
 
-const textFile = fs.readFileSync('story/main.ink', 'utf8')
-const text = textFile.replace(BOM, '')
+const text = readSource()
 
-const compiler = new Compiler(text)
-
-let story
-try {
-  story = compiler.Compile()
-} catch (error) {
-  console.error(compiler.errors)
-  process.exit(1)
+function compile (ink, code) {
+  const compiler = new Compiler(ink)
+  let story
+  try {
+    story = compiler.Compile()
+  } catch (error) {
+    console.error(`${code}:`, compiler.errors.length > 0 ? compiler.errors : error)
+    process.exit(1)
+  }
+  if (compiler.warnings.length > 0) {
+    console.error(`${code}:`, compiler.warnings)
+    process.exit(1)
+  }
+  return story.ToJson()
 }
 
-if (compiler.warnings.length > 0) {
-  console.error(compiler.warnings)
-  process.exit(1)
+function report (title, entries) {
+  return [`${title}:`, ...entries.map(entry => `  ${entry}`)].join('\n')
 }
 
 const backgrounds = [...text.matchAll(/#\s*bg:\s*([^#\n]+)/g)].flatMap(bg => bg[1].trim().split(/\s+/))
@@ -92,11 +100,55 @@ for (const path of menuFiles) {
   }
 }
 
-const json = story.ToJson()
-fs.writeFileSync('public/content/story.json', json)
+const font = fontkit.openSync(FONT)
+const fontTexts = [
+  ['story/main.ink', text],
+  ...LANGUAGES.filter(({ code }) => code !== SOURCE).map(({ code }) => [localePath(code), fs.readFileSync(localePath(code), 'utf8')]),
+  ...fs.readdirSync(I18N_DIR).map(name => [`${I18N_DIR}/${name}`, fs.readFileSync(`${I18N_DIR}/${name}`, 'utf8')]),
+]
+for (const [path, content] of fontTexts) {
+  const missing = [...new Set(content.replace(/\s/g, ''))]
+    .filter(char => !font.hasGlyphForCodePoint(char.codePointAt(0)))
+  if (missing.length > 0) {
+    console.error(`${FONT} has no glyphs for ${missing.map(char => `«${char}» U+${char.codePointAt(0).toString(16).toUpperCase()}`).join(', ')} (${path})`)
+    process.exit(1)
+  }
+}
 
+let items
+try {
+  items = parse(text)
+} catch (error) {
+  console.error(error.message)
+  process.exit(1)
+}
+
+const stories = {}
 const hash = crypto.createHash('sha256')
-hash.update(json)
+
+for (const { code } of LANGUAGES) {
+  let ink = text
+  if (code !== SOURCE) {
+    const result = translate(items, readTable(code))
+    if (result.unused.length > 0) {
+      console.warn(report(`${localePath(code)}: keys not in the story`, result.unused))
+    }
+    if (result.invalid.length > 0) {
+      console.error(report(`${localePath(code)}: ink syntax in translation`, result.invalid))
+      process.exit(1)
+    }
+    if (result.missing.length > 0) {
+      console.error(report(`${localePath(code)}: no translation (npm run locale -- ${code})`, result.missing))
+      process.exit(1)
+    }
+    ink = result.ink
+  }
+  const file = code === SOURCE ? 'story.json' : `story.${code}.json`
+  const json = compile(ink, code)
+  fs.writeFileSync(`${CONTENT_DIR}/${file}`, json)
+  stories[code] = file
+  hash.update(json)
+}
 
 const assetFiles = fs.readdirSync(ASSETS_DIR, { recursive: true })
   .map(name => name.replaceAll('\\', '/'))
@@ -112,13 +164,14 @@ const version = hash.digest('hex').slice(0, 8)
 
 const manifestJson = {
   'version': version,
-  'story': 'story.json',
+  'story': stories[SOURCE],
+  'stories': stories,
 }
 
-fs.writeFileSync('public/content/manifest.json',
+fs.writeFileSync(`${CONTENT_DIR}/manifest.json`,
   JSON.stringify(manifestJson, null, 2), 'utf8')
 
-console.log(`story built, version: ${version}`)
+console.log(`story built (${Object.keys(stories).join(', ')}), version: ${version}`)
 
 
 

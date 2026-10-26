@@ -1,12 +1,14 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Story } from 'inkjs'
 import { assetUrl, CONTENT_URL } from '@/novel/config'
+import { Lang, SOURCE_LANG } from '@/novel/i18n'
 import { fetchAssets, keepDecoded, loadAssets, loadedShare, loadMusic } from '@/novel/preload'
 import { preloadSounds } from '@/novel/sound'
 
 export type Manifest = {
   version: string
   story: string
+  stories?: Record<string, string>
 }
 type CachedStory = {
   version: string
@@ -17,9 +19,24 @@ export type LoadedStory = CachedStory & { offline: boolean }
 const STORY_KEY = 'tomorrow-i-promise.story'
 const TIMEOUT_MS = 8 * 1000
 
-async function readCache (): Promise<CachedStory | null> {
+export class NoStoryError extends Error {
+  constructor () {
+    super('no connection and no cached story')
+    this.name = 'NoStoryError'
+  }
+}
+
+function storyKey (lang: Lang): string {
+  return lang === SOURCE_LANG ? STORY_KEY : `${STORY_KEY}.${lang}`
+}
+
+function storyFile (manifest: Manifest, lang: Lang): string {
+  return manifest.stories?.[lang] ?? manifest.story
+}
+
+async function readCache (lang: Lang): Promise<CachedStory | null> {
   try {
-    const cache = await AsyncStorage.getItem(STORY_KEY)
+    const cache = await AsyncStorage.getItem(storyKey(lang))
 
     if (cache === null) {
       return null
@@ -37,14 +54,14 @@ async function readCache (): Promise<CachedStory | null> {
   }
 }
 
-export async function cachedVersion (): Promise<string | null> {
-  const cached = await readCache()
+export async function cachedVersion (lang: Lang): Promise<string | null> {
+  const cached = await readCache(lang) ?? await readCache(SOURCE_LANG)
   return cached?.version ?? null
 }
 
-async function writeCache(cache: CachedStory): Promise<void> {
+async function writeCache(lang: Lang, cache: CachedStory): Promise<void> {
   try {
-    await AsyncStorage.setItem(STORY_KEY, JSON.stringify(cache))
+    await AsyncStorage.setItem(storyKey(lang), JSON.stringify(cache))
   } catch (error) {
     console.warn('failed to write cache', error)
   }
@@ -72,11 +89,14 @@ export async function fetchManifest (): Promise<Manifest> {
   if (typeof data.version !== 'string' || typeof data.story !== 'string') {
     throw new Error(`Missing version or story in manifest.json: ${data}`)
   }
-  return data as Manifest
+  const stories = typeof data.stories === 'object' && data.stories !== null
+    ? Object.fromEntries(Object.entries(data.stories).filter(([, file]) => typeof file === 'string'))
+    : undefined
+  return { version: data.version, story: data.story, stories } as Manifest
 }
 
-export async function getStory (): Promise<LoadedStory> {
-  const cached = await readCache()
+export async function getStory (lang: Lang): Promise<LoadedStory> {
+  const cached = await readCache(lang)
 
   let manifest: Manifest
   try {
@@ -86,7 +106,7 @@ export async function getStory (): Promise<LoadedStory> {
     if (cached) {
       return { ...cached, offline: true }
     }
-    throw new Error('Нет соединения, а сохраненной истории еще нет')
+    throw new NoStoryError()
   }
 
   if (cached?.version === manifest.version) {
@@ -94,7 +114,7 @@ export async function getStory (): Promise<LoadedStory> {
   }
   
   try {
-    const res = await fetchWithTimeout(`${CONTENT_URL}/${manifest.story}?v=${manifest.version}`)
+    const res = await fetchWithTimeout(`${CONTENT_URL}/${storyFile(manifest, lang)}?v=${manifest.version}`)
 
     if (!res.ok) {
       throw new Error(`HTTP Error ${res.status}`)
@@ -104,7 +124,7 @@ export async function getStory (): Promise<LoadedStory> {
 
     new Story(json)
 
-    await writeCache({ version: manifest.version, json })
+    await writeCache(lang, { version: manifest.version, json })
 
     return { version: manifest.version, json, offline: false}
   } catch (error) {
@@ -256,9 +276,9 @@ export function preloadStory (json: string, version: string, act: number, curren
   return preloading.promise
 }
 
-export async function warmStory (act: number, currentBg: string | null): Promise<void> {
+export async function warmStory (lang: Lang, act: number, currentBg: string | null): Promise<void> {
   try {
-    const loaded = await getStory()
+    const loaded = await getStory(lang)
     await preloadStory(loaded.json, loaded.version, act, currentBg)
   } catch (error) {
     console.warn('warm up failed', error)

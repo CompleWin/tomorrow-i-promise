@@ -17,6 +17,7 @@ import Credits from '@/novel/components/Credits'
 import End from '@/novel/components/End'
 import EndingBackdrop from '@/novel/components/EndingBackdrop'
 import { useFade } from '@/novel/components/Fade'
+import { useLocale } from '@/novel/components/Locale'
 import LoadingBar from '@/novel/components/LoadingBar'
 import MenuItem from '@/novel/components/MenuItem'
 import PauseButton from '@/novel/components/PauseButton'
@@ -43,7 +44,8 @@ const SHAKE = {
 
 export default function Play () {
   const { act } = useLocalSearchParams<{ act?: string }>()
-  const novel = useNovel(__DEV__ ? act : undefined)
+  const { lang, t } = useLocale()
+  const novel = useNovel(lang, __DEV__ ? act : undefined)
   const reload = novel.reload
   const fade = useFade()
   const banner = useBanner()
@@ -244,23 +246,23 @@ export default function Play () {
     if (novel.notice === null || novel.loading) {
       return
     }
-    const id = banner.show(novel.notice, { duration: 3200 })
+    const id = banner.show(t.play[novel.notice], { duration: 3200 })
     return () => banner.hide(id)
-  }, [novel.notice, novel.loading, banner])
+  }, [novel.notice, novel.loading, banner, t])
 
   useEffect(() => {
     if (!novel.updateAvailable) {
       return
     }
-    const id = banner.show('Доступна новая версия истории', {
-      action: 'Обновить',
+    const id = banner.show(t.play.update, {
+      action: t.play.updateAction,
       onPress: () => {
         setPaused(false)
         setUpdating(true)
       },
     })
     return () => banner.hide(id)
-  }, [novel.updateAvailable, banner])
+  }, [novel.updateAvailable, banner, t])
 
   useEffect(() => {
     if (!updating) {
@@ -387,9 +389,9 @@ export default function Play () {
     return (
       <Stage>
         <View style={styles.status}>
-          <UIText size={30} color={COLORS.muted}>Не удалось загрузить историю</UIText>
-          <MenuItem label={'Повторить'} onPress={novel.reload} style={styles.retry} />
-          <MenuItem label={'В меню'} onPress={toMenu} />
+          <UIText size={30} color={COLORS.muted}>{t.play.loadFailed}</UIText>
+          <MenuItem label={t.play.retry} onPress={novel.reload} style={styles.retry} />
+          <MenuItem label={t.play.menu} onPress={toMenu} />
         </View>
       </Stage>
     )

@@ -41,7 +41,7 @@ jobs:
           EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
           EXPO_PUBLIC_FIREBASE_APP_ID: ${{ vars.EXPO_PUBLIC_FIREBASE_APP_ID }}
 
-      - run: cp dist/+not-found.html dist/404.html && rm dist/_sitemap.html
+      - run: cp dist/+not-found.html dist/404.html && rm dist/_sitemap.html 'dist/[lang].html'
 
       - uses: actions/upload-pages-artifact@v5
         with:

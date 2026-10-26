@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { isLang, Lang, SOURCE_LANG } from '@/novel/i18n'
 
 export type VoteStatus = 'none' | 'pending' | 'sent'
 
@@ -13,6 +14,8 @@ export type SaveData = {
   act: number | null
   music: string | null
   loops: string[]
+  lang: Lang
+  prevInkState: string | null
 }
 
 export type Completed = {
@@ -58,6 +61,8 @@ export async function loadSave() : Promise<SaveData | null> {
       act: typeof saveData.act === 'number' ? saveData.act : null,
       music: typeof saveData.music === 'string' ? saveData.music : null,
       loops: Array.isArray(saveData.loops) ? saveData.loops.filter((loop: unknown) => typeof loop === 'string') : [],
+      lang: isLang(saveData.lang) ? saveData.lang : SOURCE_LANG,
+      prevInkState: typeof saveData.prevInkState === 'string' ? saveData.prevInkState : null,
     } as SaveData
   } catch (error) {
     console.warn('loadSave failed', error)
